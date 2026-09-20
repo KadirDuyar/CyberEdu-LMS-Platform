@@ -355,8 +355,10 @@ export default function CourseList() {
 
         {/* Toast Bildirimi */}
         {toast && (
-          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-2xl transition-all duration-300 animate-slide-up bg-slate-900/95 border-amber-500/50 text-amber-300 text-sm font-medium">
-            <AlertCircle size={18} className="shrink-0 text-amber-400" />
+          <div className={`fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-2xl transition-all duration-300 animate-slide-up bg-slate-900/95 text-sm font-medium ${
+            toast.type === 'warning' ? 'border-amber-500/50 text-amber-300' : 'border-emerald-500/50 text-emerald-300'
+          }`}>
+            <AlertCircle size={18} className={`shrink-0 ${toast.type === 'warning' ? 'text-amber-400' : 'text-emerald-400'}`} />
             <span>{toast.message}</span>
           </div>
         )}

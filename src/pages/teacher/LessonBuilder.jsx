@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getLessonForBuilder, saveLessonData } from '../../services/teacherService';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import {
-  Save, ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown, CheckSquare, Square, RotateCcw, Sparkles
+  Save, ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown, CheckSquare, Square, RotateCcw, Sparkles, AlertCircle
 } from 'lucide-react';
 import Card from '../../components/Card';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -39,6 +39,12 @@ export default function LessonBuilder() {
   const [blockAiModal, setBlockAiModal] = useState({ isOpen: false, idx: null, blockType: null });
   const [quickAddAiModal, setQuickAddAiModal] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   // Bloklar değiştikçe toplam XP'yi otomatik hesaplama
   useEffect(() => {
@@ -65,7 +71,7 @@ export default function LessonBuilder() {
 
   const saveLesson = async () => {
     if (!lessonTitle.trim()) {
-      alert('Ders başlığı boş olamaz!');
+      showToast('Ders başlığı boş olamaz!', 'error');
       return;
     }
 
@@ -97,9 +103,9 @@ export default function LessonBuilder() {
     setSaving(false);
 
     if (error) {
-      alert('Ders kaydedilemedi: ' + error.message);
+      showToast('Ders kaydedilemedi: ' + error.message, 'error');
     } else {
-      alert('Ders başarıyla kaydedildi!');
+      showToast('Ders başarıyla kaydedildi!');
       if (lessonId === 'new') {
         navigate(`/teacher/courses/${courseId}/edit`);
       }
@@ -191,7 +197,7 @@ export default function LessonBuilder() {
       setBlocks(newBlocks);
       setBlockAiModal({ isOpen: false, idx: null, blockType: null });
     } catch (err) {
-      alert("Yapay Zeka ile içerik üretilirken hata oluştu: " + err.message);
+      showToast("Yapay Zeka ile içerik üretilirken hata oluştu: " + err.message, "error");
     } finally {
       setGeneratingIdx(null);
       setAiGenerating(false);
@@ -230,7 +236,7 @@ export default function LessonBuilder() {
       setBlocks([...blocks, newBlock]);
       setQuickAddAiModal(false);
     } catch (err) {
-      alert("Yapay Zeka ile etkinlik eklenemedi: " + err.message);
+      showToast("Yapay Zeka ile etkinlik eklenemedi: " + err.message, "error");
     } finally {
       setAiGenerating(false);
     }
@@ -462,7 +468,7 @@ export default function LessonBuilder() {
                               />
                               <button
                                 onClick={() => {
-                                  if (block.options.length <= 2) return alert('En az 2 şık olmalıdır.');
+                                  if (block.options.length <= 2) return showToast('En az 2 şık olmalıdır.', 'warning');
                                   const newOpts = block.options.filter((_, i) => i !== oIdx);
                                   updateBlock(idx, 'options', newOpts);
                                   if (block.correct_answer === opt) updateBlock(idx, 'correct_answer', newOpts[0] || '');
@@ -786,6 +792,15 @@ export default function LessonBuilder() {
         ]}
         loading={aiGenerating}
       />
+      {/* Toast Bildirimi */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-2xl transition-all duration-300 animate-slide-up bg-slate-900/95 text-sm font-medium ${
+          toast.type === 'error' ? 'border-rose-500/50 text-rose-300' : 'border-emerald-500/50 text-emerald-300'
+        }`}>
+          <AlertCircle size={18} className={`shrink-0 ${toast.type === 'error' ? 'text-rose-400' : 'text-emerald-400'}`} />
+          <span>{toast.message}</span>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

@@ -6,7 +6,7 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import EmptyState from '../../components/ui/EmptyState';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import Card from '../../components/Card';
-import { Plus, BookOpen, Edit, Eye, Shield, Code2, Trash2, Wand2 } from 'lucide-react';
+import { Plus, BookOpen, Edit, Eye, Shield, Code2, Trash2, Wand2, AlertCircle } from 'lucide-react';
 
 export default function TeacherCourses() {
   const { user } = useAuth();
@@ -14,6 +14,12 @@ export default function TeacherCourses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   useEffect(() => {
     loadCourses();
@@ -38,8 +44,9 @@ export default function TeacherCourses() {
     setSeeding(false);
     
     if (error) {
-      alert('Hata: ' + error.message);
+      showToast('Hata: ' + error.message, 'error');
     } else {
+      showToast('Şablon kurslar başarıyla eklendi!');
       loadCourses();
     }
   };
@@ -47,8 +54,11 @@ export default function TeacherCourses() {
   const handleDelete = async (courseId, courseTitle) => {
     if (window.confirm(`"${courseTitle}" kursunu silmek istediğinize emin misiniz?`)) {
       const { error } = await deleteCourse(courseId);
-      if (error) alert('Hata: ' + error.message);
-      else loadCourses();
+      if (error) showToast('Hata: ' + error.message, 'error');
+      else {
+        showToast('Kurs silindi.');
+        loadCourses();
+      }
     }
   };
 
@@ -148,6 +158,15 @@ export default function TeacherCourses() {
         )}
 
       </div>
+      {/* Toast Bildirimi */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-2xl transition-all duration-300 animate-slide-up bg-slate-900/95 text-sm font-medium ${
+          toast.type === 'error' ? 'border-rose-500/50 text-rose-300' : 'border-emerald-500/50 text-emerald-300'
+        }`}>
+          <AlertCircle size={18} className={`shrink-0 ${toast.type === 'error' ? 'text-rose-400' : 'text-emerald-400'}`} />
+          <span>{toast.message}</span>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
