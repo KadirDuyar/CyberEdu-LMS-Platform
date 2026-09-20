@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
@@ -15,12 +15,13 @@ export default function StudentDashboard() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
-  const [leaderboard, setLeaderboard] = useState([]);
   const [completedLessonIds, setCompletedLessonIds] = useState(new Set());
+  const [leaderboard, setLeaderboard] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [activeCourse, setActiveCourse] = useState(null);
   const [isCourseFinished, setIsCourseFinished] = useState(false);
   const [activeLesson, setActiveLesson] = useState(null);
+  const initialLoadDone = useRef(false);
 
   useEffect(() => {
     if (profile && !profile.onboarding_completed) {
@@ -28,12 +29,16 @@ export default function StudentDashboard() {
       return;
     }
     if (user && profile) {
-      loadDashboardData();
+      const isInitial = !initialLoadDone.current;
+      initialLoadDone.current = true;
+      loadDashboardData(isInitial);
     }
-  }, [profile, user]);
+  }, [profile?.onboarding_completed, profile?.learning_area, profile?.xp, profile?.level, user?.id]);
 
-  async function loadDashboardData() {
-    setLoading(true);
+  async function loadDashboardData(isInitial = false) {
+    if (isInitial || !activeCourse) {
+      setLoading(true);
+    }
     try {
       // 1. Canlı Liderlik Tablosu
       const { data: board } = await supabase
@@ -76,58 +81,100 @@ export default function StudentDashboard() {
       );
 
       if (allCourses && allCourses.length > 0) {
-        // Eğer hiçbir kursa kayıtlı değilse, ilk zorunlu kursa otomatik kaydet
-        if (enrolledIds.size === 0) {
-          const firstCourse = allCourses[0];
-          await supabase.from('enrollments').upsert({
-            user_id: user.id,
-            course_id: firstCourse.id,
-            status: 'active',
-          }, { onConflict: 'user_id,course_id' });
-          enrolledIds.add(firstCourse.id);
+        // Tüm kursları sıralı işle (dersleri ve tamamlanma durumları)
+        const processedCourses = allCourses.map((c, idx) => {
+          const pubLessons = (c.lessons || [])
+            .filter((l) => l.is_published)
+            .sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
+
+          const doneCount = pubLessons.filter((l) => doneIds.has(l.id)).length;
+          const isCompleted = pubLessons.length > 0 && doneCount === pubLessons.length;
+          const isEnrolled = enrolledIds.has(c.id);
+
+          return {
+            ...c,
+            publishedLessons: pubLessons,
+            totalLessons: pubLessons.length,
+            doneCount,
+            isCompleted,
+            isEnrolled,
+            courseOrder: idx,
+          };
+        });
+
+        // AKTİF KURS BELİRLEME MANTIĞI:
+        // 1. En son kalınan kursu localStorage'dan kontrol et
+        const savedLastCourseId = localStorage.getItem(`cyberedu_last_active_course_${user.id}`);
+        let targetCourse = null;
+
+        if (savedLastCourseId) {
+          const found = processedCourses.find((c) => c.id === savedLastCourseId);
+          // Eğer kayıtlı son kurs tamamlanmamışsa öncelikle onu devam ettir
+          if (found && !found.isCompleted) {
+            targetCourse = found;
+          }
         }
 
-        // Kayıtlı kursları işle
-        const processedCourses = allCourses
-          .filter((c) => enrolledIds.has(c.id))
-          .map((c) => {
-            const pubLessons = (c.lessons || [])
-              .filter((l) => l.is_published)
-              .sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
+        // 2. Eğer localStorage'da yoksa veya o kurs bitmişse:
+        // Öğrencinin en son işlem yaptığı (lesson_progress updated_at) kursu bul
+        if (!targetCourse) {
+          try {
+            const { data: latestProgress } = await supabase
+              .from('lesson_progress')
+              .select('lesson_id, updated_at, lessons(course_id)')
+              .eq('user_id', user.id)
+              .order('updated_at', { ascending: false })
+              .limit(1);
 
-            const doneCount = pubLessons.filter((l) => doneIds.has(l.id)).length;
-            const isCompleted = pubLessons.length > 0 && doneCount === pubLessons.length;
+            const lastWorkedCourseId = latestProgress?.[0]?.lessons?.course_id;
+            if (lastWorkedCourseId) {
+              const found = processedCourses.find((c) => c.id === lastWorkedCourseId);
+              if (found && !found.isCompleted) {
+                targetCourse = found;
+              }
+            }
+          } catch (e) {
+            console.error('Son aktivite kontrol hatası:', e);
+          }
+        }
 
-            return {
-              ...c,
-              publishedLessons: pubLessons,
-              totalLessons: pubLessons.length,
-              doneCount,
-              isCompleted,
-            };
-          });
+        // 3. Hala hedef kurs belirlenmediyse:
+        // Müfredattaki İLK TAMAMLANMAMIŞ kursu seç! (Böylece Kurs 1 bitince otomatik Kurs 2 gelir)
+        if (!targetCourse) {
+          targetCourse = processedCourses.find((c) => !c.isCompleted);
+        }
 
-        setEnrolledCourses(processedCourses);
-
-        // Aktif kurs belirleme:
-        // Öncelik: Tamamlanmamış ilk kurs
-        // Eğer hepsi tamamlanmışsa: son tamamlanan kurs seçilir ve isCourseFinished = true olur
-        const ongoingCourse = processedCourses.find((c) => !c.isCompleted);
-
-        if (ongoingCourse) {
-          setActiveCourse(ongoingCourse);
-          setIsCourseFinished(false);
-          const nextLesson = ongoingCourse.publishedLessons.find((l) => !doneIds.has(l.id)) || ongoingCourse.publishedLessons[0];
-          setActiveLesson(nextLesson);
-        } else if (processedCourses.length > 0) {
+        // 4. Eğer tüm kurslar tamamlandıysa:
+        if (!targetCourse) {
           const lastCompleted = processedCourses[processedCourses.length - 1];
           setActiveCourse(lastCompleted);
           setIsCourseFinished(true);
           setActiveLesson(null);
         } else {
-          setActiveCourse(allCourses[0]);
+          // Hedef kursa kaydı yoksa otomatik kaydet
+          if (!targetCourse.isEnrolled) {
+            supabase.from('enrollments').upsert({
+              user_id: user.id,
+              course_id: targetCourse.id,
+              status: 'active',
+            }, { onConflict: 'user_id,course_id' }).catch(() => {});
+            targetCourse.isEnrolled = true;
+            enrolledIds.add(targetCourse.id);
+          }
+
+          setActiveCourse(targetCourse);
           setIsCourseFinished(false);
+
+          // Sıradaki tamamlanmamış dersi bul
+          const nextLesson = targetCourse.publishedLessons.find((l) => !doneIds.has(l.id)) || targetCourse.publishedLessons[0];
+          setActiveLesson(nextLesson);
+
+          // Hafızaya kaydet
+          localStorage.setItem(`cyberedu_last_active_course_${user.id}`, targetCourse.id);
         }
+
+        // Kayıtlı kurslar listesini güncelle (enrolled olanlar ve aktif kurs)
+        setEnrolledCourses(processedCourses.filter((c) => c.isEnrolled || enrolledIds.has(c.id) || c.id === targetCourse?.id));
       }
     } catch (err) {
       console.error('Dashboard yükleme hatası:', err);

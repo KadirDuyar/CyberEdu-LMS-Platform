@@ -40,11 +40,22 @@ export function AuthProvider({ children }) {
 
     // Auth durumu değişikliklerini dinle (login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
+        if (event === 'TOKEN_REFRESHED') {
+          // Token yenilendiğinde kullanıcı oturumu devam ediyor; tüm sayfayı yeniden yüklememek için profile re-fetch yapma
+          if (session?.user) {
+            setUser((prev) => (prev?.id === session.user.id ? prev : session.user));
+          }
+          return;
+        }
+
         if (session?.user) {
-          setUser(session.user);
+          setUser((prev) => (prev?.id === session.user.id ? prev : session.user));
           const prof = await fetchProfile(session.user.id);
-          setProfile(prof);
+          setProfile((prev) => {
+            if (prev && JSON.stringify(prev) === JSON.stringify(prof)) return prev;
+            return prof;
+          });
         } else {
           setUser(null);
           setProfile(null);

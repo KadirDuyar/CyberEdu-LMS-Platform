@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CheckCircle2, XCircle, Play, Pause, RotateCcw, ArrowUp, ArrowDown, Maximize, Minimize } from 'lucide-react';
+import { CheckCircle2, XCircle, Play, Pause, RotateCcw, RotateCw, ArrowUp, ArrowDown, Maximize, Minimize } from 'lucide-react';
 
 const formatAnswer = (ans) => {
   if (ans === undefined || ans === null) return '';
@@ -193,6 +193,8 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isEnded, setIsEnded] = useState(submitted || false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const iframeRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -231,13 +233,74 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
     }
   };
 
+  const postPlayerCommand = (func, args = []) => {
+    if (!iframeRef.current || !iframeRef.current.contentWindow) return;
+    iframeRef.current.contentWindow.postMessage(
+      JSON.stringify({ event: 'command', func, args }),
+      '*'
+    );
+  };
+
   useEffect(() => {
+    let player = null;
+    let timer = null;
+
+    const initYT = () => {
+      if (!window.YT || !window.YT.Player || !iframeRef.current) return;
+      try {
+        player = new window.YT.Player(iframeRef.current, {
+          events: {
+            onReady: (e) => {
+              const dur = e.target.getDuration();
+              if (dur) setDuration(dur);
+            },
+            onStateChange: (e) => {
+              if (e.data === 0) { // ENDED
+                setIsEnded(true);
+                setIsPlaying(false);
+              } else if (e.data === 1) { // PLAYING
+                setIsPlaying(true);
+              } else if (e.data === 2) { // PAUSED
+                setIsPlaying(false);
+              }
+            },
+          },
+        });
+
+        timer = setInterval(() => {
+          if (player && typeof player.getCurrentTime === 'function') {
+            try {
+              const cur = player.getCurrentTime() || 0;
+              const dur = player.getDuration() || 0;
+              setCurrentTime(cur);
+              if (dur > 0) setDuration(dur);
+              if (dur > 0 && cur >= dur - 1) {
+                setIsEnded(true);
+              }
+            } catch (err) {}
+          }
+        }, 500);
+      } catch (err) {
+        // Fallback to window message
+      }
+    };
+
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      window.onYouTubeIframeAPIReady = initYT;
+    } else {
+      initYT();
+    }
+
     const handleMessage = (e) => {
       try {
         if (typeof e.data !== 'string') return;
         const data = JSON.parse(e.data);
         if (data.event === 'onStateChange') {
-          if (data.info === 0) { // ENDED
+          if (data.info === 0) {
             setIsEnded(true);
             setIsPlaying(false);
           } else if (data.info === 1) {
@@ -246,34 +309,52 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
             setIsPlaying(false);
           }
         }
+        if (data.info && typeof data.info.currentTime === 'number') {
+          setCurrentTime(data.info.currentTime);
+        }
+        if (data.info && typeof data.info.duration === 'number') {
+          setDuration(data.info.duration);
+        }
       } catch (err) {}
     };
 
     window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
+    return () => {
+      if (timer) clearInterval(timer);
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [videoId]);
 
   const togglePlay = () => {
-    if (!iframeRef.current) return;
-    const cmd = isPlaying ? 'pauseVideo' : 'playVideo';
-    iframeRef.current.contentWindow.postMessage(
-      JSON.stringify({ event: 'command', func: cmd, args: [] }),
-      '*'
-    );
-    setIsPlaying(!isPlaying);
+    const nextState = !isPlaying;
+    postPlayerCommand(nextState ? 'playVideo' : 'pauseVideo');
+    setIsPlaying(nextState);
+  };
+
+  const seekRelative = (delta) => {
+    const target = Math.max(0, Math.min(duration || 99999, currentTime + delta));
+    postPlayerCommand('seekTo', [target, true]);
+    setCurrentTime(target);
+  };
+
+  const handleSeekChange = (e) => {
+    const newTime = parseFloat(e.target.value);
+    setCurrentTime(newTime);
+    postPlayerCommand('seekTo', [newTime, true]);
   };
 
   const restart = () => {
-    if (!iframeRef.current) return;
-    iframeRef.current.contentWindow.postMessage(
-      JSON.stringify({ event: 'command', func: 'seekTo', args: [0, true] }),
-      '*'
-    );
-    iframeRef.current.contentWindow.postMessage(
-      JSON.stringify({ event: 'command', func: 'playVideo', args: [] }),
-      '*'
-    );
+    postPlayerCommand('seekTo', [0, true]);
+    postPlayerCommand('playVideo');
+    setCurrentTime(0);
     setIsPlaying(true);
+  };
+
+  const formatTime = (sec) => {
+    if (!sec || isNaN(sec)) return '00:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
   // Butonun tıklanabilirlik şartı: Zorunluluk yoksa doğrudan, varsa video bitince
@@ -288,8 +369,8 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
         {videoId ? (
           <iframe
             ref={iframeRef}
-            src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&fs=1`}
-            className="absolute top-0 left-0 w-full h-full pointer-events-none"
+            src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&controls=1&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&fs=1`}
+            className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
             allowFullScreen={true}
             title="Ders Videosu"
@@ -297,35 +378,93 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
         ) : (
           <div className="text-white p-6">Geçersiz YouTube Video Linki</div>
         )}
+      </div>
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4 z-10">
+      {/* Özel CyberEdu Video İlerleme ve Kontrol Çubuğu */}
+      <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 shadow-lg space-y-3">
+        {/* İlerleme Çubuğu & Zaman */}
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-mono font-bold text-violet-400 min-w-[42px] text-right select-none">
+            {formatTime(currentTime)}
+          </span>
+          <div className="relative flex-1 flex items-center">
+            <input
+              type="range"
+              min="0"
+              max={duration || 100}
+              step="1"
+              value={currentTime}
+              onChange={handleSeekChange}
+              className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-violet-500 hover:accent-violet-400 transition-all"
+            />
+          </div>
+          <span className="text-xs font-mono font-bold text-slate-400 min-w-[42px] select-none">
+            {formatTime(duration)}
+          </span>
+        </div>
+
+        {/* Hızlı Kontrol Butonları */}
+        <div className="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-white/5">
           <div className="flex items-center gap-2">
+            {/* -10 Saniye Geri */}
             <button
+              type="button"
+              onClick={() => seekRelative(-10)}
+              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 border border-white/5 hover:border-violet-500/30 cursor-pointer"
+              title="10 Saniye Geri Sar"
+            >
+              <RotateCcw size={14} className="text-violet-400" />
+              <span>-10sn</span>
+            </button>
+
+            {/* Oynat / Durdur */}
+            <button
+              type="button"
               onClick={togglePlay}
-              className="p-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold transition-all flex items-center gap-2 text-xs"
+              className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-violet-600/30 active:scale-95 cursor-pointer"
             >
-              {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-              {isPlaying ? 'Durdur' : 'Oynat'}
+              {isPlaying ? <Pause size={15} /> : <Play size={15} />}
+              <span>{isPlaying ? 'Durdur' : 'Oynat'}</span>
             </button>
+
+            {/* +10 Saniye İleri */}
             <button
+              type="button"
+              onClick={() => seekRelative(10)}
+              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 border border-white/5 hover:border-violet-500/30 cursor-pointer"
+              title="10 Saniye İleri Sar"
+            >
+              <span>+10sn</span>
+              <RotateCw size={14} className="text-violet-400" />
+            </button>
+
+            {/* Başa Sar */}
+            <button
+              type="button"
               onClick={restart}
-              className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
-              title="Başa Sar"
+              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all border border-white/5 cursor-pointer hover:text-white"
+              title="Videoyu Başa Al"
             >
-              <RotateCcw size={16} />
+              <RotateCcw size={15} />
             </button>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <span className="text-[11px] text-slate-400 font-mono px-2.5 py-1 rounded-lg bg-slate-800/80 border border-white/5 hidden sm:inline-block">
+              {isRequireCompletion ? '🎯 İzleme Kontrolü Aktif' : '✨ Serbest İzleme'}
+            </span>
+
+            {/* Tam Ekran */}
             <button
+              type="button"
               onClick={toggleFullscreen}
-              className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors flex items-center gap-1.5 text-xs font-bold"
-              title={isFullscreen ? 'Tam Ekrandan Çık' : 'Tam Ekran'}
+              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all flex items-center gap-1.5 text-xs font-bold border border-white/5 hover:border-violet-500/30 active:scale-95 cursor-pointer"
+              title={isFullscreen ? 'Tam Ekrandan Çık' : 'Tam Ekran Modu'}
             >
-              {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+              {isFullscreen ? <Minimize size={15} className="text-violet-400" /> : <Maximize size={15} className="text-violet-400" />}
               <span className="hidden sm:inline">{isFullscreen ? 'Küçült' : 'Tam Ekran'}</span>
             </button>
           </div>
-          <span className="text-xs text-slate-400 font-mono">
-            {isRequireCompletion ? 'İzleme Kontrolü Aktif' : 'Serbest İzleme'}
-          </span>
         </div>
       </div>
 

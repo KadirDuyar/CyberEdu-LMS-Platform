@@ -31,6 +31,12 @@ export default function CoursePage() {
   const [lockChecking, setLockChecking] = useState(true);
 
   useEffect(() => {
+    if (courseId && user) {
+      localStorage.setItem(`cyberedu_last_active_course_${user.id}`, courseId);
+    }
+  }, [courseId, user]);
+
+  useEffect(() => {
     async function checkCourseLock() {
       if (!course || !user) {
         setLockChecking(false);
