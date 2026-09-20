@@ -95,11 +95,11 @@ function getRecommendedPath(learningArea) {
     emoji: '⚔️',
     color: 'from-orange-900/40 to-red-900/30 border-orange-500/20',
     steps: [
-      { title: 'HTTP & HTTPS Temelleri', icon: '🌐' },
       { title: 'Web Uygulama Mimarisi', icon: '🏗️' },
+      { title: 'Güvenli Kod Yazımı', icon: '🛡️' },
+      { title: 'HTTP & HTTPS Temelleri', icon: '🌐' },
       { title: 'SQL Injection Nedir?', icon: '💉' },
       { title: 'XSS Saldırıları', icon: '🐛' },
-      { title: 'Güvenli Kod Yazımı', icon: '🛡️' },
     ],
   };
 }
