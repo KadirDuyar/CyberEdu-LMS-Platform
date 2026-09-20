@@ -86,6 +86,10 @@ export default function LearningPath() {
       showToast(`🔒 Bu kursa geçebilmek için önce "${prevCourse?.title || 'önceki kursu'}" tamamlamalısınız.`);
       return;
     }
+    localStorage.setItem('cyberedu_last_active_course', course.id);
+    if (user) {
+      localStorage.setItem(`cyberedu_last_active_course_${user.id}`, course.id);
+    }
     if (!isEnrolled && user) {
       // Kursa kaydol
       await enrollInCourse(user.id, course.id);

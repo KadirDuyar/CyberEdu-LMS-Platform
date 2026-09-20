@@ -63,16 +63,17 @@ export default function StudentDashboard() {
       const { data: enrollments } = await supabase
         .from('enrollments')
         .select('course_id, status, enrolled_at')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .order('enrolled_at', { ascending: false });
 
       const enrolledIds = new Set((enrollments || []).map((e) => e.course_id));
+      const latestEnrolledCourseId = enrollments?.[0]?.course_id;
 
-      // 4. Öğrencinin parkurundaki tüm kurslar
+      // 4. Tüm yayınlanmış kursları çek (tüm kategoriler dahil)
       const area = profile?.learning_area || 'awareness';
       const { data: rawCourses } = await supabase
         .from('courses')
-        .select('id, title, category, description, thumbnail_emoji, lessons(id, title, xp_reward, order_index, is_published)')
-        .eq('category', area)
+        .select('id, title, category, description, thumbnail_emoji, created_at, lessons(id, title, xp_reward, order_index, is_published)')
         .eq('is_published', true)
         .order('created_at', { ascending: true });
 
@@ -103,20 +104,18 @@ export default function StudentDashboard() {
         });
 
         // AKTİF KURS BELİRLEME MANTIĞI:
-        // 1. En son kalınan kursu localStorage'dan kontrol et
-        const savedLastCourseId = localStorage.getItem(`cyberedu_last_active_course_${user.id}`);
+        // 1. En son kalınan/tıklanan kursu localStorage'dan kontrol et
+        const savedLastCourseId = localStorage.getItem(`cyberedu_last_active_course_${user.id}`) || localStorage.getItem('cyberedu_last_active_course');
         let targetCourse = null;
 
         if (savedLastCourseId) {
           const found = processedCourses.find((c) => c.id === savedLastCourseId);
-          // Eğer kayıtlı son kurs tamamlanmamışsa öncelikle onu devam ettir
-          if (found && !found.isCompleted) {
+          if (found) {
             targetCourse = found;
           }
         }
 
-        // 2. Eğer localStorage'da yoksa veya o kurs bitmişse:
-        // Öğrencinin en son işlem yaptığı (lesson_progress updated_at) kursu bul
+        // 2. Eğer localStorage'da yoksa: Öğrencinin en son işlem yaptığı (lesson_progress updated_at) kursu bul
         if (!targetCourse) {
           try {
             const { data: latestProgress } = await supabase
@@ -129,7 +128,7 @@ export default function StudentDashboard() {
             const lastWorkedCourseId = latestProgress?.[0]?.lessons?.course_id;
             if (lastWorkedCourseId) {
               const found = processedCourses.find((c) => c.id === lastWorkedCourseId);
-              if (found && !found.isCompleted) {
+              if (found) {
                 targetCourse = found;
               }
             }
@@ -138,39 +137,49 @@ export default function StudentDashboard() {
           }
         }
 
-        // 3. Hala hedef kurs belirlenmediyse:
-        // Müfredattaki İLK TAMAMLANMAMIŞ kursu seç! (Böylece Kurs 1 bitince otomatik Kurs 2 gelir)
-        if (!targetCourse) {
-          targetCourse = processedCourses.find((c) => !c.isCompleted);
+        // 3. Eğer hala yoksa: En son kayıt olunan kurs
+        if (!targetCourse && latestEnrolledCourseId) {
+          const found = processedCourses.find((c) => c.id === latestEnrolledCourseId);
+          if (found) {
+            targetCourse = found;
+          }
         }
 
-        // 4. Eğer tüm kurslar tamamlandıysa:
+        // 4. Hala hedef kurs belirlenmediyse:
+        // Öğrencinin alanındaki ilk tamamlanmamış kurs, yoksa herhangi bir tamamlanmamış kurs
         if (!targetCourse) {
-          const lastCompleted = processedCourses[processedCourses.length - 1];
-          setActiveCourse(lastCompleted);
-          setIsCourseFinished(true);
-          setActiveLesson(null);
-        } else {
+          const areaCourses = processedCourses.filter((c) => c.category === area);
+          targetCourse = areaCourses.find((c) => !c.isCompleted) || processedCourses.find((c) => !c.isCompleted);
+        }
+
+        // 5. Eğer tüm kurslar tamamlandıysa son kursu seç
+        if (!targetCourse) {
+          targetCourse = processedCourses[processedCourses.length - 1];
+        }
+
+        if (targetCourse) {
           // Hedef kursa kaydı yoksa otomatik kaydet
           if (!targetCourse.isEnrolled) {
             supabase.from('enrollments').upsert({
               user_id: user.id,
               course_id: targetCourse.id,
               status: 'active',
+              enrolled_at: new Date().toISOString(),
             }, { onConflict: 'user_id,course_id' }).catch(() => {});
             targetCourse.isEnrolled = true;
             enrolledIds.add(targetCourse.id);
           }
 
           setActiveCourse(targetCourse);
-          setIsCourseFinished(false);
+          setIsCourseFinished(targetCourse.isCompleted);
 
           // Sıradaki tamamlanmamış dersi bul
-          const nextLesson = targetCourse.publishedLessons.find((l) => !doneIds.has(l.id)) || targetCourse.publishedLessons[0];
+          const nextLesson = targetCourse.publishedLessons.find((l) => !doneIds.has(l.id)) || targetCourse.publishedLessons[targetCourse.publishedLessons.length - 1];
           setActiveLesson(nextLesson);
 
           // Hafızaya kaydet
           localStorage.setItem(`cyberedu_last_active_course_${user.id}`, targetCourse.id);
+          localStorage.setItem('cyberedu_last_active_course', targetCourse.id);
         }
 
         // Kayıtlı kurslar listesini güncelle (enrolled olanlar ve aktif kurs)
@@ -389,8 +398,12 @@ export default function StudentDashboard() {
                       onClick={() => {
                         setActiveCourse(c);
                         setIsCourseFinished(c.isCompleted);
-                        const next = c.publishedLessons.find((l) => !completedLessonIds.has(l.id)) || c.publishedLessons[0];
+                        const next = c.publishedLessons.find((l) => !completedLessonIds.has(l.id)) || c.publishedLessons[c.publishedLessons.length - 1];
                         setActiveLesson(next);
+                        if (user) {
+                          localStorage.setItem(`cyberedu_last_active_course_${user.id}`, c.id);
+                        }
+                        localStorage.setItem('cyberedu_last_active_course', c.id);
                       }}
                       className={`p-3 rounded-xl glass border cursor-pointer transition-all ${
                         activeCourse?.id === c.id ? 'border-violet-500 bg-violet-600/10' : 'border-white/5 hover:border-white/20'

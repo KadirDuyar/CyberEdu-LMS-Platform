@@ -31,7 +31,7 @@ export async function getCourseWithLessons(courseId) {
 export async function enrollInCourse(userId, courseId) {
   const { data, error } = await supabase
     .from('enrollments')
-    .upsert([{ user_id: userId, course_id: courseId }], { onConflict: 'user_id,course_id' })
+    .upsert([{ user_id: userId, course_id: courseId, enrolled_at: new Date().toISOString() }], { onConflict: 'user_id,course_id' })
     .select()
     .single();
   return { data, error };

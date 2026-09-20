@@ -154,6 +154,7 @@ export default function LessonPage() {
 
       if (user && data) {
         if (data.course_id) {
+          localStorage.setItem('cyberedu_last_active_course', data.course_id);
           localStorage.setItem(`cyberedu_last_active_course_${user.id}`, data.course_id);
         }
         const { data: progress } = await supabase
