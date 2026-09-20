@@ -258,11 +258,12 @@ export default function LessonPage() {
       return;
     }
 
+    const totalActivityPoints = interactiveActivities.reduce((sum, a) => sum + (a.points || 0), 0);
     const xpFromActivities = Object.values(activityStates)
       .filter((s) => s.result?.isCorrect)
       .reduce((sum, s) => sum + (s.result.points ?? 0), 0);
 
-    const totalXP = (lesson?.xp_reward ?? 100) + xpFromActivities;
+    const totalXP = totalActivityPoints > 0 ? xpFromActivities : (lesson?.xp_reward ?? 50);
 
     if (user) {
       const { error: compError } = await completeLesson(user.id, lessonId);
@@ -446,7 +447,7 @@ export default function LessonPage() {
             <div className="flex items-center gap-3 mt-1">
               <div className="flex items-center gap-1 text-xs text-amber-400">
                 <Zap size={12}/>
-                <span>+{lesson.xp_reward} XP</span>
+                <span>+{interactiveActivities.reduce((s, a) => s + (a.points || 0), 0) || lesson.xp_reward || 0} XP</span>
               </div>
               {activities.length > 0 && (
                 <div className="flex items-center gap-1 text-xs text-slate-400">

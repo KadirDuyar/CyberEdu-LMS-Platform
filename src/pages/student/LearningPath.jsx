@@ -49,11 +49,14 @@ export default function LearningPath() {
           .order('created_at', { ascending: true });
 
         if (courseList) {
-          setCourses(courseList);
+          const filtered = courseList.filter(
+            (c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')
+          );
+          setCourses(filtered);
 
           // İlk kursa otomatik kayıt ol (eğer kayıtlı değilse)
-          if (courseList.length > 0 && user) {
-            const firstCourseId = courseList[0].id;
+          if (filtered.length > 0 && user) {
+            const firstCourseId = filtered[0].id;
             setEnrolledCourseIds((prev) => {
               const updated = new Set(prev);
               updated.add(firstCourseId);
@@ -165,10 +168,6 @@ export default function LearningPath() {
                             Kursa Katıl
                           </span>
                         )}
-
-                        <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
-                          <Zap size={13} /> {totalXp} XP
-                        </span>
                       </div>
 
                       <div className={`flex items-start gap-3 ${isLeft ? 'md:flex-row-reverse' : ''}`}>

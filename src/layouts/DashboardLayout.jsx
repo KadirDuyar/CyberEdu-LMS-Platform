@@ -343,7 +343,7 @@ export default function DashboardLayout({ children }) {
                   <p className="font-bold text-sm text-white mb-3">Bildirimler</p>
                   <div className="space-y-2">
                     {[
-                      { icon: '🛡️', text: 'TUSAŞ Siber Güvenlik Laboratuvarı aktif', time: 'Şimdi' },
+                      { icon: '🛡️', text: 'Siber Güvenlik Platformuna hoş geldiniz!', time: 'Şimdi' },
                       { icon: '📚', text: 'Phishing Analizi modülü hazırlandı', time: '2 saat önce' },
                     ].map((n, i) => (
                       <div key={i} className="flex gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">

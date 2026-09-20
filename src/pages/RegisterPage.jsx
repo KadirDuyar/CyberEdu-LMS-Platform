@@ -79,6 +79,8 @@ export default function RegisterPage() {
     setStep(2);
   };
 
+  const [showGoogleNotice, setShowGoogleNotice] = useState(false);
+
   const handleGoogleLogin = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
@@ -87,9 +89,11 @@ export default function RegisterPage() {
           redirectTo: `${window.location.origin}/student`
         }
       });
-      if (error) alert('Google ile kayıt hatası: ' + error.message);
+      if (error) {
+        setShowGoogleNotice(true);
+      }
     } catch (err) {
-      alert('Google ile işlem yapılırken beklenmeyen bir hata oluştu.');
+      setShowGoogleNotice(true);
     }
   };
 
@@ -115,6 +119,37 @@ export default function RegisterPage() {
   return (
     <AuthLayout>
       <div className="space-y-6">
+
+        {/* Google OAuth Bilgi Modalı */}
+        {showGoogleNotice && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-slate-900 border border-violet-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                  <AlertCircle size={22} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Google İle Kayıt Bilgisi</h3>
+                  <p className="text-xs text-slate-400">Supabase Provider Yapılandırması</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Supabase projenizde Google ile oturum açmayı aktifleştirmek için <strong className="text-violet-400">Authentication &gt; Providers &gt; Google</strong> menüsünden Google Client ID ve Secret girilmelidir.
+              </p>
+              <p className="text-xs text-slate-400">
+                Lütfen aşağıdaki formdan e-posta adresiniz ve şifrenizle doğrudan kayıt olunuz.
+              </p>
+
+              <button
+                onClick={() => setShowGoogleNotice(false)}
+                className="w-full py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs transition-all shadow-lg"
+              >
+                Anladım, Formu Doldur
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Header */}
         <div className="text-center space-y-1">
@@ -191,7 +226,7 @@ export default function RegisterPage() {
                   onBlur={() => setTouched((t) => ({ ...t, fullName: true }))}
                   placeholder="Adın ve soyadın"
                   autoComplete="name"
-                  className="form-input pl-10"
+                  className="form-input has-icon-left"
                   required
                 />
               </div>
@@ -209,7 +244,7 @@ export default function RegisterPage() {
                   onBlur={() => setTouched((t) => ({ ...t, email: true }))}
                   placeholder="ornek@eposta.com"
                   autoComplete="email"
-                  className="form-input pl-10"
+                  className="form-input has-icon-left"
                   required
                 />
               </div>
@@ -226,7 +261,7 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="new-password"
-                  className="form-input pl-10 pr-11"
+                  className="form-input has-icon-left has-icon-right"
                   required
                 />
                 <button
@@ -272,7 +307,7 @@ export default function RegisterPage() {
                   onChange={(e) => setConfirm(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="new-password"
-                  className={`form-input pl-10 pr-11 ${
+                  className={`form-input has-icon-left has-icon-right ${
                     confirm && confirm !== password ? 'border-rose-500/60' : ''
                   }`}
                   required

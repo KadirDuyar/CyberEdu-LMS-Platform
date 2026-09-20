@@ -161,7 +161,9 @@ export default function CourseList() {
           />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {courses.map((course, idx) => {
+            {courses
+              .filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği'))
+              .map((course, idx) => {
               const lessonsForCourse = courseLessonsMap[course.id] || [];
               const lessonCount = lessonsForCourse.length || course.lessons?.[0]?.count || 0;
               const completedCount = lessonsForCourse.filter((id) => completedLessons.has(id)).length;
@@ -227,10 +229,6 @@ export default function CourseList() {
                       <div className="flex items-center gap-1.5 text-xs text-slate-400">
                         <BookOpen size={13} />
                         <span>{lessonCount} ders</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-xs text-amber-400">
-                        <Zap size={13} />
-                        <span>+{lessonCount * 100} XP</span>
                       </div>
                       <div className="ml-auto flex items-center gap-1 text-xs font-semibold transition-all">
                         {isCompleted ? (

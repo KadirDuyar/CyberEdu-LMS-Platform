@@ -102,10 +102,6 @@ export default function CoursePage() {
                   <BookOpen size={13} />
                   <span>{totalCount} ders</span>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-amber-400">
-                  <Zap size={13} />
-                  <span>+{totalCount * 100} XP</span>
-                </div>
               </div>
             </div>
           </div>

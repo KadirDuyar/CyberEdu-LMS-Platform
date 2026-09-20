@@ -64,12 +64,16 @@ export default function StudentDashboard() {
 
       // 4. Öğrencinin parkurundaki tüm kurslar
       const area = profile?.learning_area || 'awareness';
-      const { data: allCourses } = await supabase
+      const { data: rawCourses } = await supabase
         .from('courses')
         .select('id, title, category, description, thumbnail_emoji, lessons(id, title, xp_reward, order_index, is_published)')
         .eq('category', area)
         .eq('is_published', true)
         .order('created_at', { ascending: true });
+
+      const allCourses = (rawCourses || []).filter(
+        (c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')
+      );
 
       if (allCourses && allCourses.length > 0) {
         // Eğer hiçbir kursa kayıtlı değilse, ilk zorunlu kursa otomatik kaydet

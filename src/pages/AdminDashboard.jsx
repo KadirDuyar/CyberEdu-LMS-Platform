@@ -54,32 +54,65 @@ export default function AdminDashboard() {
     }
   }
 
-  const handleResetProgress = async (userId, userName) => {
-    if (window.confirm(`${userName} adlı kullanıcının tüm ders ilerlemesi ve XP puanı sıfırlanacak. Onaylıyor musunuz?`)) {
-      const { error } = await resetStudentProgress(userId);
-      if (error) {
-        alert('Hata: ' + error.message);
-      } else {
-        alert('Kullanıcı ilerlemesi sıfırlandı.');
-        loadDashboardData();
-      }
-    }
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Onayla',
+    isDanger: false,
+    onConfirm: null,
+  });
+  const [toast, setToast] = useState(null);
+
+  const showToast = (type, text) => {
+    setToast({ type, text });
+    setTimeout(() => setToast(null), 4000);
   };
 
-  const handleRoleChange = async (userId, currentRole) => {
-    const nextRole = currentRole === 'student' ? 'teacher' : 'student';
-    if (window.confirm(`Kullanıcının rolü '${ROLE_LABELS[nextRole]}' olarak güncellensin mi?`)) {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: nextRole })
-        .eq('id', userId);
+  const handleResetProgress = (userId, userName) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'İlerlemeyi Sıfırla',
+      message: `${userName} adlı öğrencinin tamamladığı tüm dersler, sınavlar ve XP puanları kalıcı olarak sıfırlanacaktır. Bu işlemi onaylıyor musunuz?`,
+      confirmText: 'Evet, Sıfırla',
+      isDanger: true,
+      onConfirm: async () => {
+        setConfirmModal((m) => ({ ...m, isOpen: false }));
+        const { error } = await resetStudentProgress(userId);
+        if (error) {
+          showToast('error', 'Hata: ' + error.message);
+        } else {
+          showToast('success', `${userName} kullanıcısının ilerlemesi başarıyla sıfırlandı.`);
+          loadDashboardData();
+        }
+      },
+    });
+  };
 
-      if (error) {
-        alert('Rol güncellenemedi: ' + error.message);
-      } else {
-        loadDashboardData();
-      }
-    }
+  const handleRoleChange = (userId, currentRole) => {
+    const nextRole = currentRole === 'student' ? 'teacher' : 'student';
+    const nextLabel = ROLE_LABELS[nextRole] || nextRole;
+    setConfirmModal({
+      isOpen: true,
+      title: 'Kullanıcı Rolünü Güncelle',
+      message: `Kullanıcının rolü '${nextLabel}' olarak değiştirilecektir. Onaylıyor musunuz?`,
+      confirmText: 'Rolü Değiştir',
+      isDanger: false,
+      onConfirm: async () => {
+        setConfirmModal((m) => ({ ...m, isOpen: false }));
+        const { error } = await supabase
+          .from('profiles')
+          .update({ role: nextRole })
+          .eq('id', userId);
+
+        if (error) {
+          showToast('error', 'Rol güncellenemedi: ' + error.message);
+        } else {
+          showToast('success', `Kullanıcı rolü başarıyla '${nextLabel}' olarak güncellendi.`);
+          loadDashboardData();
+        }
+      },
+    });
   };
 
   const studentCount = users.filter((u) => u.role === 'student').length;
@@ -181,12 +214,12 @@ export default function AdminDashboard() {
                     {ROLE_LABELS[u.role] || u.role}
                   </span>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {/* Rol Değiştirme Butonu (Admin hariç) */}
                     {u.role !== 'admin' && (
                       <button
                         onClick={() => handleRoleChange(u.id, u.role)}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 px-2.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 text-xs font-bold border border-cyan-500/20"
+                        className="p-1.5 px-2.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/25 text-cyan-300 text-xs font-bold border border-cyan-500/30 transition-all hover:scale-105"
                         title="Rolü Öğrenci/Eğitmen olarak değiştir"
                       >
                         <UserCheck size={14} className="inline mr-1" />
@@ -198,7 +231,7 @@ export default function AdminDashboard() {
                     {u.role === 'student' && (
                       <button
                         onClick={() => handleResetProgress(u.id, u.full_name || 'Öğrenci')}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 px-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold border border-rose-500/20"
+                        className="p-1.5 px-2.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 text-xs font-bold border border-rose-500/30 transition-all hover:scale-105"
                         title="Ders ilerlemesini sıfırla"
                       >
                         <RotateCcw size={14} className="inline mr-1" /> Sıfırla
@@ -214,6 +247,63 @@ export default function AdminDashboard() {
             )}
           </div>
         </Card>
+
+        {/* Özel Onay Modalı (window.confirm yerine) */}
+        {confirmModal.isOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-slate-900 border border-white/15 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl space-y-5">
+              <div className="flex items-center gap-3">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                  confirmModal.isDanger ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-violet-500/20 text-violet-400 border border-violet-500/30'
+                }`}>
+                  {confirmModal.isDanger ? <RotateCcw size={22} /> : <UserCheck size={22} />}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">{confirmModal.title}</h3>
+                  <p className="text-xs text-slate-400">Yönetici İşlem Onayı</p>
+                </div>
+              </div>
+
+              <p className="text-sm text-slate-300 leading-relaxed">
+                {confirmModal.message}
+              </p>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmModal((m) => ({ ...m, isOpen: false }))}
+                  className="flex-1 py-3 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-sm transition-all"
+                >
+                  İptal
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmModal.onConfirm}
+                  className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm text-white transition-all shadow-lg ${
+                    confirmModal.isDanger
+                      ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-500/30'
+                      : 'bg-violet-600 hover:bg-violet-500 shadow-violet-500/30'
+                  }`}
+                >
+                  {confirmModal.confirmText}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Toast Bildirimi */}
+        {toast && (
+          <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+            <div className={`px-5 py-3 rounded-2xl shadow-2xl border text-sm font-bold flex items-center gap-2 ${
+              toast.type === 'success'
+                ? 'bg-emerald-950/90 text-emerald-200 border-emerald-500/50'
+                : 'bg-rose-950/90 text-rose-200 border-rose-500/50'
+            }`}>
+              {toast.type === 'success' ? '✅' : '⚠️'} {toast.text}
+            </div>
+          </div>
+        )}
 
         {/* Siber Güvenlik Altyapı Notu */}
         <Card className="border-emerald-500/20 bg-emerald-950/10">

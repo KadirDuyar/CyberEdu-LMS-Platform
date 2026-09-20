@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CheckCircle2, XCircle, Play, Pause, RotateCcw, ArrowUp, ArrowDown } from 'lucide-react';
+import { CheckCircle2, XCircle, Play, Pause, RotateCcw, ArrowUp, ArrowDown, Maximize, Minimize } from 'lucide-react';
 
 const formatAnswer = (ans) => {
   if (ans === undefined || ans === null) return '';
@@ -192,7 +192,9 @@ function FillBlankActivity({ activity, onSubmit, submitted, result, initialAnswe
 function YoutubeActivity({ activity, onSubmit, submitted }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isEnded, setIsEnded] = useState(submitted || false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const iframeRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Öğretmenin seçimine göre tamamlama zorunluluğu (varsayılan: true)
   const isRequireCompletion = activity.options?.require_completion ?? true;
@@ -203,6 +205,31 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
   };
 
   const videoId = getYoutubeId(activity.question) || activity.question;
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!containerRef.current) return;
+    if (!document.fullscreenElement) {
+      if (containerRef.current.requestFullscreen) {
+        containerRef.current.requestFullscreen().catch(() => {});
+      } else if (containerRef.current.webkitRequestFullscreen) {
+        containerRef.current.webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+  };
 
   useEffect(() => {
     const handleMessage = (e) => {
@@ -254,20 +281,24 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
 
   return (
     <div className="space-y-4">
-      <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-800 bg-black group">
+      <div
+        ref={containerRef}
+        className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-800 bg-black group"
+      >
         {videoId ? (
           <iframe
             ref={iframeRef}
-            src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3`}
+            src={`https://www.youtube.com/embed/${videoId}?enablejsapi=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&fs=1`}
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowFullScreen={true}
             title="Ders Videosu"
           />
         ) : (
           <div className="text-white p-6">Geçersiz YouTube Video Linki</div>
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4 z-10">
           <div className="flex items-center gap-2">
             <button
               onClick={togglePlay}
@@ -282,6 +313,14 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
               title="Başa Sar"
             >
               <RotateCcw size={16} />
+            </button>
+            <button
+              onClick={toggleFullscreen}
+              className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors flex items-center gap-1.5 text-xs font-bold"
+              title={isFullscreen ? 'Tam Ekrandan Çık' : 'Tam Ekran'}
+            >
+              {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+              <span className="hidden sm:inline">{isFullscreen ? 'Küçült' : 'Tam Ekran'}</span>
             </button>
           </div>
           <span className="text-xs text-slate-400 font-mono">
