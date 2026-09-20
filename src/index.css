@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Global Reset & Base ─────────────────────────────────────── */
+/* ----------------- Global Reset & Base ----------------- */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -21,13 +21,13 @@ body {
   overflow-x: hidden;
 }
 
-/* ─── Scrollbar Styling ──────────────────────────────────────── */
+/* ----------------- Scrollbar Styling ----------------- */
 ::-webkit-scrollbar        { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { background: #1E1A2E; }
 ::-webkit-scrollbar-thumb  { background: #7C3AED; border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: #8B5CF6; }
 
-/* ─── Glassmorphism Utility ──────────────────────────────────── */
+/* ----------------- Glassmorphism Utility ----------------- */
 @layer utilities {
   .glass {
     background: rgba(255, 255, 255, 0.06);
@@ -56,21 +56,9 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-
-  .glow-purple {
-    box-shadow: 0 0 30px rgba(124, 58, 237, 0.4);
-  }
-
-  .glow-pink {
-    box-shadow: 0 0 30px rgba(236, 72, 153, 0.4);
-  }
-
-  .glow-cyan {
-    box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
-  }
 }
 
-/* ─── Animated Background ────────────────────────────────────── */
+/* ----------------- Animated Background ----------------- */
 .animated-bg {
   background:
     radial-gradient(ellipse 80% 50% at 20% -10%, rgba(124, 58, 237, 0.35) 0%, transparent 60%),
@@ -79,7 +67,7 @@ body {
     #0F0A1E;
 }
 
-/* ─── Login Background ───────────────────────────────────────── */
+/* ----------------- Login Background & Floating Orbs ----------------- */
 .login-bg {
   background:
     radial-gradient(ellipse 70% 60% at 10% 20%, rgba(124, 58, 237, 0.45) 0%, transparent 55%),
@@ -88,22 +76,21 @@ body {
     #0A0614;
 }
 
-/* ─── Floating Orbs ──────────────────────────────────────────── */
 .orb {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(60px);
-  opacity: 0.6;
-  animation: floatOrb 6s ease-in-out infinite;
+  filter: blur(80px);
+  opacity: 0.55;
+  animation: floatOrb 8s ease-in-out infinite alternate;
   pointer-events: none;
 }
 
 @keyframes floatOrb {
-  0%, 100% { transform: translateY(0px) scale(1); }
-  50%       { transform: translateY(-20px) scale(1.05); }
+  0% { transform: translateY(0px) scale(1); }
+  100% { transform: translateY(-30px) scale(1.1); }
 }
 
-/* ─── Sidebar Transition ─────────────────────────────────────── */
+/* ----------------- Sidebar Transition ----------------- */
 .sidebar-link {
   @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400
          transition-all duration-200 hover:text-white hover:bg-white/10 font-medium;
@@ -115,34 +102,14 @@ body {
   box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
 }
 
-/* ─── Card Hover Lift ────────────────────────────────────────── */
-.card-lift {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-.card-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
-/* ─── Progress Bar Gradient ──────────────────────────────────── */
+/* ----------------- Progress Bar Gradient ----------------- */
 .progress-bar {
   background: linear-gradient(90deg, #7C3AED, #EC4899);
   border-radius: 99px;
   transition: width 0.6s ease;
 }
 
-/* ─── XP Badge ───────────────────────────────────────────────── */
-.xp-badge {
-  background: linear-gradient(135deg, #F59E0B, #EF4444);
-  border-radius: 99px;
-  padding: 2px 10px;
-  font-weight: 700;
-  font-size: 0.75rem;
-  color: white;
-  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
-}
-
-/* ─── Input Styles ───────────────────────────────────────────── */
+/* ----------------- Input Styles ----------------- */
 .form-input {
   @apply w-full px-4 py-3 rounded-xl bg-white/10 border border-white/15
          text-white placeholder-slate-400 outline-none
@@ -150,7 +117,7 @@ body {
          focus:border-violet-500 focus:bg-white/15 focus:ring-2 focus:ring-violet-500/30;
 }
 
-/* ─── Button Base ────────────────────────────────────────────── */
+/* ----------------- Button Base ----------------- */
 .btn-primary {
   @apply w-full py-3.5 px-6 rounded-xl font-bold text-white text-base
          transition-all duration-200 active:scale-95 select-none cursor-pointer;
@@ -160,4 +127,85 @@ body {
 .btn-primary:hover {
   box-shadow: 0 12px 35px rgba(124, 58, 237, 0.65);
   transform: translateY(-1px);
+}
+
+/* ☀️ Light Mode Overrides (Theme Feature) ☀️ */
+body.light-mode {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+}
+
+body.light-mode .bg-\[\#0f172a\] {
+  background-color: #F1F5F9 !important;
+}
+
+body.light-mode .text-white {
+  color: #0F172A !important;
+}
+
+body.light-mode .text-slate-400,
+body.light-mode .text-slate-300 {
+  color: #475569 !important;
+}
+
+body.light-mode .bg-white\/5,
+body.light-mode .bg-white\/10 {
+  background-color: rgba(0,0,0,0.03) !important;
+}
+
+body.light-mode .border-white\/10,
+body.light-mode .border-white\/15,
+body.light-mode .border-white\/5 {
+  border-color: #cbd5e1 !important;
+}
+
+body.light-mode .glass,
+body.light-mode .glass-light {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-mode input,
+body.light-mode textarea,
+body.light-mode .form-input {
+  background: #ffffff !important;
+  color: #0F172A !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+body.light-mode input::placeholder,
+body.light-mode textarea::placeholder,
+body.light-mode .form-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+body.light-mode .animated-bg,
+body.light-mode .login-bg {
+  background: #F8FAFC !important;
+}
+
+body.light-mode .sidebar-link {
+  color: #475569;
+}
+body.light-mode .sidebar-link:hover {
+  background: rgba(0,0,0,0.05);
+  color: #0F172A;
+}
+body.light-mode .sidebar-link.active {
+  background: linear-gradient(to right, rgba(124, 58, 237, 0.1), rgba(236, 72, 153, 0.05));
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #7C3AED !important;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.1);
+}
+body {
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input, textarea, .form-input, .prose-custom, [contenteditable="true"], .cursor-text {
+  cursor: text;
+  -webkit-user-select: text;
+  user-select: text;
 }

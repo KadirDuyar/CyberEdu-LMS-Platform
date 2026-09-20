@@ -1,10 +1,11 @@
 /**
  * AuthLayout – Login / Kayıt sayfaları için animasyonlu arka planlı wrapper.
- * İçeriği ekranın tam ortasında gösterir.
+ * Siber güvenlik teması: 🔐 🛡️ 🔑 🌐 semboller
  */
 export default function AuthLayout({ children }) {
   return (
     <div className="relative min-h-screen login-bg flex items-center justify-center p-4 overflow-hidden">
+
       {/* Dekoratif floating orbs */}
       <div
         className="orb w-80 h-80 bg-violet-600"
@@ -19,15 +20,19 @@ export default function AuthLayout({ children }) {
         style={{ top: '40%', right: '15%', animationDelay: '1s' }}
       />
 
-      {/* Floating emojis */}
-      <div className="absolute top-10 left-10 text-4xl animate-float opacity-40 select-none">⚡</div>
-      <div className="absolute top-20 right-20 text-3xl animate-float opacity-30 select-none" style={{ animationDelay: '1s' }}>🚀</div>
-      <div className="absolute bottom-20 left-20 text-4xl animate-float opacity-30 select-none" style={{ animationDelay: '0.5s' }}>🔬</div>
-      <div className="absolute bottom-10 right-10 text-3xl animate-float opacity-40 select-none" style={{ animationDelay: '1.5s' }}>⭐</div>
+      {/* Siber güvenlik floating emojileri */}
+      <div className="absolute top-10 left-10 text-4xl animate-float opacity-30 select-none">🔐</div>
+      <div className="absolute top-20 right-20 text-3xl animate-float opacity-25 select-none" style={{ animationDelay: '1s' }}>🛡️</div>
+      <div className="absolute bottom-20 left-20 text-4xl animate-float opacity-25 select-none" style={{ animationDelay: '0.5s' }}>🔑</div>
+      <div className="absolute bottom-10 right-10 text-3xl animate-float opacity-30 select-none" style={{ animationDelay: '1.5s' }}>🌐</div>
+      <div className="absolute top-1/2 left-8 text-2xl animate-float opacity-20 select-none" style={{ animationDelay: '2.5s' }}>⚔️</div>
+      <div className="absolute top-1/3 right-8 text-2xl animate-float opacity-20 select-none" style={{ animationDelay: '0.8s' }}>🔍</div>
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-md">
-        {children}
+        <div className="glass rounded-3xl p-8 border border-white/10 shadow-2xl">
+          {children}
+        </div>
       </div>
     </div>
   );

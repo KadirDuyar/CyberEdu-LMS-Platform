@@ -2,33 +2,58 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// ─── Pages ────────────────────────────────────────────────────────────────────
-import LoginPage        from './pages/LoginPage';
-import StudentDashboard from './pages/StudentDashboard';
-import TeacherDashboard from './pages/TeacherDashboard';
-import AdminDashboard   from './pages/AdminDashboard';
+// ─── Public Pages ─────────────────────────────────────────────────────────────
+import LoginPage    from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
-// ─── Placeholder pages (ilerleyen sprint'lerde geliştirilecek) ────────────────
-function ComingSoon({ title }) {
+// ─── Student Pages ────────────────────────────────────────────────────────────
+import StudentDashboard from './pages/StudentDashboard';
+import Navigator        from './pages/student/Navigator';
+import LearningPath     from './pages/student/LearningPath';
+import CourseList       from './pages/student/CourseList';
+import CoursePage       from './pages/student/CoursePage';
+import LessonPage       from './pages/student/LessonPage';
+import AiMentor         from './pages/student/AiMentor';
+
+// ─── Teacher Pages ────────────────────────────────────────────────────────────
+import TeacherDashboard from './pages/TeacherDashboard';
+import TeacherCourses   from './pages/teacher/TeacherCourses';
+import CourseEditor     from './pages/teacher/CourseEditor';
+import LessonBuilder    from './pages/teacher/LessonBuilder';
+
+// ─── Admin Pages ──────────────────────────────────────────────────────────────
+import AdminDashboard from './pages/AdminDashboard';
+
+// ─── Shared Pages ─────────────────────────────────────────────────────────────
+import ProfilePage from './pages/ProfilePage';
+
+function ComingSoon({ title, emoji = '🚧' }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 text-center">
-      <div className="text-6xl animate-float">🚧</div>
+      <div className="text-6xl animate-float">{emoji}</div>
       <h2 className="font-display font-black text-2xl text-white">{title}</h2>
-      <p className="text-slate-400 text-sm">Bu sayfa yakında gelecek!</p>
+      <p className="text-slate-400 text-sm max-w-xs">
+        Bu sayfa geliştirme aşamasında. Yakında hazır olacak!
+      </p>
+      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/20 border border-violet-500/30">
+        <span className="w-2 h-2 bg-violet-400 rounded-full animate-pulse" />
+        <span className="text-violet-300 text-xs font-medium">Geliştirme devam ediyor</span>
+      </div>
     </div>
   );
 }
 
-// ─── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Public */}
-          <Route path="/login" element={<LoginPage />} />
 
-          {/* Student Routes */}
+          {/* ── Public ─────────────────────────────────────────────── */}
+          <Route path="/login"    element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          {/* ── Student ────────────────────────────────────────────── */}
           <Route
             path="/student"
             element={
@@ -38,10 +63,42 @@ export default function App() {
             }
           />
           <Route
-            path="/student/roadmap"
+            path="/student/navigator"
             element={
               <ProtectedRoute allowedRoles={['student']}>
-                <ComingSoon title="Yol Haritası" />
+                <Navigator />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/learning-path"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <LearningPath />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/courses"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <CourseList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/courses/:courseId"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <CoursePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/lessons/:lessonId"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <LessonPage />
               </ProtectedRoute>
             }
           />
@@ -49,20 +106,28 @@ export default function App() {
             path="/student/achievements"
             element={
               <ProtectedRoute allowedRoles={['student']}>
-                <ComingSoon title="Başarılar" />
+                <ComingSoon title="Başarılarım" emoji="🏆" />
               </ProtectedRoute>
             }
           />
           <Route
-            path="/student/ai-assistant"
+            path="/student/ai-mentor"
             element={
               <ProtectedRoute allowedRoles={['student']}>
-                <ComingSoon title="AI Asistan" />
+                <AiMentor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/profile"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />
 
-          {/* Teacher Routes */}
+          {/* ── Teacher ────────────────────────────────────────────── */}
           <Route
             path="/teacher"
             element={
@@ -72,10 +137,42 @@ export default function App() {
             }
           />
           <Route
-            path="/teacher/lessons"
+            path="/teacher/courses"
             element={
               <ProtectedRoute allowedRoles={['teacher']}>
-                <ComingSoon title="Dersler" />
+                <TeacherCourses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/courses/new"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <CourseEditor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/courses/:courseId/edit"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <CourseEditor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/courses/:courseId/lessons/new"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <LessonBuilder />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/courses/:courseId/lessons/:lessonId/edit"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <LessonBuilder />
               </ProtectedRoute>
             }
           />
@@ -83,12 +180,20 @@ export default function App() {
             path="/teacher/stats"
             element={
               <ProtectedRoute allowedRoles={['teacher']}>
-                <ComingSoon title="İstatistikler" />
+                <ComingSoon title="İstatistikler" emoji="📊" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/profile"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />
 
-          {/* Admin Routes */}
+          {/* ── Admin ──────────────────────────────────────────────── */}
           <Route
             path="/admin"
             element={
@@ -101,7 +206,15 @@ export default function App() {
             path="/admin/users"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <ComingSoon title="Kullanıcı Yönetimi" />
+                <ComingSoon title="Kullanıcı Yönetimi" emoji="👥" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/courses"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <ComingSoon title="Kurs Yönetimi" emoji="📚" />
               </ProtectedRoute>
             }
           />
@@ -109,13 +222,32 @@ export default function App() {
             path="/admin/settings"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <ComingSoon title="Ayarlar" />
+                <ComingSoon title="Sistem Ayarları" emoji="⚙️" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/profile"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />
 
-          {/* Catch-all → login */}
+          {/* ── Shared ─────────────────────────────────────────────── */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ── Catch-all ──────────────────────────────────────────── */}
           <Route path="*" element={<Navigate to="/login" replace />} />
+
         </Routes>
       </AuthProvider>
     </BrowserRouter>

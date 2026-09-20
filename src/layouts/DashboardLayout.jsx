@@ -1,25 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  Map, Trophy, Bot, LayoutDashboard, LogOut,
-  ChevronLeft, ChevronRight, Star, Zap, Bell, User,
-  BookOpen, BarChart3, Settings, Users,
+  LayoutDashboard, LogOut, ChevronLeft, ChevronRight,
+  Star, Zap, Bell, Map, Trophy, Bot, BookOpen,
+  BarChart3, Settings, Users, Shield, PlusCircle, Menu, X, Sun, Moon, User
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import AiChatWidget from '../components/AiChatWidget';
 
-// ─── Sidebar menü konfigürasyonu (role göre filtrelenir) ──────────────────────
+// ─── Sidebar menü konfigürasyonu ──────────────────────────────────────────────
 const NAV_ITEMS = [
   {
     label: 'Kontrol Paneli',
     icon: LayoutDashboard,
-    href: null,          // rol bazlı href App.jsx'ten gelir
-    roles: ['student', 'teacher', 'admin'],
     hrefMap: { student: '/student', teacher: '/teacher', admin: '/admin' },
+    roles: ['student', 'teacher', 'admin'],
   },
   {
-    label: 'Yol Haritası',
+    label: 'Profilim',
+    icon: User,
+    hrefMap: { student: '/student/profile', teacher: '/teacher/profile', admin: '/admin/profile' },
+    roles: ['student', 'teacher', 'admin'],
+  },
+  {
+    label: 'Öğrenme Yolculuğum',
     icon: Map,
-    href: '/student/roadmap',
+    href: '/student/learning-path',
+    roles: ['student'],
+  },
+  {
+    label: 'Kurslar',
+    icon: BookOpen,
+    href: '/student/courses',
     roles: ['student'],
   },
   {
@@ -29,15 +41,21 @@ const NAV_ITEMS = [
     roles: ['student'],
   },
   {
-    label: 'AI Asistan',
+    label: 'AI Mentor',
     icon: Bot,
-    href: '/student/ai-assistant',
+    href: '/student/ai-mentor',
     roles: ['student'],
   },
   {
-    label: 'Dersler',
+    label: 'Kurslarım',
     icon: BookOpen,
-    href: '/teacher/lessons',
+    href: '/teacher/courses',
+    roles: ['teacher'],
+  },
+  {
+    label: 'Yeni Kurs',
+    icon: PlusCircle,
+    href: '/teacher/courses/new',
     roles: ['teacher'],
   },
   {
@@ -53,6 +71,12 @@ const NAV_ITEMS = [
     roles: ['admin'],
   },
   {
+    label: 'Kurslar',
+    icon: BookOpen,
+    href: '/admin/courses',
+    roles: ['admin'],
+  },
+  {
     label: 'Ayarlar',
     icon: Settings,
     href: '/admin/settings',
@@ -60,14 +84,18 @@ const NAV_ITEMS = [
   },
 ];
 
-// ─── XP seviyesi için renk gradyanı ──────────────────────────────────────────
 const LEVEL_COLORS = {
   student: 'from-violet-500 to-pink-500',
   teacher: 'from-cyan-500 to-blue-500',
   admin:   'from-amber-500 to-orange-500',
 };
 
-// ─── Sidebar Item ─────────────────────────────────────────────────────────────
+const ROLE_LABELS = {
+  student: 'Öğrenci',
+  teacher: 'Eğitmen',
+  admin: 'Sistem Yöneticisi',
+};
+
 function SidebarItem({ item, collapsed, userRole }) {
   const href = item.hrefMap ? item.hrefMap[userRole] : item.href;
   if (!href) return null;
@@ -79,6 +107,7 @@ function SidebarItem({ item, collapsed, userRole }) {
       className={({ isActive }) =>
         `sidebar-link ${isActive ? 'active' : ''} ${collapsed ? 'justify-center px-3' : ''}`
       }
+      title={collapsed ? item.label : undefined}
     >
       <item.icon size={20} className="shrink-0" />
       {!collapsed && <span>{item.label}</span>}
@@ -86,164 +115,242 @@ function SidebarItem({ item, collapsed, userRole }) {
   );
 }
 
-// ─── DashboardLayout ──────────────────────────────────────────────────────────
 export default function DashboardLayout({ children }) {
-  const { user, logout } = useAuth();
-  const navigate          = useNavigate();
+  const { profile, role, logout } = useAuth();
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  
+  const [isLightMode, setIsLightMode] = useState(() => {
+    return localStorage.getItem('cyberedu_theme') === 'light';
+  });
 
-  const filteredNav = NAV_ITEMS.filter((item) => item.roles.includes(user?.role));
-  const levelColor  = LEVEL_COLORS[user?.role] || LEVEL_COLORS.student;
+  useEffect(() => {
+    if (isLightMode) {
+      document.body.classList.add('light-mode');
+      localStorage.setItem('cyberedu_theme', 'light');
+    } else {
+      document.body.classList.remove('light-mode');
+      localStorage.setItem('cyberedu_theme', 'dark');
+    }
+  }, [isLightMode]);
 
-  // XP progress (her 500 XP bir seviye)
-  const xpInLevel    = (user?.xp || 0) % 500;
-  const xpPercent    = Math.round((xpInLevel / 500) * 100);
+  const filteredNav = NAV_ITEMS.filter((item) => item.roles.includes(role));
+  const levelColor  = LEVEL_COLORS[role] || LEVEL_COLORS.student;
 
-  const handleLogout = () => {
-    logout();
+  const xp        = profile?.xp ?? 0;
+  const level     = profile?.level ?? 1;
+  const xpInLevel = xp % 500;
+  const xpPercent = Math.round((xpInLevel / 500) * 100);
+
+  const isStudent = role === 'student';
+
+  const handleLogout = async () => {
+    await logout();
     navigate('/login', { replace: true });
   };
 
-  return (
-    <div className="flex h-screen animated-bg overflow-hidden">
-
-      {/* ── Sidebar ─────────────────────────────────────────────────── */}
-      <aside
-        className={[
-          'flex flex-col h-full glass border-r border-white/10 transition-all duration-300 z-20 shrink-0',
-          collapsed ? 'w-[72px]' : 'w-64',
-        ].join(' ')}
-      >
-        {/* Logo */}
-        <div className={`flex items-center gap-3 px-4 py-5 border-b border-white/10 ${collapsed ? 'justify-center' : ''}`}>
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center text-lg shrink-0 shadow-lg shadow-violet-500/30">
-            ⚡
-          </div>
-          {!collapsed && (
-            <div>
-              <p className="font-display font-black text-sm leading-tight text-gradient">
-                Kuvvet &amp; Hareket
-              </p>
-              <p className="text-xs text-slate-400">LMS Platformu</p>
-            </div>
-          )}
+  const sidebarContent = (
+    <>
+      {/* Logo */}
+      <div className={`flex items-center gap-3 px-4 py-5 border-b border-white/10 ${collapsed ? 'justify-center' : ''}`}>
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center text-lg shrink-0 shadow-lg shadow-violet-500/30">
+          🔐
         </div>
+        {!collapsed && (
+          <div>
+            <p className="font-display font-black text-sm leading-tight text-gradient">
+              CyberEdu
+            </p>
+            <p className="text-xs text-slate-400 font-medium">Siber Güvenlik LMS</p>
+          </div>
+        )}
+      </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {filteredNav.map((item) => (
-            <SidebarItem
-              key={item.label}
-              item={item}
-              collapsed={collapsed}
-              userRole={user?.role}
-            />
-          ))}
-        </nav>
+      {/* Navigasyon */}
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {filteredNav.map((item) => (
+          <SidebarItem
+            key={item.label}
+            item={item}
+            collapsed={collapsed}
+            userRole={role}
+          />
+        ))}
+      </nav>
 
-        {/* User Mini Card */}
-        <div className={`px-3 py-4 border-t border-white/10 ${collapsed ? 'flex justify-center' : ''}`}>
-          {!collapsed ? (
-            <div className="glass-light rounded-xl p-3 space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{user?.avatar}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-white truncate">{user?.name}</p>
-                  <p className="text-xs text-slate-400 capitalize">{
-                    user?.role === 'student' ? 'Öğrenci' :
-                    user?.role === 'teacher' ? 'Öğretmen' : 'Admin'
-                  }</p>
-                </div>
+      {/* Güvenlik rozeti (sadece öğrenciye) */}
+      {!collapsed && isStudent && (
+        <div className="px-3 py-2">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+            <Shield size={13} className="text-emerald-400 shrink-0" />
+            <p className="text-[10px] text-emerald-400 font-bold">Güvenli Laboratuvar</p>
+          </div>
+        </div>
+      )}
+
+      {/* Kullanıcı Kartı */}
+      <div className={`px-3 py-4 border-t border-white/10 ${collapsed ? 'flex justify-center' : ''}`}>
+        {!collapsed ? (
+          <div className="glass-light rounded-xl p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">{profile?.avatar_emoji || (isStudent ? '🚀' : '🎓')}</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-sm text-white truncate">
+                  {profile?.full_name || 'Kullanıcı'}
+                </p>
+                <p className="text-[11px] font-semibold text-slate-400">
+                  {ROLE_LABELS[role] || role}
+                </p>
               </div>
-              {/* XP Progress */}
+            </div>
+
+            {/* SADECE ÖĞRENCİYE XP VE SEVİYE ÇUBUĞU */}
+            {isStudent && (
               <div>
-                <div className="flex justify-between text-xs text-slate-400 mb-1">
-                  <span>Seviye {user?.level}</span>
+                <div className="flex justify-between text-xs text-slate-400 mb-1 font-medium">
+                  <span>Seviye {level}</span>
                   <span>{xpInLevel}/500 XP</span>
                 </div>
-                <div className="h-1.5 bg-white/10 rounded-full">
+                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full bg-gradient-to-r ${levelColor} progress-bar`}
                     style={{ width: `${xpPercent}%` }}
                   />
                 </div>
               </div>
-              {/* Logout */}
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 text-xs text-slate-400 hover:text-rose-400 transition-colors w-full mt-1"
-              >
-                <LogOut size={13} />
-                Çıkış Yap
-              </button>
-            </div>
-          ) : (
-            <button onClick={handleLogout} className="p-2 hover:text-rose-400 text-slate-400 transition-colors">
-              <LogOut size={20} />
-            </button>
-          )}
-        </div>
+            )}
 
-        {/* Collapse Toggle */}
-        <button
-          onClick={() => setCollapsed((c) => !c)}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full glass border border-white/20 flex items-center justify-center text-slate-300 hover:text-white transition-colors z-30 shadow-lg"
-        >
-          {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
-        </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-xs text-slate-400 hover:text-rose-400 font-semibold transition-colors w-full pt-1"
+            >
+              <LogOut size={13} />
+              Çıkış Yap
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleLogout}
+            className="p-2 hover:text-rose-400 text-slate-400 transition-colors"
+            title="Çıkış Yap"
+          >
+            <LogOut size={20} />
+          </button>
+        )}
+      </div>
+
+      <button
+        onClick={() => setCollapsed((c) => !c)}
+        className="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full glass border border-white/20 items-center justify-center text-slate-300 hover:text-white transition-colors z-30 shadow-lg"
+      >
+        {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+      </button>
+    </>
+  );
+
+  return (
+    <div className="flex h-screen animated-bg overflow-hidden">
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Desktop Sidebar */}
+      <aside
+        className={[
+          'relative hidden md:flex flex-col h-full glass border-r border-white/10 transition-all duration-300 z-20 shrink-0',
+          collapsed ? 'w-[72px]' : 'w-64',
+        ].join(' ')}
+      >
+        {sidebarContent}
       </aside>
 
-      {/* ── Main Content ─────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Mobile Sidebar */}
+      <aside
+        className={[
+          'fixed top-0 left-0 h-full w-64 flex flex-col glass border-r border-white/10 z-40 transition-transform duration-300 md:hidden',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full',
+        ].join(' ')}
+      >
+        {sidebarContent}
+      </aside>
 
-        {/* Header */}
-        <header className="glass border-b border-white/10 px-6 py-4 flex items-center justify-between shrink-0">
-          {/* Left: Greeting */}
-          <div>
-            <h1 className="font-display font-black text-xl text-white">
-              Merhaba, <span className="text-gradient">{user?.name?.split(' ')[0]} {user?.avatar}</span>
-            </h1>
-            <p className="text-sm text-slate-400">
-              {new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' })}
-            </p>
+      {/* Ana İçerik */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="glass border-b border-white/10 px-4 md:px-6 py-4 flex items-center justify-between shrink-0 relative z-40">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileOpen((o) => !o)}
+              className="md:hidden w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-white/10"
+            >
+              {mobileOpen ? <X size={18} className="text-slate-300" /> : <Menu size={18} className="text-slate-300" />}
+            </button>
+            <div>
+              <h1 className="font-display font-black text-lg md:text-xl text-white">
+                Merhaba,{' '}
+                <span className="text-gradient">
+                  {profile?.full_name?.split(' ')[0] || 'Kullanıcı'}{' '}
+                  {profile?.avatar_emoji || (isStudent ? '🚀' : '🎓')}
+                </span>
+              </h1>
+              <p className="text-xs md:text-sm text-slate-400 hidden sm:block">
+                {new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' })}
+              </p>
+            </div>
           </div>
 
-          {/* Right: Stats + Notif + Profile */}
-          <div className="flex items-center gap-3">
-            {/* Level + XP badge */}
-            <div className="hidden sm:flex items-center gap-2 glass-light rounded-xl px-4 py-2 border border-white/10">
-              <Star size={15} className="text-amber-400" />
-              <span className="text-sm font-bold text-white">Seviye {user?.level}</span>
-              <span className="w-px h-4 bg-white/20" />
-              <Zap size={15} className="text-violet-400" />
-              <span className="text-sm font-bold text-violet-300">
-                {(user?.xp || 0).toLocaleString('tr-TR')} Puan
-              </span>
-            </div>
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* SADECE ÖĞRENCİDE GÖRÜNEN LEVEL/XP KUTUSU */}
+            {isStudent && (
+              <div className="hidden sm:flex items-center gap-2 glass-light rounded-xl px-3 md:px-4 py-2 border border-white/10">
+                <Star size={15} className="text-amber-400" />
+                <span className="text-sm font-bold text-white">Lv.{level}</span>
+                <span className="w-px h-4 bg-white/20" />
+                <Zap size={15} className="text-violet-400" />
+                <span className="text-sm font-bold text-violet-300">
+                  {xp.toLocaleString('tr-TR')} XP
+                </span>
+              </div>
+            )}
 
-            {/* Notification bell */}
+            {/* Tema Butonu */}
+            <button
+              onClick={() => setIsLightMode(!isLightMode)}
+              className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-white/10 hover:border-violet-500/50 transition-colors"
+              title={isLightMode ? 'Koyu Tema' : 'Açık Tema'}
+            >
+              {isLightMode ? <Moon size={17} className="text-slate-500" /> : <Sun size={17} className="text-amber-300" />}
+            </button>
+
+            {/* Bildirim */}
             <div className="relative">
               <button
                 onClick={() => setNotifOpen((n) => !n)}
-                className="w-10 h-10 glass-light rounded-xl flex items-center justify-center border border-white/10 hover:border-violet-500/50 transition-colors relative"
+                className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-white/10 hover:border-violet-500/50 transition-colors relative"
               >
-                <Bell size={18} className="text-slate-300" />
+                <Bell size={17} className="text-slate-300" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full" />
               </button>
               {notifOpen && (
-                <div className="absolute right-0 top-12 w-72 glass-light border border-white/15 rounded-2xl p-4 z-50 shadow-2xl">
+                <div
+                  className="absolute right-0 top-12 w-72 glass-light border border-white/15 rounded-2xl p-4 z-50 shadow-2xl"
+                  onMouseLeave={() => setNotifOpen(false)}
+                >
                   <p className="font-bold text-sm text-white mb-3">Bildirimler</p>
                   <div className="space-y-2">
                     {[
-                      { icon: '🏆', text: 'Yeni rozet kazandın: "Quiz Ustası"', time: '5 dk önce' },
-                      { icon: '📚', text: 'Yeni ders eklendi: Sürtünme Kuvveti', time: '1 saat önce' },
-                    ].map((n) => (
-                      <div key={n.text} className="flex gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
+                      { icon: '🛡️', text: 'TUSAŞ Siber Güvenlik Laboratuvarı aktif', time: 'Şimdi' },
+                      { icon: '📚', text: 'Phishing Analizi modülü hazırlandı', time: '2 saat önce' },
+                    ].map((n, i) => (
+                      <div key={i} className="flex gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
                         <span className="text-lg">{n.icon}</span>
                         <div>
-                          <p className="text-xs text-white">{n.text}</p>
-                          <p className="text-xs text-slate-500">{n.time}</p>
+                          <p className="text-xs text-white font-medium">{n.text}</p>
+                          <p className="text-[10px] text-slate-400">{n.time}</p>
                         </div>
                       </div>
                     ))}
@@ -252,18 +359,24 @@ export default function DashboardLayout({ children }) {
               )}
             </div>
 
-            {/* Avatar */}
-            <div className="w-10 h-10 glass-light rounded-xl flex items-center justify-center border border-white/10 text-xl">
-              {user?.avatar}
-            </div>
+            {/* Avatar Kutusu (Tıklanabilir Profil) */}
+            <button
+              onClick={() => navigate(role === 'teacher' ? '/teacher/profile' : role === 'admin' ? '/admin/profile' : '/student/profile')}
+              className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-white/10 text-lg hover:border-violet-500/60 hover:scale-105 transition-all cursor-pointer"
+              title="Profil Sayfam"
+            >
+              {profile?.avatar_emoji || (isStudent ? '🚀' : '🎓')}
+            </button>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
         </main>
       </div>
+
+      {/* Sağ Altta Kayan AI Chat Asistanı */}
+      <AiChatWidget />
     </div>
   );
 }

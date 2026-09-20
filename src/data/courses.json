@@ -1,0 +1,68 @@
+[
+  {
+    "id": "course-1",
+    "title": "Siber Güvenlik Farkındalığı",
+    "description": "Günlük dijital hayatta herkesin bilmesi gereken temel siber güvenlik ve korunma yöntemleri.",
+    "category": "awareness",
+    "level": "beginner",
+    "thumbnail_emoji": "🛡️",
+    "lessons": [
+      {
+        "id": "lesson-1",
+        "title": "Oltalama (Phishing) Nedir?",
+        "xp_reward": 100,
+        "blocks": [
+          {
+            "type": "heading",
+            "question": "Oltalama (Phishing) Nedir?",
+            "points": 0
+          },
+          {
+            "type": "text",
+            "question": "Phishing, saldırganların güvenilir bir kurum veya kişi gibi davranarak hassas bilgilerinizi ele geçirmeye çalışmasıdır.",
+            "points": 0
+          },
+          {
+            "type": "multiple_choice",
+            "question": "Bir e-postanın sahte (phishing) olduğunu nasıl anlarsınız?",
+            "options": [
+              "İsmimle hitap ediyorsa",
+              "Banka logoları içeriyorsa",
+              "Gönderici e-posta adresi resmi kurumu taklit ediyorsa ama ufak harf hataları varsa (örn: support@bannka.com)"
+            ],
+            "correct_answer": "Gönderici e-posta adresi resmi kurumu taklit ediyorsa ama ufak harf hataları varsa (örn: support@bannka.com)",
+            "explanation": "Logolar kopyalanabilir ancak e-posta domain adresleri taklit edilirken ufak harf oyunları yapılır.",
+            "points": 10
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "course-2",
+    "title": "Web Uygulama Güvenliği (OWASP)",
+    "description": "Yazılım geliştiriciler için temel zafiyetler ve güvenli kodlama pratikleri.",
+    "category": "technical",
+    "level": "intermediate",
+    "thumbnail_emoji": "⚔️",
+    "lessons": [
+      {
+        "id": "lesson-2",
+        "title": "Cross-Site Scripting (XSS)",
+        "xp_reward": 150,
+        "blocks": [
+          {
+            "type": "heading",
+            "question": "XSS (Cross-Site Scripting) Zafiyeti",
+            "points": 0
+          },
+          {
+            "type": "text",
+            "question": "XSS, kötü niyetli kullanıcıların web sayfalarına zararlı istemci tarafı (client-side) scriptleri enjekte etmesine olanak tanır.",
+            "points": 0
+          }
+        ]
+      }
+    ]
+  }
+]
