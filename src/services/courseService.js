@@ -6,10 +6,10 @@ import { supabase } from '../lib/supabase';
 export async function getCoursesByCategory(category) {
   const { data, error } = await supabase
     .from('courses')
-    .select('*, lessons(count)')
+    .select('*, lessons(id, title, xp_reward, is_published, order_index)')
     .eq('category', category)
     .eq('is_published', true)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: true });
   return { data, error };
 }
 

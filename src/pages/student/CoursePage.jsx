@@ -1,13 +1,15 @@
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCourse } from '../../hooks/useCourses';
+import { supabase } from '../../lib/supabase';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import Card from '../../components/Card';
 import ProgressBar from '../../components/ui/ProgressBar';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import {
   ArrowLeft, BookOpen, Zap, CheckCircle, Lock,
-  Play, ChevronRight, Users,
+  Play, ChevronRight, Users, ArrowRight,
 } from 'lucide-react';
 
 const LEVEL_LABELS = {
@@ -24,6 +26,56 @@ export default function CoursePage() {
     course, enrolled, progress, loading, enrolling, error,
     enroll, completedCount, totalCount, progressPct,
   } = useCourse(courseId);
+
+  const [courseLockInfo, setCourseLockInfo] = useState({ isLocked: false, prevCourse: null });
+  const [lockChecking, setLockChecking] = useState(true);
+
+  useEffect(() => {
+    async function checkCourseLock() {
+      if (!course || !user) {
+        setLockChecking(false);
+        return;
+      }
+      try {
+        const { data: allCourses } = await supabase
+          .from('courses')
+          .select('id, title, lessons(id, is_published)')
+          .eq('category', course.category)
+          .eq('is_published', true)
+          .order('created_at', { ascending: true });
+
+        const filtered = (allCourses || []).filter(
+          (c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')
+        );
+
+        const currentIdx = filtered.findIndex((c) => c.id === course.id);
+        if (currentIdx > 0) {
+          const prev = filtered[currentIdx - 1];
+          const prevLessonIds = (prev.lessons || []).filter((l) => l.is_published).map((l) => l.id);
+
+          if (prevLessonIds.length > 0) {
+            const { data: doneLessons } = await supabase
+              .from('lesson_progress')
+              .select('lesson_id')
+              .eq('user_id', user.id)
+              .eq('status', 'completed')
+              .in('lesson_id', prevLessonIds);
+
+            const doneCount = (doneLessons || []).length;
+            if (doneCount < prevLessonIds.length) {
+              setCourseLockInfo({ isLocked: true, prevCourse: prev });
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Kurs kilit kontrolü hatası:', err);
+      } finally {
+        setLockChecking(false);
+      }
+    }
+
+    checkCourseLock();
+  }, [course, user]);
 
   if (loading) {
     return (
@@ -75,9 +127,36 @@ export default function CoursePage() {
           <ArrowLeft size={16} /> Kurslara Dön
         </button>
 
-        {/* Kurs Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-900/50 to-purple-900/30 border border-violet-500/20 p-6">
-          <div className="absolute -top-8 -right-8 w-36 h-36 bg-violet-500/20 rounded-full blur-3xl" />
+        {/* Kurs Kilitli Uyarısı */}
+        {courseLockInfo.isLocked ? (
+          <Card className="border border-amber-500/30 bg-amber-950/20 text-center py-12 px-6 space-y-4">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/20 flex items-center justify-center text-3xl border border-amber-500/40">
+              🔒
+            </div>
+            <h2 className="text-2xl font-black text-white">Bu Kurs Henüz Kilitli</h2>
+            <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+              Müfredat akışına göre bu kursa başlayabilmek için öncelikle bir önceki kurs olan <strong className="text-amber-400">"{courseLockInfo.prevCourse?.title}"</strong> kursundaki tüm dersleri tamamlamanız gerekmektedir.
+            </p>
+            <div className="pt-3 flex items-center justify-center gap-3">
+              <button
+                onClick={() => navigate(`/student/courses/${courseLockInfo.prevCourse?.id}`)}
+                className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-lg shadow-amber-600/30 transition-all flex items-center gap-2"
+              >
+                <span>Önceki Kursa Git</span> <ArrowRight size={16} />
+              </button>
+              <button
+                onClick={() => navigate('/student/courses')}
+                className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-medium text-sm transition-all"
+              >
+                Tüm Kurslar
+              </button>
+            </div>
+          </Card>
+        ) : (
+          <>
+            {/* Kurs Header */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-900/50 to-purple-900/30 border border-violet-500/20 p-6">
+              <div className="absolute -top-8 -right-8 w-36 h-36 bg-violet-500/20 rounded-full blur-3xl" />
           <div className="relative flex gap-5">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/30 to-pink-500/20 flex items-center justify-center text-4xl border border-white/10 shrink-0">
               {course.thumbnail_emoji}
@@ -232,6 +311,8 @@ export default function CoursePage() {
             <h3 className="font-display font-bold text-emerald-400">Tebrikler! Kursu tamamladın!</h3>
             <p className="text-xs text-slate-400">Bu kursu başarıyla bitirdin. Diğer kurslara göz atabilirsin.</p>
           </Card>
+        )}
+          </>
         )}
 
       </div>

@@ -4,7 +4,7 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { enrollInCourse } from '../../services/courseService';
-import { Zap, CheckCircle2, Lock, ArrowRight, BookOpen, Sparkles, Play } from 'lucide-react';
+import { Zap, CheckCircle2, Lock, ArrowRight, BookOpen, Sparkles, Play, AlertCircle } from 'lucide-react';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 export default function LearningPath() {
@@ -14,6 +14,12 @@ export default function LearningPath() {
   const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set());
   const [completedLessonIds, setCompletedLessonIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 4000);
+  };
 
   useEffect(() => {
     async function loadPath() {
@@ -75,7 +81,11 @@ export default function LearningPath() {
     loadPath();
   }, [profile, user]);
 
-  const handleCourseClick = async (course, isEnrolled) => {
+  const handleCourseClick = async (course, isEnrolled, isLocked, prevCourse) => {
+    if (isLocked) {
+      showToast(`🔒 Bu kursa geçebilmek için önce "${prevCourse?.title || 'önceki kursu'}" tamamlamalısınız.`);
+      return;
+    }
     if (!isEnrolled && user) {
       // Kursa kaydol
       await enrollInCourse(user.id, course.id);
@@ -121,15 +131,22 @@ export default function LearningPath() {
           <div className="absolute left-1/2 top-0 bottom-0 w-1 -translate-x-1/2 bg-gradient-to-b from-violet-600 via-pink-600 to-slate-800 rounded-full z-0 hidden md:block" />
 
           <div className="space-y-12 relative z-10">
-            {courses.map((course, idx) => {
+            {courses.map((course, idx, arr) => {
               const isLeft = idx % 2 === 0;
               const pubLessons = (course.lessons || []).filter((l) => l.is_published);
               const totalLessons = pubLessons.length;
               const completedCount = pubLessons.filter((l) => completedLessonIds.has(l.id)).length;
               const isCompleted = totalLessons > 0 && completedCount === totalLessons;
               const isEnrolled = enrolledCourseIds.has(course.id) || idx === 0;
-              const isActive = idx === currentActiveIdx;
-              const isLocked = idx > currentActiveIdx + 1 && !isEnrolled;
+
+              // Sıralı ilerleme mantığı:
+              const prevCourse = idx > 0 ? arr[idx - 1] : null;
+              const prevPubLessons = prevCourse ? (prevCourse.lessons || []).filter((l) => l.is_published) : [];
+              const isPrevCompleted = idx === 0 || (
+                prevPubLessons.length > 0 && prevPubLessons.every((l) => completedLessonIds.has(l.id))
+              );
+              const isLocked = !isPrevCompleted;
+              const isActive = !isLocked && !isCompleted;
 
               const totalXp = pubLessons.reduce((acc, l) => acc + (l.xp_reward || 0), 0);
 
@@ -141,14 +158,14 @@ export default function LearningPath() {
                   {/* Kart Alanı */}
                   <div className={`w-full md:w-[45%] ${isLeft ? 'md:text-right' : 'md:text-left'}`}>
                     <div 
-                      onClick={() => !isLocked && handleCourseClick(course, isEnrolled)}
+                      onClick={() => handleCourseClick(course, isEnrolled, isLocked, prevCourse)}
                       className={`p-5 rounded-2xl border transition-all duration-300 ${
                         isCompleted
                           ? 'glass border-emerald-500/50 bg-emerald-950/20 hover:border-emerald-400 hover:scale-[1.02] cursor-pointer'
-                          : isActive || isEnrolled
-                            ? 'glass border-violet-500 shadow-[0_0_25px_rgba(124,58,237,0.3)] hover:scale-[1.02] cursor-pointer' 
-                            : isLocked
-                              ? 'glass border-white/5 opacity-50 cursor-not-allowed'
+                          : isLocked
+                            ? 'glass border-white/5 bg-slate-900/40 opacity-60 cursor-not-allowed'
+                            : isActive || isEnrolled
+                              ? 'glass border-violet-500 shadow-[0_0_25px_rgba(124,58,237,0.3)] hover:scale-[1.02] cursor-pointer' 
                               : 'glass border-white/10 hover:border-violet-500/40 hover:scale-[1.02] cursor-pointer'
                       }`}
                     >
@@ -159,8 +176,13 @@ export default function LearningPath() {
                             <CheckCircle2 size={12} />
                             Tamamlandı
                           </span>
+                        ) : isLocked ? (
+                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-white/10 flex items-center gap-1">
+                            <Lock size={11} />
+                            Kilitli
+                          </span>
                         ) : isEnrolled ? (
-                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/40 animate-pulse">
+                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/40">
                             Kayıtlı • {completedCount}/{totalLessons} Ders
                           </span>
                         ) : (
@@ -171,11 +193,15 @@ export default function LearningPath() {
                       </div>
 
                       <div className={`flex items-start gap-3 ${isLeft ? 'md:flex-row-reverse' : ''}`}>
-                        <div className="text-3xl shrink-0 p-2 rounded-xl bg-white/5 border border-white/10">
-                          {course.thumbnail_emoji || '🛡️'}
+                        <div className={`text-3xl shrink-0 p-2 rounded-xl border ${
+                          isLocked 
+                            ? 'bg-slate-800/40 border-white/5 grayscale' 
+                            : 'bg-white/5 border-white/10'
+                        }`}>
+                          {isLocked ? '🔒' : (course.thumbnail_emoji || '🛡️')}
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-base text-white">{course.title}</h3>
+                          <h3 className={`font-bold text-base ${isLocked ? 'text-slate-400' : 'text-white'}`}>{course.title}</h3>
                           <p className="text-xs text-slate-400 mt-1 line-clamp-2">
                             {course.description || 'İnteraktif siber güvenlik modülleri ve pratik senaryolar.'}
                           </p>
@@ -183,7 +209,11 @@ export default function LearningPath() {
                       </div>
                       
                       {/* Aksiyon Butonu */}
-                      {!isLocked && (
+                      {isLocked ? (
+                        <div className={`mt-4 pt-3 border-t border-white/5 flex items-center gap-1.5 text-xs font-semibold text-slate-500 ${isLeft ? 'md:justify-end' : ''}`}>
+                          <Lock size={12} /> Önceki Kursu Tamamla
+                        </div>
+                      ) : (
                         <div className={`mt-4 pt-3 border-t border-white/10 flex items-center gap-1.5 text-xs font-bold ${
                           isCompleted ? 'text-emerald-400' : isEnrolled ? 'text-violet-400' : 'text-cyan-400'
                         } ${isLeft ? 'md:justify-end' : ''}`}>
@@ -205,13 +235,13 @@ export default function LearningPath() {
                       <div className="w-full h-full rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
                         <CheckCircle2 size={20} />
                       </div>
+                    ) : isLocked ? (
+                      <div className="w-full h-full rounded-full bg-slate-800 text-slate-500 flex items-center justify-center border border-white/5">
+                        <Lock size={16} />
+                      </div>
                     ) : isActive || isEnrolled ? (
                       <div className="w-full h-full rounded-full bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center text-white ring-4 ring-violet-500/30 shadow-lg shadow-violet-500/30">
                         {idx + 1}
-                      </div>
-                    ) : isLocked ? (
-                      <div className="w-full h-full rounded-full bg-slate-800 text-slate-500 flex items-center justify-center">
-                        <Lock size={16} />
                       </div>
                     ) : (
                       <div className="w-full h-full rounded-full bg-slate-800 text-slate-300 flex items-center justify-center">
@@ -227,6 +257,14 @@ export default function LearningPath() {
             })}
           </div>
         </div>
+
+        {/* Toast Bildirimi */}
+        {toast && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-2xl transition-all duration-300 animate-slide-up bg-slate-900/95 border-amber-500/50 text-amber-300 text-sm font-medium">
+            <AlertCircle size={18} className="shrink-0 text-amber-400" />
+            <span>{toast}</span>
+          </div>
+        )}
 
       </div>
     </DashboardLayout>

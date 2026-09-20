@@ -8,7 +8,7 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import Card from '../../components/Card';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState';
-import { BookOpen, Zap, ArrowRight, Shield, Code2, CheckCircle2, Play } from 'lucide-react';
+import { BookOpen, Zap, ArrowRight, Shield, Code2, CheckCircle2, Play, Lock, AlertCircle } from 'lucide-react';
 
 // ─── Kategori görünüm ayarları ────────────────────────────────────────────────
 const CATEGORY_UI = {
@@ -119,12 +119,23 @@ export default function CourseList() {
     );
   }
 
-  const handleCardClick = async (courseId, isEnrolled) => {
-    if (!isEnrolled && user) {
-      await enrollInCourse(user.id, courseId);
-      setEnrolledMap((prev) => ({ ...prev, [courseId]: true }));
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'info') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
+
+  const handleCardClick = async (course, isEnrolled, isLocked, prevCourse) => {
+    if (isLocked) {
+      showToast(`🔒 Bu kurs kilitlidir. Başlamak için önce "${prevCourse?.title || 'önceki kursu'}" tamamlamalısınız.`, 'warning');
+      return;
     }
-    navigate(`/student/courses/${courseId}`);
+    if (!isEnrolled && user) {
+      await enrollInCourse(user.id, course.id);
+      setEnrolledMap((prev) => ({ ...prev, [course.id]: true }));
+    }
+    navigate(`/student/courses/${course.id}`);
   };
 
   return (
@@ -163,7 +174,7 @@ export default function CourseList() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {courses
               .filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği'))
-              .map((course, idx) => {
+              .map((course, idx, arr) => {
               const lessonsForCourse = courseLessonsMap[course.id] || [];
               const lessonCount = lessonsForCourse.length || course.lessons?.[0]?.count || 0;
               const completedCount = lessonsForCourse.filter((id) => completedLessons.has(id)).length;
@@ -171,26 +182,42 @@ export default function CourseList() {
               const isEnrolled = enrolledMap[course.id] || idx === 0;
               const level = LEVEL_LABELS[course.level] || LEVEL_LABELS.beginner;
 
+              // Sıralı ilerleme mantığı:
+              // İlk kurs (idx === 0) açıktır.
+              // Sonraki kurslar (idx > 0) ancak önceki kurs tamamlandığında açılır.
+              const prevCourse = idx > 0 ? arr[idx - 1] : null;
+              const prevLessons = prevCourse ? (courseLessonsMap[prevCourse.id] || []) : [];
+              const isPrevCompleted = idx === 0 || (
+                prevLessons.length > 0 && prevLessons.every((id) => completedLessons.has(id))
+              );
+              const isLocked = !isPrevCompleted;
+
               return (
                 <div
                   key={course.id}
-                  onClick={() => handleCardClick(course.id, isEnrolled)}
-                  className="group cursor-pointer"
+                  onClick={() => handleCardClick(course, isEnrolled, isLocked, prevCourse)}
+                  className={`group ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   <Card
-                    hover
+                    hover={!isLocked}
                     className={`h-full border transition-all duration-200 ${
                       isCompleted
                         ? 'border-emerald-500/40 bg-emerald-950/10 hover:border-emerald-400'
-                        : isEnrolled
-                          ? 'border-violet-500/40 hover:border-violet-400'
-                          : 'border-white/10 hover:border-violet-500/40'
+                        : isLocked
+                          ? 'border-white/5 bg-slate-900/40 opacity-60'
+                          : isEnrolled
+                            ? 'border-violet-500/40 hover:border-violet-400'
+                            : 'border-white/10 hover:border-violet-500/40'
                     }`}
                   >
                     {/* Üst: emoji + badge */}
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500/20 to-pink-500/10 flex items-center justify-center text-3xl border border-white/10">
-                        {course.thumbnail_emoji || '🛡️'}
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl border ${
+                        isLocked 
+                          ? 'bg-slate-800/50 border-white/5 grayscale' 
+                          : 'bg-gradient-to-br from-violet-500/20 to-pink-500/10 border-white/10'
+                      }`}>
+                        {isLocked ? '🔒' : (course.thumbnail_emoji || '🛡️')}
                       </div>
                       
                       <div className="flex items-center gap-1.5">
@@ -198,6 +225,11 @@ export default function CourseList() {
                           <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
                             <CheckCircle2 size={12} />
                             Tamamlandı
+                          </span>
+                        ) : isLocked ? (
+                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-slate-800/80 text-slate-400 border border-white/10 flex items-center gap-1">
+                            <Lock size={11} />
+                            Kilitli
                           </span>
                         ) : isEnrolled ? (
                           <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/40">
@@ -215,7 +247,9 @@ export default function CourseList() {
                     </div>
 
                     {/* Başlık ve açıklama */}
-                    <h3 className="font-display font-bold text-lg text-white group-hover:text-violet-300 transition-colors">
+                    <h3 className={`font-display font-bold text-lg transition-colors ${
+                      isLocked ? 'text-slate-400' : 'text-white group-hover:text-violet-300'
+                    }`}>
                       {course.title}
                     </h3>
                     {course.description && (
@@ -233,6 +267,8 @@ export default function CourseList() {
                       <div className="ml-auto flex items-center gap-1 text-xs font-semibold transition-all">
                         {isCompleted ? (
                           <span className="text-emerald-400 flex items-center gap-1">Tekrar İncele <ArrowRight size={13} /></span>
+                        ) : isLocked ? (
+                          <span className="text-slate-500 flex items-center gap-1">Önceki Kursu Tamamla <Lock size={12} /></span>
                         ) : isEnrolled ? (
                           <span className="text-violet-400 flex items-center gap-1">Devam Et <ArrowRight size={13} /></span>
                         ) : (
@@ -244,6 +280,14 @@ export default function CourseList() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Toast Bildirimi */}
+        {toast && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-2xl transition-all duration-300 animate-slide-up bg-slate-900/95 border-amber-500/50 text-amber-300 text-sm font-medium">
+            <AlertCircle size={18} className="shrink-0 text-amber-400" />
+            <span>{toast.message}</span>
           </div>
         )}
 
