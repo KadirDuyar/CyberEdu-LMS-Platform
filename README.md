@@ -1,0 +1,238 @@
+# 🛡️ CyberEdu LMS — Açık ve Uzaktan Öğrenme Siber Güvenlik Platformu
+
+Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eğitim platformu. Üniversite, kurum veya bireysel eğitimler için hem genel siber farkındalık hem de ileri teknik zafiyet laboratuvarları sunar.
+
+![CyberEdu Platformu](https://img.shields.io/badge/Platform-CyberEdu_LMS-blueviolet?style=for-the-badge)
+![React 18](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)
+![Supabase](https://img.shields.io/badge/Database-Supabase_PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase)
+![Google Gemini](https://img.shields.io/badge/AI-Google_Gemini-4285F4?style=for-the-badge&logo=google)
+
+---
+
+## 📑 İçindekiler
+1. [Proje Hakkında](#-proje-hakkında)
+2. [Temel Teknolojiler](#-temel-teknolojiler)
+3. [Kullanıcı Rolleri & Mimari](#-kullanıcı-rolleri--mimari)
+4. [Öğrenci Özellikleri](#-öğrenci-özellikleri)
+5. [Oyunlaştırma & Karakter Koleksiyonu](#-oyunlaştırma--karakter-koleksiyonu)
+6. [Yapay Zeka (AI) Entegrasyonu](#-yapay-zeka-ai-entegrasyonu)
+7. [Öğretmen / Eğitmen Özellikleri](#-öğretmen--eğitmen-özellikleri)
+8. [Yönetici (Admin) Özellikleri](#-yönetici-admin-özellikleri)
+9. [Veritabanı Şeması & Migrasyonlar](#-veritabanı-şeması--migrasyonlar)
+10. [Kurulum & Çalıştırma](#-kurulum--çalıştırma)
+11. [Canlıya Alma (Vercel Deployment)](#-canlıya-alma-vercel-deployment)
+
+---
+
+## 🚀 Proje Hakkında
+
+**CyberEdu LMS**, öğrencilerin siber güvenlik bilgi ve yeteneklerini iki farklı uzmanlık hattında (Farkındalık ve Teknik Parkur) geliştirmelerini sağlayan açık ve uzaktan öğrenme yönetim sistemidir. Platform; teorik anlatımları interaktif etkinlikler, oyunlaştırma dinamikleri (XP, unvanlar, açılabilir avatarlar) ve gerçek zamanlı bir yapay zeka asistanı ile harmanlayarak yüksek motivasyonlu bir öğrenme deneyimi sunar.
+
+---
+
+## 🛠️ Temel Teknolojiler
+
+- **Frontend:** React 18 (Vite tabanlı), React Router DOM v6
+- **Stil & Tasarım:** Tailwind CSS, Özel Siber Neon Koyu Tema (Cyberpunk / Modern Dark UI), Glassmorphism efektleri
+- **İkonlar & Animasyonlar:** Lucide React, Framer Motion
+- **Backend / Veritabanı:** Supabase (PostgreSQL, Row Level Security - RLS Politikaları, Auth)
+- **Yapay Zeka (AI):** Google Gemini 1.5 Flash / Flash Lite API (Öğrenci Mentorluğu ve Öğretmen İçerik Üretimi)
+- **Medya Entegrasyonu:** Özel YouTube Player API kontrolleri (Zaman çubuğu, 10s ileri/geri sarma, tam ekran)
+
+---
+
+## 👥 Kullanıcı Rolleri & Mimari
+
+Sistemde 3 temel kullanıcı rolü bulunur ve her rol kendi yetki sınırları dahilinde çalışır:
+
+1. **Öğrenci (`student`):**
+   - Kendi parkurundaki zorunlu dersleri sırayla takip eder.
+   - Seçmeli kurslara serbestçe kaydolur.
+   - İnteraktif etkinlikleri tamamlar, XP kazanır, karakter ve rozetlerin kilidini açar.
+   - AI Mentor'dan ders çalışırken ipucu desteği alır.
+2. **Öğretmen (`teacher`):**
+   - Yeni kurs ve ders modülleri oluşturur/yayınlar.
+   - Soru, eşleştirme, video ve anlatım blokları tasarlar (veya YZ ile otomatik üretir).
+   - Öğrencilerin detaylı analizlerini ve **en son tamamladıkları dersleri** anlık olarak izler.
+3. **Yönetici (`admin`):**
+   - Tüm kullanıcıları, rolleri ve kursları yönetir.
+   - Gerektiğinde öğrenci ilerlemelerini sıfırlayabilir.
+
+---
+
+## 🎓 Öğrenci Özellikleri
+
+### 1. Akıllı Oryantasyon (Navigator)
+- Yeni kayıt olan öğrenciye özel rehber arayüzü sunulur.
+- İlgi alanına göre iki parkurdan birini seçer:
+  - 🛡️ **Siber Farkındalık Parkuru:** Günlük dijital güvenlik, phishing, şifre güvenliği, sosyal mühendislik.
+  - 💻 **Teknik Güvenlik Parkuru:** HTTP/HTTPS, SQL Injection, XSS, ağ protokolleri, sızma testi temelleri.
+- Seviyesini belirler (Başlangıç, Orta, İleri).
+
+### 2. Akıllı Öğrenci Kontrol Paneli (Dashboard)
+- **Yeni Öğrenci Karşılama ("🎯 İlk Kursun Hazır!"):** Henüz ders tamamlamamış yeni kayıtlı öğrencilere özel bir karşılama kartı ve ilk dersine tek tıkla başlama butonu sunar.
+- **Kaldığın Yerden Devam Etme:** Öğrencinin son çalıştığı veya dersini bitirdiği kursu anlık olarak hafızada tutar ve doğrudan sıradaki dersi önerir.
+- **Kurs Tamamlama Kutlaması:** Kursun tüm dersleri bittiğinde tebrik banner'ı çıkar ve sıradaki kursları önerir.
+- **Metrik Sayaçları:** Toplam öğrenme süresi (dk/saat), kazanılan toplam XP ve aktif kurs ilerleme yüzdesi.
+- **Canlı Liderlik Tablosu:** Tüm öğrenciler arasındaki sıralama ve puan tablosu.
+
+### 3. Öğrenme Yolculuğum (Zorunlu Çekirdek Müfredat)
+- Yalnızca **Zorunlu Kursları (`is_mandatory = true`)** içeren sarmal yol haritası.
+- Sıralı kilit mantığı: Bir sonraki zorunlu kursa geçebilmek için önceki kursun tüm derslerinin bitirilmesi gerekir.
+- Sayfa altında seçmeli kursları keşfetme daveti bulunur.
+
+### 4. Kurslar Kataloğu (Seçmeli & Zorunlu Kurslar)
+- Sekmeler: `Tüm Kurslar`, `🌟 Seçmeli Kurslar`, `📌 Zorunlu Müfredat`.
+- **Seçmeli Kurs Serbestliği:** Seçmeli kurslarda ön koşul kilidi yoktur (`isLocked = false`). Öğrenci ilgisini çeken seçmeli kursa istediği zaman başlayabilir.
+- Her kartta ders sayısı, zorunluk durumu ve zorluk seviyesi gösterilir.
+
+### 5. İnteraktif Ders & Etkinlik Motoru
+- **Markdown Destekli Ders İçeriği:** Zengin biçimlendirilmiş metinler ve kod blokları.
+- **Çoktan Seçmeli Sorular:** Anlık doğruluk kontrolü ve geri bildirim.
+- **Doğru / Yanlış Soruları:** Hızlı pekiştirme soruları.
+- **Boşluk Doldurma:** Metin tabanlı etkileşimler.
+- **Eşleştirme (Matching):** Kavram ve tanımları eşleştiren interaktif kartlar.
+- **Gelişmiş Video Eğitimi:** Özel video ilerleme çubuğu (slider), dakika:saniye sayacı, -10 sn geri sarma, +10 sn ileri sarma, baştan başlatma ve tam ekran izleme.
+- **Başarı Eşiği:** Dersin tamamlanabilmesi için interaktif sorulardan en az %80 başarı elde edilmesi gerekir.
+
+---
+
+## 🏆 Oyunlaştırma & Karakter Koleksiyonu
+
+Öğrencilerin eğitimde sürekliliğini sağlamak için çok katmanlı bir ödül sistemi inşa edilmiştir:
+
+### 1. Açılabilir Siber Kahraman Karakterleri (Avatarlar)
+Kurslar tamamlandıkça yeni karakterlerin kilitleri açılır:
+- `👨‍💻` **Siber Çırak** & `👩‍💻` **Kod Stratejisti** & `🚀` **Dijital Kaşif** *(Başlangıçta açık)*
+- `🛡️` **Kalkan Muhafızı** — *Siber Güvenliğe Giriş* kursuyla açılır.
+- `🕵️‍♂️` **Siber Dedektif** — *Phishing Nedir?* veya *Sosyal Mühendislik* kursuyla açılır.
+- `🔑` **Kripto Hakimi** — *Güçlü Parola Kullanımı* kursuyla açılır.
+- `⚡` **İki Aşamalı Bekçi** — *MFA & 2FA Nedir?* kursuyla açılır.
+- `🌐` **Protokol Mimarı** — *HTTP & HTTPS Temelleri* kursuyla açılır.
+- `🥷` **Veritabanı Ninjası** — *SQL Injection Temelleri* kursuyla açılır.
+- `🧙‍♂️` **Kod Büyücüsü** — *XSS Temelleri* kursuyla açılır.
+- `🦾` **Siber Gladyatör** — *Brute Force & Parola Güvenliği* kursuyla açılır.
+- `🦅` **Ağ Şahini** — *Network & Port Güvenliği* kursuyla açılır.
+- `👑` **Siber Lord** — En az 3 kurs bitiren öğrencilere açılır.
+
+### 2. Başarılar / Şampiyonlar Odası (`/student/achievements`)
+- **Karakteri Kuşan:** Öğrenci kilidi açılmış herhangi bir karakter kartındaki *"Karakteri Kuşan ✨"* butonuna basarak profil resmini tek tıkla değiştirebilir.
+- **Başarı Rozetleri:** *İlk Adım*, *İlk Mezuniyet*, *Oltalama Avcısı*, *XP Avcısı (500+ XP)* gibi kazanılan tüm madalyalar listelenir.
+- **Siber Unvanlar:** Öğrencinin tamamladığı uzmanlık konularına göre hak ettiği prestij unvanları.
+
+---
+
+## 🤖 Yapay Zeka (AI) Entegrasyonu
+
+Platformda Google Gemini API ile çalışan iki yönlü yapay zeka gücü bulunur:
+
+1. **Öğrenci AI Mentor (Sağ Altta Sabit Widget):**
+   - Her sayfada sağ altta bulunan butona tıklandığında modern bir sohbet penceresi açılır.
+   - Sokratik yöntem: Öğrenci bir soruda zorlandığında cevabı doğrudan söylemek yerine düşünmeye teşvik edici ipuçları verir.
+   - Siber güvenlik kavramlarını açıklar ve yol gösterir.
+2. **Öğretmen İçerik Asistanı (YZ ile Üret):**
+   - Kurs ve ders oluştururken öğretmen konu başlığını ve hedefini girer.
+   - Yapay zeka saniyeler içinde zengin ders içeriği, çoktan seçmeli sorular ve eşleştirme etkinlikleri üretir.
+
+---
+
+## 👨‍🏫 Öğretmen / Eğitmen Özellikleri
+
+### 1. Eğitmen Kontrol Paneli (`/teacher`)
+- Toplam kurs, yayındaki kurs, kayıtlı öğrenci sayıları.
+- Hızlı farkındalık ve teknik kurs şablonu başlatma kısayolları.
+- Hazırlanan kursların yönetim listesi.
+
+### 2. Müfredat & Ders Editörü (`/teacher/courses/:id/edit`)
+- Kurs başlığı, açıklaması, kategorisi (Farkındalık / Teknik), seviyesi ve küçük resim emojisi düzenleme.
+- Ders ekleme, sıralama ve yayınlama kontrolleri.
+
+### 3. Görsel Ders İnşa Edici (Lesson Builder)
+- Ders içerisine serbestçe blok ekleme:
+  - 📝 Anlatım & Markdown Metni
+  - ❓ Çoktan Seçmeli Test Sorusu
+  - 🧩 Eşleştirme Etkinliği
+  - 🎥 YouTube Video Eğitimi
+- Blokları yukarı/aşağı taşıma ve canlı önizleme.
+
+### 4. Öğrenci Analiz & İstatistik Merkezi (`/teacher/stats`)
+- **🎯 En Son Tamamlanan Ders Takibi:** Her öğrencinin bitirdiği en son dersin adı, ait olduğu kurs ve zaman damgası (*"10 dk önce"*, *"Bugün"*, *"Dün"*) canlı olarak listelenir.
+- **Öğrenci Kartları & İlerleme:** Tamamlanan ders sayısı, toplam XP, seviye ve parkur bilgisi.
+- **Filtreleme & Arama:** Öğrenci adına göre anlık arama, parkura göre (`Farkındalık` / `Teknik`) filtreleme ve `En Son Tamamlayanlar` sıralaması.
+
+---
+
+## 👑 Yönetici (Admin) Özellikleri
+
+- **Kullanıcı Yönetimi (`/admin`):** Sistemdeki tüm kullanıcıları listeleme, rolleri (`student`, `teacher`, `admin`) anında değiştirme.
+- **Öğrenci İlerlemesini Sıfırlama:** Test süreçleri için öğrencinin XP, seviye ve ders ilerlemelerini güvenli onay penceresiyle sıfırlama.
+- **Sistem İstatistikleri:** Platform genelindeki toplam kullanıcı, öğrenci, öğretmen ve kurs metrikleri.
+
+---
+
+## 🗄️ Veritabanı Şeması & Migrasyonlar
+
+Proje veritabanı Supabase üzerinde PostgreSQL ile yapılandırılmıştır. Tüm tablolar Row Level Security (RLS) politikaları ile korunmaktadır.
+
+### Tablolar:
+- `profiles`: Kullanıcı profil bilgileri (rol, xp, seviye, avatar_emoji, learning_area).
+- `courses`: Kurslar (`is_mandatory`, `course_type`, `category`, `level`, `thumbnail_emoji`).
+- `lessons`: Dersler (`course_id`, `title`, `content`, `order_index`, `xp_reward`, `is_published`).
+- `activities`: İnteraktif aktiviteler (`lesson_id`, `type`, `question`, `options`, `correct_answer`, `points`).
+- `enrollments`: Kurs kayıtları (`user_id`, `course_id`, `status`, `enrolled_at`, `completed_at`).
+- `lesson_progress`: Ders tamamlama durumları (`user_id`, `lesson_id`, `status`, `completed_at`, `updated_at`).
+- `activity_attempts`: Soru cevaplama ve puan denemeleri.
+- `badges` & `user_badges`: Başarı rozetleri ve kazanım kayıtları.
+
+### ⚡ Gerekli SQL Dosyaları:
+1. `supabase/migration.sql`: Temel veritabanı şeması ve RLS politikaları.
+2. `supabase/add_mandatory_elective_courses.sql`: Zorunlu/seçmeli kurs alanları ve enrollments güncellemesi.
+3. `supabase/seed_exact_courses.sql`: Farkındalık ve Teknik standart kurs müfredat verileri.
+
+---
+
+## 💻 Kurulum & Çalıştırma
+
+### 1. Depoyu Klonlayın
+```bash
+git clone https://github.com/KadirDuyar/acikVeUzaktanOgrenme.git
+cd acikVeUzaktanOgrenme
+```
+
+### 2. Bağımlılıkları Yükleyin
+```bash
+npm install
+```
+
+### 3. Çevre Değişkenlerini Tanımlayın (`.env`)
+Proje kök dizininde bir `.env` dosyası oluşturun:
+```env
+VITE_SUPABASE_URL=https://projeniz.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOi...anon-key
+VITE_GEMINI_API_KEY=AIzaSy...gemini-api-key
+```
+
+### 4. Geliştirme Sunucusunu Başlatın
+```bash
+npm run dev
+```
+Uygulama varsayılan olarak `http://localhost:5173` adresinde açılacaktır.
+
+---
+
+## 🌐 Canlıya Alma (Vercel Deployment)
+
+1. Projeyi GitHub reponuza push edin (`git push origin main`).
+2. [Vercel Dashboard](https://vercel.com) üzerinden **Add New Project** seçeneğiyle deponuzu bağlayın.
+3. **Environment Variables** bölümüne `.env` dosyanızdaki anahtarları ekleyin:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_GEMINI_API_KEY`
+4. **Deploy** butonuna tıklayın. Vercel projeyi otomatik olarak derleyip yayına alacaktır.
+
+---
+
+## 📄 Lisans
+Bu proje eğitim amaçlı açık ve uzaktan öğrenme platformu olarak geliştirilmiştir.
+Tüm hakları saklıdır © 2026 CyberEdu LMS.
