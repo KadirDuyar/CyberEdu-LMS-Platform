@@ -8,8 +8,9 @@ import ActivityRenderer from '../../components/activities/ActivityRenderer';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import {
   ArrowLeft, CheckCircle, Zap, BookOpen, ChevronRight,
-  Trophy, RotateCcw
+  Trophy, RotateCcw, Sparkles
 } from 'lucide-react';
+import { findNewUnlockedReward } from '../../data/achievementsData';
 
 const PASS_PERCENT = 80;
 
@@ -353,7 +354,8 @@ export default function LessonPage() {
                 Bu kurstaki tüm dersleri, soru ve uygulamaları başarıyla tamamladın. Siber güvenlik yolculuğunda büyük bir adım attın!
               </p>
 
-              <div className="flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 my-4 shadow-lg">
+              {/* XP Kazancı */}
+              <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 my-3 shadow-lg">
                 <Zap className="text-amber-400" size={24} />
                 <span className="font-display font-black text-2xl text-amber-400">
                   {earnedXP > 0 ? `+${earnedXP} XP` : 'Tüm XP\'ler Toplandı'}
@@ -363,18 +365,39 @@ export default function LessonPage() {
                 </span>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 w-full mt-2">
+              {/* Yeni Açılan Karakter & Ödül Kartı */}
+              {(() => {
+                const reward = findNewUnlockedReward(lesson.courses?.title);
+                if (!reward) return null;
+                return (
+                  <div className="w-full my-3 p-4 rounded-2xl bg-gradient-to-r from-violet-950/80 via-purple-950/60 to-slate-900 border border-violet-500/40 flex items-center gap-4 text-left shadow-xl">
+                    <div className="w-14 h-14 rounded-2xl bg-violet-600/30 border border-violet-400/50 flex items-center justify-center text-3xl shadow-inner shrink-0 animate-bounce-subtle">
+                      {reward.emoji}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30 inline-flex items-center gap-1">
+                        <Sparkles size={11} /> Yeni Başarı Rozeti & Unvanı Kazandın!
+                      </span>
+                      <h4 className="font-bold text-white text-base mt-1.5">{reward.title}</h4>
+                      <p className="text-xs text-violet-300 font-bold mb-0.5">{reward.name}</p>
+                      <p className="text-[11px] text-slate-400 line-clamp-2">Başarılar menüsünden yeni rozetini ve madalyanı inceleyebilirsin.</p>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div className="flex flex-col sm:flex-row gap-3 w-full mt-3">
                 <button
-                  onClick={() => navigate('/student/courses')}
-                  className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-sm shadow-xl shadow-emerald-500/30 hover:scale-[1.02] transition-all"
+                  onClick={() => navigate('/student/achievements')}
+                  className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 text-white font-bold text-sm shadow-xl shadow-violet-600/30 hover:scale-[1.02] transition-all"
                 >
-                  <BookOpen size={18} /> Başka Kurslara Bak
+                  <Trophy size={18} /> Rozetlerimi & Başarılarımı Gör
                 </button>
                 <button
-                  onClick={() => navigate('/student')}
+                  onClick={() => navigate('/student/courses')}
                   className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 font-semibold text-sm transition-all"
                 >
-                  <ArrowLeft size={18} /> Dashboard'a Dön
+                  <BookOpen size={18} /> Başka Kurslara Bak
                 </button>
               </div>
             </div>

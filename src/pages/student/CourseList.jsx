@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCourses } from '../../hooks/useCourses';
 import { supabase } from '../../lib/supabase';
@@ -8,7 +8,7 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import Card from '../../components/Card';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState';
-import { BookOpen, Zap, ArrowRight, Shield, Code2, CheckCircle2, Play, Lock, AlertCircle } from 'lucide-react';
+import { BookOpen, Zap, ArrowRight, Shield, Code2, CheckCircle2, Play, Lock, AlertCircle, Sparkles, Filter } from 'lucide-react';
 
 // ─── Kategori görünüm ayarları ────────────────────────────────────────────────
 const CATEGORY_UI = {
@@ -42,9 +42,11 @@ const LEVEL_LABELS = {
 
 export default function CourseList() {
   const navigate             = useNavigate();
+  const [searchParams]       = useSearchParams();
   const { user, profile }    = useAuth();
   const { courses, loading, error } = useCourses();
 
+  const [activeTab, setActiveTab] = useState(searchParams.get('filter') === 'elective' ? 'elective' : 'all');
   const [enrolledMap, setEnrolledMap] = useState({});
   const [completedLessons, setCompletedLessons] = useState(new Set());
   const [courseLessonsMap, setCourseLessonsMap] = useState({});
@@ -163,6 +165,40 @@ export default function CourseList() {
           </div>
         </div>
 
+        {/* Filtreleme Sekmeleri: Tümü, Seçmeli, Zorunlu */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-4">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'all'
+                ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25'
+                : 'bg-white/5 hover:bg-white/10 text-slate-300'
+            }`}
+          >
+            Tüm Kurslar ({courses.filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')).length})
+          </button>
+          <button
+            onClick={() => setActiveTab('elective')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === 'elective'
+                ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25'
+                : 'bg-white/5 hover:bg-white/10 text-amber-300/90'
+            }`}
+          >
+            <Sparkles size={13} /> Seçmeli Kurslar
+          </button>
+          <button
+            onClick={() => setActiveTab('mandatory')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === 'mandatory'
+                ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/25'
+                : 'bg-white/5 hover:bg-white/10 text-cyan-300/90'
+            }`}
+          >
+            📌 Zorunlu Müfredat
+          </button>
+        </div>
+
         {/* İçerik */}
         {loading ? (
           <LoadingSpinner fullPage message="Kurslar yükleniyor..." />
@@ -178,6 +214,12 @@ export default function CourseList() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {courses
               .filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği'))
+              .filter((c) => {
+                const isElective = c.is_mandatory === false || c.course_type === 'elective';
+                if (activeTab === 'elective') return isElective;
+                if (activeTab === 'mandatory') return !isElective;
+                return true;
+              })
               .map((course, idx, arr) => {
               const lessonsForCourse = courseLessonsMap[course.id] || [];
               const lessonCount = lessonsForCourse.length || course.lessons?.[0]?.count || 0;
@@ -186,15 +228,26 @@ export default function CourseList() {
               const isEnrolled = enrolledMap[course.id] || idx === 0;
               const level = LEVEL_LABELS[course.level] || LEVEL_LABELS.beginner;
 
+              const isElective = course.is_mandatory === false || course.course_type === 'elective';
+              const isMandatory = !isElective;
+
               // Sıralı ilerleme mantığı:
-              // İlk kurs (idx === 0) açıktır.
-              // Sonraki kurslar (idx > 0) ancak önceki kurs tamamlandığında açılır.
-              const prevCourse = idx > 0 ? arr[idx - 1] : null;
-              const prevLessons = prevCourse ? (courseLessonsMap[prevCourse.id] || []) : [];
-              const isPrevCompleted = idx === 0 || (
-                prevLessons.length > 0 && prevLessons.every((id) => completedLessons.has(id))
-              );
-              const isLocked = !isPrevCompleted;
+              // Seçmeli kurslar serbestçe alınabilir (kilitli değildir).
+              // Zorunlu kurslar: İlk zorunlu kurs açık, sonrakiler bir önceki zorunlu kurs tamamlandığında açılır.
+              let isLocked = false;
+              let prevCourse = null;
+              if (isMandatory) {
+                const mandatoryCourses = courses
+                  .filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği'))
+                  .filter((c) => c.is_mandatory !== false && c.course_type !== 'elective');
+                const mandIdx = mandatoryCourses.findIndex((c) => c.id === course.id);
+                if (mandIdx > 0) {
+                  prevCourse = mandatoryCourses[mandIdx - 1];
+                  const prevLessons = prevCourse ? (courseLessonsMap[prevCourse.id] || []) : [];
+                  const isPrevCompleted = prevLessons.length > 0 && prevLessons.every((id) => completedLessons.has(id));
+                  isLocked = !isPrevCompleted;
+                }
+              }
 
               return (
                 <div
@@ -209,9 +262,11 @@ export default function CourseList() {
                         ? 'border-emerald-500/40 bg-emerald-950/10 hover:border-emerald-400'
                         : isLocked
                           ? 'border-white/5 bg-slate-900/40 opacity-60'
-                          : isEnrolled
-                            ? 'border-violet-500/40 hover:border-violet-400'
-                            : 'border-white/10 hover:border-violet-500/40'
+                          : isElective
+                            ? 'border-amber-500/40 bg-amber-950/10 hover:border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.05)] hover:shadow-[0_0_20px_rgba(245,158,11,0.1)]'
+                            : isEnrolled
+                              ? 'border-violet-500/40 hover:border-violet-400'
+                              : 'border-white/10 hover:border-violet-500/40'
                     }`}
                   >
                     {/* Üst: emoji + badge */}
@@ -219,7 +274,9 @@ export default function CourseList() {
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl border ${
                         isLocked 
                           ? 'bg-slate-800/50 border-white/5 grayscale' 
-                          : 'bg-gradient-to-br from-violet-500/20 to-pink-500/10 border-white/10'
+                          : isElective
+                            ? 'bg-gradient-to-br from-amber-500/20 to-orange-500/10 border-amber-500/30'
+                            : 'bg-gradient-to-br from-violet-500/20 to-pink-500/10 border-white/10'
                       }`}>
                         {isLocked ? '🔒' : (course.thumbnail_emoji || '🛡️')}
                       </div>
@@ -244,6 +301,15 @@ export default function CourseList() {
                             Kursa Katıl
                           </span>
                         )}
+
+                        <span className={`text-[10px] font-black px-2 py-1 rounded-full border ${
+                          isElective
+                            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                            : 'bg-violet-500/15 text-violet-300 border-violet-500/30'
+                        }`}>
+                          {isElective ? '🌟 Seçmeli' : '📌 Zorunlu'}
+                        </span>
+
                         <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${level.color}`}>
                           {level.label}
                         </span>

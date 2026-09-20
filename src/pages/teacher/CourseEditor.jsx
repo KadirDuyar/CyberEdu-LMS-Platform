@@ -213,29 +213,100 @@ export default function CourseEditor() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">Kurs Türü</label>
+                    <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/10">
+                      <button
+                        type="button"
+                        onClick={() => handleChange('course_type', 'mandatory')}
+                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          course.course_type === 'mandatory'
+                            ? 'bg-violet-600 text-white shadow-lg'
+                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        📌 Zorunlu Müfredat
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChange('course_type', 'elective')}
+                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          course.course_type === 'elective'
+                            ? 'bg-amber-500 text-slate-950 shadow-lg'
+                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        🌟 Seçmeli Kurs
+                      </button>
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-xs font-semibold text-slate-400 mb-1.5">Kategori (Hedef Kitle)</label>
-                    <select
-                      value={course.category}
-                      onChange={(e) => handleChange('category', e.target.value)}
-                      className="form-input w-full appearance-none"
-                    >
-                      <option value="awareness">🛡️ Farkındalık (Normal Öğrenci)</option>
-                      <option value="technical">⚔️ Teknik (İleri Seviye)</option>
-                    </select>
+                    <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/10">
+                      <button
+                        type="button"
+                        onClick={() => handleChange('category', 'awareness')}
+                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          course.category === 'awareness'
+                            ? 'bg-cyan-600 text-white shadow-lg'
+                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        🛡️ Farkındalık
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChange('category', 'technical')}
+                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          course.category === 'technical'
+                            ? 'bg-orange-600 text-white shadow-lg'
+                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        ⚔️ Teknik
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">Zorluk Seviyesi</label>
-                    <select
-                      value={course.level}
-                      onChange={(e) => handleChange('level', e.target.value)}
-                      className="form-input w-full appearance-none"
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1.5">Zorluk Seviyesi</label>
+                  <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => handleChange('level', 'beginner')}
+                      className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                        course.level === 'beginner'
+                          ? 'bg-emerald-600 text-white shadow-lg'
+                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      }`}
                     >
-                      <option value="beginner">🌱 Başlangıç</option>
-                      <option value="intermediate">🔥 Orta</option>
-                      <option value="advanced">⚡ İleri</option>
-                    </select>
+                      🌱 Başlangıç
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChange('level', 'intermediate')}
+                      className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                        course.level === 'intermediate'
+                          ? 'bg-amber-600 text-white shadow-lg'
+                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      🔥 Orta
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleChange('level', 'advanced')}
+                      className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                        course.level === 'advanced'
+                          ? 'bg-rose-600 text-white shadow-lg'
+                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      ⚡ İleri
+                    </button>
                   </div>
                 </div>
 

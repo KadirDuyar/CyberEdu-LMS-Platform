@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -6,12 +7,13 @@ import Card from '../components/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import {
   User, Lock, Shield, Zap, CheckCircle2,
-  Calendar, Key, BookOpen, Save, Award, AlertCircle
+  Calendar, Key, BookOpen, Save, Award, AlertCircle, ArrowRight, Sparkles
 } from 'lucide-react';
 
-const AVATAR_OPTIONS = ['👨‍💻', '👩‍💻', '🛡️', '🤖', '🕵️', '🚀', '⚡', '🎯', '🧠', '🐱‍💻', '🔥', '👾'];
+const AVATAR_OPTIONS = ['👨‍💻', '👩‍💻', '🚀', '🛡️', '🕵️‍♂️', '🔑', '⚡', '🌐', '🥷', '🧙‍♂️', '🦾', '🦅', '👑', '🤖', '👾'];
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const { user, profile, updateProfile } = useAuth();
 
   const [fullName, setFullName] = useState(profile?.full_name || '');
@@ -78,7 +80,6 @@ export default function ProfilePage() {
         .from('enrollments')
         .select(`
           course_id,
-          status,
           enrolled_at,
           courses (
             id,
@@ -216,6 +217,16 @@ export default function ProfilePage() {
                     </button>
                   ))}
                 </div>
+                {profile?.role === 'student' && (
+                  <button
+                    type="button"
+                    onClick={() => navigate('/student/achievements')}
+                    className="mt-2 text-xs font-bold text-violet-400 hover:text-violet-300 flex items-center gap-1.5 transition-colors"
+                  >
+                    <Sparkles size={13} className="text-amber-400" />
+                    Karakter Koleksiyonu & Başarılar Odası <ArrowRight size={12} />
+                  </button>
+                )}
               </div>
 
               <div>

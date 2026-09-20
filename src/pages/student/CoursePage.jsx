@@ -45,16 +45,27 @@ export default function CoursePage() {
         setLockChecking(false);
         return;
       }
+
+      // Seçmeli kurslar serbesttir, asla kilitlenmez
+      if (course.is_mandatory === false || course.course_type === 'elective') {
+        setCourseLockInfo({ isLocked: false, prevCourse: null });
+        setLockChecking(false);
+        return;
+      }
+
       try {
         const { data: allCourses } = await supabase
           .from('courses')
-          .select('id, title, lessons(id, is_published)')
+          .select('*, lessons(id, is_published)')
           .eq('category', course.category)
           .eq('is_published', true)
           .order('created_at', { ascending: true });
 
         const filtered = (allCourses || []).filter(
-          (c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')
+          (c) => !c.title.includes('Kurumsal Siber Güvenlik') && 
+                 !c.title.includes('Uygulama Güvenliği') &&
+                 c.is_mandatory !== false &&
+                 c.course_type !== 'elective'
         );
 
         const currentIdx = filtered.findIndex((c) => c.id === course.id);

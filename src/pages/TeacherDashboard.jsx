@@ -14,21 +14,30 @@ export default function TeacherDashboard() {
   const navigate = useNavigate();
 
   const [courses, setCourses] = useState([]);
+  const [studentCount, setStudentCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadTeacherCourses() {
+    async function loadTeacherData() {
       if (!user) return;
       try {
-        const { data, error } = await supabase
+        const { data: coursesData } = await supabase
           .from('courses')
           .select('id, title, description, category, is_published, created_at')
           .eq('created_by', user.id)
           .order('created_at', { ascending: false });
 
-        if (!error && data) {
-          setCourses(data);
+        if (coursesData) {
+          setCourses(coursesData);
         }
+
+        // Gerçek öğrenci sayısını çek
+        const { count } = await supabase
+          .from('profiles')
+          .select('id', { count: 'exact', head: true })
+          .eq('role', 'student');
+
+        if (count !== null) setStudentCount(count);
       } catch (err) {
         // Hata durumunda boş liste
       } finally {
@@ -36,7 +45,7 @@ export default function TeacherDashboard() {
       }
     }
 
-    loadTeacherCourses();
+    loadTeacherData();
   }, [user]);
 
   const totalCourses = courses.length;
@@ -85,17 +94,21 @@ export default function TeacherDashboard() {
             <p className="text-xs text-slate-400 font-bold mt-0.5">Yayındaki Kurs</p>
           </Card>
 
-          <Card hover className="border-violet-500/20">
-            <Users size={22} className="text-violet-400" />
-            <p className="font-display font-black text-2xl mt-2 text-violet-400">5</p>
-            <p className="text-xs text-slate-400 font-bold mt-0.5">Aktif Öğrenci</p>
-          </Card>
+          <div onClick={() => navigate('/teacher/stats')} className="cursor-pointer">
+            <Card hover className="border-violet-500/20 hover:border-violet-400/50 transition-all">
+              <Users size={22} className="text-violet-400" />
+              <p className="font-display font-black text-2xl mt-2 text-violet-400">{studentCount}</p>
+              <p className="text-xs text-slate-400 font-bold mt-0.5">Kayıtlı Öğrenci</p>
+            </Card>
+          </div>
 
-          <Card hover className="border-amber-500/20">
-            <TrendingUp size={22} className="text-amber-400" />
-            <p className="font-display font-black text-2xl mt-2 text-amber-400">%84</p>
-            <p className="text-xs text-slate-400 font-bold mt-0.5">Ort. Başarı Oranı</p>
-          </Card>
+          <div onClick={() => navigate('/teacher/stats')} className="cursor-pointer">
+            <Card hover className="border-amber-500/20 hover:border-amber-400/50 transition-all">
+              <TrendingUp size={22} className="text-amber-400" />
+              <p className="font-display font-black text-2xl mt-2 text-amber-400">İncele →</p>
+              <p className="text-xs text-slate-400 font-bold mt-0.5">Öğrenci İstatistikleri</p>
+            </Card>
+          </div>
         </div>
 
         {/* Hızlı Şablon Başlatma */}

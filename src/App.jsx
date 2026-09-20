@@ -14,12 +14,14 @@ import CourseList       from './pages/student/CourseList';
 import CoursePage       from './pages/student/CoursePage';
 import LessonPage       from './pages/student/LessonPage';
 import AiMentor         from './pages/student/AiMentor';
+import Achievements     from './pages/student/Achievements';
 
 // ─── Teacher Pages ────────────────────────────────────────────────────────────
 import TeacherDashboard from './pages/TeacherDashboard';
 import TeacherCourses   from './pages/teacher/TeacherCourses';
 import CourseEditor     from './pages/teacher/CourseEditor';
 import LessonBuilder    from './pages/teacher/LessonBuilder';
+import TeacherStats     from './pages/teacher/TeacherStats';
 
 // ─── Admin Pages ──────────────────────────────────────────────────────────────
 import AdminDashboard from './pages/AdminDashboard';
@@ -105,8 +107,8 @@ export default function App() {
           <Route
             path="/student/achievements"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
-                <ComingSoon title="Başarılarım" emoji="🏆" />
+              <ProtectedRoute allowedRoles={['student', 'admin', 'teacher']}>
+                <Achievements />
               </ProtectedRoute>
             }
           />
@@ -179,8 +181,8 @@ export default function App() {
           <Route
             path="/teacher/stats"
             element={
-              <ProtectedRoute allowedRoles={['teacher']}>
-                <ComingSoon title="İstatistikler" emoji="📊" />
+              <ProtectedRoute allowedRoles={['teacher', 'admin']}>
+                <TeacherStats />
               </ProtectedRoute>
             }
           />

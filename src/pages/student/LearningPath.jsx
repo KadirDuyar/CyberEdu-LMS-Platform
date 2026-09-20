@@ -46,17 +46,20 @@ export default function LearningPath() {
           setEnrolledCourseIds(new Set((enrollData || []).map((e) => e.course_id)));
         }
 
-        // 3. Öğrencinin alanındaki TÜM kursları ve alt derslerini çek
+        // 3. Öğrencinin alanındaki ZORUNLU kursları ve alt derslerini çek
         const { data: courseList } = await supabase
           .from('courses')
-          .select('id, title, description, category, level, thumbnail_emoji, lessons(id, title, xp_reward, order_index, is_published)')
+          .select('*, lessons(id, title, xp_reward, order_index, is_published)')
           .eq('category', area)
           .eq('is_published', true)
           .order('created_at', { ascending: true });
 
         if (courseList) {
           const filtered = courseList.filter(
-            (c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')
+            (c) => !c.title.includes('Kurumsal Siber Güvenlik') && 
+                   !c.title.includes('Uygulama Güvenliği') &&
+                   c.is_mandatory !== false &&
+                   c.course_type !== 'elective'
           );
           setCourses(filtered);
 
@@ -118,14 +121,14 @@ export default function LearningPath() {
         
         {/* Başlık */}
         <div className="text-center space-y-2">
-          <span className="text-xs font-black uppercase tracking-widest text-violet-400 bg-violet-950/60 border border-violet-800/40 px-3 py-1 rounded-full">
-            Müfredat Ağacı & Kurs Yolculuğu
+          <span className="text-xs font-black uppercase tracking-widest text-violet-400 bg-violet-950/60 border border-violet-800/40 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5">
+            📌 Zorunlu Müfredat Yol Haritası
           </span>
           <h2 className="text-2xl md:text-3xl font-black text-white">
-            {profile?.learning_area === 'technical' ? 'Teknik Güvenlik' : 'Siber Farkındalık'} Sarmal Yolun
+            {profile?.learning_area === 'technical' ? 'Teknik Güvenlik' : 'Siber Farkındalık'} Çekirdek Müfredatı
           </h2>
           <p className="text-xs md:text-sm text-slate-400 max-w-lg mx-auto">
-            İlk temel kursunuz hazır. Sırasıyla kursları tamamlayarak siber güvenlik uzmanlığınızı pekiştirin.
+            Aşağıdaki zorunlu kursları sırasıyla tamamlayarak temel uzmanlık ve sertifikanızı kazanın. İsteğe bağlı seçmeli dersler için kurslar menüsünü ziyaret edebilirsiniz.
           </p>
         </div>
 
@@ -260,6 +263,25 @@ export default function LearningPath() {
               );
             })}
           </div>
+        </div>
+
+        {/* Seçmeli Kursları Keşfet Bölümü */}
+        <div className="mt-12 p-6 md:p-8 rounded-3xl bg-gradient-to-r from-amber-950/40 via-violet-950/40 to-slate-900 border border-amber-500/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+          <div className="space-y-1 text-center md:text-left">
+            <div className="inline-flex items-center gap-1.5 text-amber-400 font-bold text-xs uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full">
+              <Sparkles size={13} /> Ekstra Beceriler & Puanlar
+            </div>
+            <h3 className="text-xl font-black text-white mt-1">Seçmeli Kursları Keşfet</h3>
+            <p className="text-slate-400 text-xs md:text-sm max-w-xl">
+              Zorunlu müfredat haricinde kendi ilgi alanına göre serbestçe katılabileceğin seçmeli kurslara Kurslar menüsünden ulaşabilirsin.
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/student/courses?filter=elective')}
+            className="shrink-0 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all shadow-lg shadow-amber-500/20 hover:scale-105 flex items-center gap-2"
+          >
+            Seçmeli Kursları Gör <ArrowRight size={16} />
+          </button>
         </div>
 
         {/* Toast Bildirimi */}

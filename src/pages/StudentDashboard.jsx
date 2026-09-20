@@ -49,31 +49,37 @@ export default function StudentDashboard() {
 
       if (board) setLeaderboard(board);
 
-      // 2. Tamamlanmış dersler (yalnızca bu kullanıcıya ait)
+      // 2. Tamamlanmış ve devam eden dersler (yalnızca bu kullanıcıya ait)
       const { data: progressData } = await supabase
         .from('lesson_progress')
-        .select('lesson_id, status')
-        .eq('user_id', user.id)
-        .eq('status', 'completed');
+        .select('lesson_id, status, completed_at, updated_at')
+        .eq('user_id', user.id);
 
-      const doneIds = new Set((progressData || []).map((p) => p.lesson_id));
+      const progressList = progressData || [];
+      const doneIds = new Set(progressList.filter((p) => p.status === 'completed').map((p) => p.lesson_id));
       setCompletedLessonIds(doneIds);
 
       // 3. Kullanıcının kayıtlı olduğu kurslar
-      const { data: enrollments } = await supabase
-        .from('enrollments')
-        .select('course_id, status, enrolled_at')
-        .eq('user_id', user.id)
-        .order('enrolled_at', { ascending: false });
+      let enrollments = [];
+      try {
+        const { data } = await supabase
+          .from('enrollments')
+          .select('course_id, enrolled_at')
+          .eq('user_id', user.id)
+          .order('enrolled_at', { ascending: false });
+        if (data) enrollments = data;
+      } catch (e) {
+        console.warn('Enrollments fetch error:', e);
+      }
 
-      const enrolledIds = new Set((enrollments || []).map((e) => e.course_id));
+      const enrolledIds = new Set(enrollments.map((e) => e.course_id));
       const latestEnrolledCourseId = enrollments?.[0]?.course_id;
 
       // 4. Tüm yayınlanmış kursları çek (tüm kategoriler dahil)
       const area = profile?.learning_area || 'awareness';
       const { data: rawCourses } = await supabase
         .from('courses')
-        .select('id, title, category, description, thumbnail_emoji, created_at, lessons(id, title, xp_reward, order_index, is_published)')
+        .select('*, lessons(id, title, xp_reward, order_index, is_published)')
         .eq('is_published', true)
         .order('created_at', { ascending: true });
 
@@ -82,15 +88,25 @@ export default function StudentDashboard() {
       );
 
       if (allCourses && allCourses.length > 0) {
-        // Tüm kursları sıralı işle (dersleri ve tamamlanma durumları)
+        // Her kurs için ilerleme durumunu ve son aktivite zamanını hesapla
         const processedCourses = allCourses.map((c, idx) => {
           const pubLessons = (c.lessons || [])
             .filter((l) => l.is_published)
             .sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
 
-          const doneCount = pubLessons.filter((l) => doneIds.has(l.id)).length;
+          const lessonIdSet = new Set(pubLessons.map((l) => l.id));
+          const courseProgresses = progressList.filter((p) => lessonIdSet.has(p.lesson_id));
+          const doneLessons = courseProgresses.filter((p) => p.status === 'completed');
+          const doneCount = doneLessons.length;
           const isCompleted = pubLessons.length > 0 && doneCount === pubLessons.length;
+          const isInProgress = doneCount > 0 && !isCompleted;
           const isEnrolled = enrolledIds.has(c.id);
+
+          // Bu kurstaki en son aktivite zamanı
+          const latestActivityTime = courseProgresses.reduce((max, p) => {
+            const time = new Date(p.completed_at || p.updated_at || 0).getTime();
+            return time > max ? time : max;
+          }, 0);
 
           return {
             ...c,
@@ -98,72 +114,72 @@ export default function StudentDashboard() {
             totalLessons: pubLessons.length,
             doneCount,
             isCompleted,
+            isInProgress,
+            latestActivityTime,
             isEnrolled,
             courseOrder: idx,
+            isMandatory: c.is_mandatory !== false,
           };
         });
 
-        // AKTİF KURS BELİRLEME MANTIĞI:
-        // 1. En son kalınan/tıklanan kursu localStorage'dan kontrol et
+        // ── AKILLI AKTİF KURS BELİRLEME MANTIĞI ──
         const savedLastCourseId = localStorage.getItem(`cyberedu_last_active_course_${user.id}`) || localStorage.getItem('cyberedu_last_active_course');
         let targetCourse = null;
 
+        // A) Eğer kullanıcının devam ettiği (başlamış ama bitirmemiş) kurslar varsa en son işlem yapılanı bul
+        const inProgressCourses = processedCourses
+          .filter((c) => c.isInProgress)
+          .sort((a, b) => b.latestActivityTime - a.latestActivityTime);
+
+        // B) Eğer localStorage'daki kurs geçerliyse:
         if (savedLastCourseId) {
           const found = processedCourses.find((c) => c.id === savedLastCourseId);
           if (found) {
-            targetCourse = found;
-          }
-        }
-
-        // 2. Eğer localStorage'da yoksa: Öğrencinin en son işlem yaptığı (lesson_progress updated_at) kursu bul
-        if (!targetCourse) {
-          try {
-            const { data: latestProgress } = await supabase
-              .from('lesson_progress')
-              .select('lesson_id, updated_at, lessons(course_id)')
-              .eq('user_id', user.id)
-              .order('updated_at', { ascending: false })
-              .limit(1);
-
-            const lastWorkedCourseId = latestProgress?.[0]?.lessons?.course_id;
-            if (lastWorkedCourseId) {
-              const found = processedCourses.find((c) => c.id === lastWorkedCourseId);
-              if (found) {
-                targetCourse = found;
-              }
+            // Eğer localStorage'daki kurs bitmemişse veya aktif olarak üzerinde çalışılıyorsa öncelik ver
+            if (!found.isCompleted) {
+              targetCourse = found;
+            } else if (inProgressCourses.length > 0) {
+              // localStorage'daki kurs bitti ama başka devam eden kurs varsa o devam eden kursa geç
+              targetCourse = inProgressCourses[0];
+            } else {
+              // Başka devam eden kurs yoksa bitirilen kursu göster (Tebrik banner'ı için)
+              targetCourse = found;
             }
-          } catch (e) {
-            console.error('Son aktivite kontrol hatası:', e);
           }
         }
 
-        // 3. Eğer hala yoksa: En son kayıt olunan kurs
+        // C) Eğer hala belirlenmediyse: Devam eden ilk kurs
+        if (!targetCourse && inProgressCourses.length > 0) {
+          targetCourse = inProgressCourses[0];
+        }
+
+        // D) En son kayıt olunan kurs (eğer henüz başlanmamış veya devam ediyorsa)
         if (!targetCourse && latestEnrolledCourseId) {
           const found = processedCourses.find((c) => c.id === latestEnrolledCourseId);
-          if (found) {
+          if (found && !found.isCompleted) {
             targetCourse = found;
           }
         }
 
-        // 4. Hala hedef kurs belirlenmediyse:
-        // Öğrencinin alanındaki ilk tamamlanmamış kurs, yoksa herhangi bir tamamlanmamış kurs
+        // E) Öğrencinin alanındaki (awareness/technical) ilk tamamlanmamış ZORUNLU kurs, yoksa ilk tamamlanmamış kurs
         if (!targetCourse) {
           const areaCourses = processedCourses.filter((c) => c.category === area);
-          targetCourse = areaCourses.find((c) => !c.isCompleted) || processedCourses.find((c) => !c.isCompleted);
+          targetCourse = areaCourses.find((c) => c.isMandatory && !c.isCompleted)
+            || areaCourses.find((c) => !c.isCompleted)
+            || processedCourses.find((c) => !c.isCompleted);
         }
 
-        // 5. Eğer tüm kurslar tamamlandıysa son kursu seç
+        // F) Tüm kurslar bittiyse veya yeni öğrenci için ilk alan kursunu seç
         if (!targetCourse) {
-          targetCourse = processedCourses[processedCourses.length - 1];
+          targetCourse = processedCourses.find((c) => c.category === area) || processedCourses[0];
         }
 
         if (targetCourse) {
-          // Hedef kursa kaydı yoksa otomatik kaydet
+          // Hedef kursa kaydı yoksa kaydet
           if (!targetCourse.isEnrolled) {
             supabase.from('enrollments').upsert({
               user_id: user.id,
               course_id: targetCourse.id,
-              status: 'active',
               enrolled_at: new Date().toISOString(),
             }, { onConflict: 'user_id,course_id' }).catch(() => {});
             targetCourse.isEnrolled = true;
@@ -174,7 +190,8 @@ export default function StudentDashboard() {
           setIsCourseFinished(targetCourse.isCompleted);
 
           // Sıradaki tamamlanmamış dersi bul
-          const nextLesson = targetCourse.publishedLessons.find((l) => !doneIds.has(l.id)) || targetCourse.publishedLessons[targetCourse.publishedLessons.length - 1];
+          const nextLesson = targetCourse.publishedLessons.find((l) => !doneIds.has(l.id))
+            || targetCourse.publishedLessons[targetCourse.publishedLessons.length - 1];
           setActiveLesson(nextLesson);
 
           // Hafızaya kaydet
@@ -182,7 +199,7 @@ export default function StudentDashboard() {
           localStorage.setItem('cyberedu_last_active_course', targetCourse.id);
         }
 
-        // Kayıtlı kurslar listesini güncelle (enrolled olanlar ve aktif kurs)
+        // Kayıtlı kurslar listesini güncelle
         setEnrolledCourses(processedCourses.filter((c) => c.isEnrolled || enrolledIds.has(c.id) || c.id === targetCourse?.id));
       }
     } catch (err) {
@@ -205,6 +222,9 @@ export default function StudentDashboard() {
   const activeDone = activeCourseLessons.filter((l) => completedLessonIds.has(l.id)).length;
   const activePercent = Math.round((activeDone / activeTotal) * 100);
 
+  // Yeni öğrenci kontrolü (hiç tamamlanmış dersi olmayan)
+  const isNewStudent = completedLessonIds.size === 0 && activeDone === 0;
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -217,7 +237,7 @@ export default function StudentDashboard() {
     <DashboardLayout>
       <div className="space-y-6 max-w-5xl mx-auto pb-12">
 
-        {/* ── Banner: Kurs Tamamlandı vs Devam Et ──────────────────────── */}
+        {/* ── Banner: Kurs Tamamlandı vs Yeni Öğrenci vs Devam Et ──────────────────────── */}
         {isCourseFinished ? (
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/90 via-teal-950/70 to-slate-900 border border-emerald-500/40 p-6 md:p-8 shadow-2xl">
             <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -251,6 +271,45 @@ export default function StudentDashboard() {
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-sm font-bold transition-all"
                 >
                   <Map size={18} /> Öğrenme Yolculuğum
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : isNewStudent ? (
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-950/90 via-blue-950/70 to-slate-900 border border-cyan-500/40 p-6 md:p-8 shadow-2xl">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-black uppercase tracking-wider text-cyan-300 bg-cyan-900/50 border border-cyan-500/40 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+                  🎯 İlk Kursun Hazır!
+                </span>
+                <span className="text-xs font-bold text-slate-300 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
+                  {profile?.learning_area === 'technical' ? '💻 Teknik Siber Güvenlik Parkuru' : '🛡️ Siber Farkındalık Parkuru'}
+                </span>
+              </div>
+
+              <h2 className="font-display font-black text-2xl md:text-3xl text-white">
+                Aramıza Hoş Geldin, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'Öğrenci'}!</span> 🚀
+              </h2>
+
+              <p className="text-slate-300 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
+                Siber güvenlik yolculuğuna <strong className="text-cyan-300 font-bold">{activeCourse?.title || 'Temel Güvenlik Kursu'}</strong> ile başlamaya hazırsın. Hemen ilk dersine gir ve maceraya başla!
+              </p>
+
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                {activeLesson && (
+                  <button
+                    onClick={() => navigate(`/student/lessons/${activeLesson.id}`)}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold transition-all shadow-lg shadow-cyan-500/25 hover:scale-105"
+                  >
+                    İlk Kursuna Başla 🚀 <ArrowRight size={18} />
+                  </button>
+                )}
+                <button
+                  onClick={() => navigate('/student/learning-path')}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-sm font-bold transition-all"
+                >
+                  <Map size={18} /> Yol Haritasını Gör
                 </button>
               </div>
             </div>
@@ -326,9 +385,20 @@ export default function StudentDashboard() {
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-lg text-white flex items-center gap-2">
-                  <BookOpen size={18} className="text-violet-400" /> {activeCourse?.title || 'Kurs Dersleri'}
-                </h3>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="font-bold text-lg text-white flex items-center gap-2">
+                    <BookOpen size={18} className="text-violet-400" /> {activeCourse?.title || 'Kurs Dersleri'}
+                  </h3>
+                  {activeCourse && (
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${
+                      activeCourse.isMandatory
+                        ? 'bg-violet-500/15 text-violet-300 border-violet-500/30'
+                        : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                    }`}>
+                      {activeCourse.isMandatory ? '📌 Zorunlu Müfredat' : '🌟 Seçmeli Kurs'}
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-slate-400 mt-0.5">
                   {isCourseFinished ? '✅ Bu kursun tüm derslerini tamamladın.' : `${activeDone} / ${activeTotal} Ders Tamamlandı`}
                 </p>

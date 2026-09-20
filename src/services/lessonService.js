@@ -58,7 +58,8 @@ export async function completeLesson(userId, lessonId) {
         user_id: userId,
         lesson_id: lessonId,
         status: 'completed',
-        completed_at: new Date().toISOString()
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       },
       { onConflict: 'user_id,lesson_id' }
     )

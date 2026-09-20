@@ -4,12 +4,17 @@ import { supabase } from '../lib/supabase';
 
 // Kategorisine göre yayınlanmış kursları çeker
 export async function getCoursesByCategory(category) {
-  const { data, error } = await supabase
+  let query = supabase
     .from('courses')
     .select('*, lessons(id, title, xp_reward, is_published, order_index)')
-    .eq('category', category)
     .eq('is_published', true)
     .order('created_at', { ascending: true });
+
+  if (category) {
+    query = query.or(`category.eq.${category},category.eq.both,course_type.eq.elective,is_mandatory.eq.false`);
+  }
+
+  const { data, error } = await query;
   return { data, error };
 }
 
@@ -52,9 +57,12 @@ export async function checkEnrollment(userId, courseId) {
 export async function getEnrolledCourses(userId) {
   const { data, error } = await supabase
     .from('enrollments')
-    .select('course_id, courses(*, lessons(count))')
+    .select('course_id, courses(*, lessons(id))')
     .eq('user_id', userId);
     
-  const mapped = data ? data.map(d => d.courses) : [];
+  const mapped = data ? data.map(d => ({
+    ...d.courses,
+    lessons: [{ count: d.courses.lessons?.length || 0 }]
+  })) : [];
   return { data: mapped, error };
 }

@@ -216,6 +216,34 @@ export function AuthProvider({ children }) {
     if (data) setProfile(data);
   }, [profile]);
 
+  // ── Profili güncelle (isim, avatar_emoji, alan vb.) ─────────────────────────
+  const updateProfile = useCallback(async (updates) => {
+    if (!user) return { error: new Error('Kullanıcı oturumu bulunamadı') };
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id)
+      .select();
+
+    if (error) {
+      console.error('Profil güncellenemedi:', error.message);
+      return { error };
+    }
+
+    if (data && data.length > 0) {
+      setProfile(data[0]);
+      return { data: data[0], error: null };
+    }
+    
+    // Fallback: fetch again if select() empty due to RLS
+    await refreshProfile();
+    return { data: null, error: null };
+  }, [user, refreshProfile]);
+
   const value = {
     // Supabase auth user (id, email vb.)
     user,
@@ -232,6 +260,7 @@ export function AuthProvider({ children }) {
     addXP,
     refreshProfile,
     completeOnboarding,
+    updateProfile,
   };
 
   return (

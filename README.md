@@ -14,6 +14,7 @@ Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eği
 1. [Proje Hakkında](#-proje-hakkında)
 2. [Temel Teknolojiler](#-temel-teknolojiler)
 3. [Kullanıcı Rolleri & Mimari](#-kullanıcı-rolleri--mimari)
+<<<<<<< HEAD
 4. [Öğrenci Özellikleri](#-öğrenci-özellikleri)
 5. [Oyunlaştırma & Karakter Koleksiyonu](#-oyunlaştırma--karakter-koleksiyonu)
 6. [Yapay Zeka (AI) Entegrasyonu](#-yapay-zeka-ai-entegrasyonu)
@@ -22,6 +23,20 @@ Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eği
 9. [Veritabanı Şeması & Migrasyonlar](#-veritabanı-şeması--migrasyonlar)
 10. [Kurulum & Çalıştırma](#-kurulum--çalıştırma)
 11. [Canlıya Alma (Vercel Deployment)](#-canlıya-alma-vercel-deployment)
+=======
+4. [📸 Platform Ekran Görüntüleri](#-platform-ekran-görüntüleri)
+   - [Öğrenci Arayüzleri](#1-öğrenci-paneli-ekran-görüntüleri)
+   - [Öğretmen Arayüzleri](#2-öğretmen-paneli-ekran-görüntüleri)
+   - [Yönetici Arayüzü](#3-yönetici-admin-paneli-ekran-görüntüsü)
+5. [Öğrenci Özellikleri](#-öğrenci-özellikleri)
+6. [Oyunlaştırma & Karakter Koleksiyonu](#-oyunlaştırma--karakter-koleksiyonu)
+7. [Yapay Zeka (AI) Entegrasyonu](#-yapay-zeka-ai-entegrasyonu)
+8. [Öğretmen / Eğitmen Özellikleri](#-öğretmen--eğitmen-özellikleri)
+9. [Yönetici (Admin) Özellikleri](#-yönetici-admin-özellikleri)
+10. [Veritabanı Şeması & Migrasyonlar](#-veritabanı-şeması--migrasyonlar)
+11. [💻 Kurulum & Çalıştırma (Otomatik Bash & Manuel)](#-kurulum--çalıştırma)
+12. [🌐 Canlıya Alma (Vercel Deployment)](#-canlıya-alma-vercel-deployment)
+>>>>>>> 8ddd324 (Fix UI, profile update bug, crashing stats page and handle electives/badges)
 
 ---
 
@@ -61,6 +76,65 @@ Sistemde 3 temel kullanıcı rolü bulunur ve her rol kendi yetki sınırları d
 
 ---
 
+<<<<<<< HEAD
+=======
+## 📸 Platform Ekran Görüntüleri
+
+> *Not: Ekran görüntülerinizi projedeki [`docs/screenshots/`](docs/screenshots/) klasörüne ilgili dosya isimleriyle yerleştirdiğinizde burada görüntülenecektir.*
+
+### 1. Öğrenci Paneli Ekran Görüntüleri
+
+#### 📊 Öğrenci Kontrol Paneli (Dashboard)
+Kaldığın yerden devam etme bannerı, yeni öğrenci karşılama modülü, canlı liderlik tablosu ve metrik sayaçları.
+![Öğrenci Kontrol Paneli](docs/screenshots/student-dashboard.png)
+
+#### 🧭 Akıllı Oryantasyon (Navigator)
+Öğrencinin alanını (Siber Farkındalık veya Web Güvenliği & Teknik) ve seviyesini belirlediği interaktif anket.
+![Akıllı Oryantasyon](docs/screenshots/student-navigator.png)
+
+#### 🗺️ Öğrenme Yolculuğum (Sarmal Yol Haritası)
+Yalnızca zorunlu dersleri adım adım ve kilit mekanizmasıyla takip ettiren sarmal müfredat haritası.
+![Öğrenme Yolculuğum](docs/screenshots/student-learning-path.png)
+
+#### 📝 İnteraktif Ders İlerlemesi & Etkinlikler
+Markdown anlatımlar, çoktan seçmeli sorular, eşleştirme ve gelişmiş zaman kontrollü YouTube video eğitimi.
+![Ders İlerlemesi ve Etkinlikler](docs/screenshots/student-lesson-progress.png)
+
+#### 🤖 Yapay Zeka Destekli AI Mentor
+Öğrenciye cevap vermeden rehberlik eden, ipuçları veren ve soruları açıklayan yüzen AI sohbet penceresi.
+![AI Mentor Sohbeti](docs/screenshots/student-ai-mentor.png)
+
+#### 🏆 Başarılar & Karakter Koleksiyonu Odası
+Kurs tamamladıkça açılan 13 farklı siber kahraman avatarları, "Karakteri Kuşan" özelliği, rozetler ve unvanlar.
+![Başarılar ve Karakter Koleksiyonu](docs/screenshots/student-achievements.png)
+
+---
+
+### 2. Öğretmen Paneli Ekran Görüntüleri
+
+#### 🏫 Eğitmen Kontrol Paneli
+Kurs ve öğrenci genel görünümü, istatistik özetleri ve tek tıkla kurs şablonu oluşturma.
+![Öğretmen Kontrol Paneli](docs/screenshots/teacher-dashboard.png)
+
+#### 🛠️ Ders & Blok İnşa Edici (Lesson Builder - YZ ile Üretim)
+İçerik, soru, eşleştirme ve video bloklarını görsel olarak tasarlama ve Gemini yapay zekasıyla otomatik ders üretimi.
+![Ders İnşa Edici](docs/screenshots/teacher-lesson-builder.png)
+
+#### 📈 Öğrenci İstatistikleri & En Son Tamamlanan Ders Takibi (`/teacher/stats`)
+Her öğrencinin en son bitirdiği dersin başlığı, ait olduğu kurs, zaman damgası (*"10 dk önce"*, *"Bugün"*), XP ve tamamlanma oranları.
+![Öğrenci İstatistikleri](docs/screenshots/teacher-student-stats.png)
+
+---
+
+### 3. Yönetici (Admin) Paneli Ekran Görüntüsü
+
+#### ⚙️ Yönetici Kontrol Paneli
+Kullanıcı rolleri değiştirme (Öğrenci, Öğretmen, Admin) ve test süreçleri için öğrenci ilerlemesini sıfırlama ekranı.
+![Yönetici Kontrol Paneli](docs/screenshots/admin-dashboard.png)
+
+---
+
+>>>>>>> 8ddd324 (Fix UI, profile update bug, crashing stats page and handle electives/badges)
 ## 🎓 Öğrenci Özellikleri
 
 ### 1. Akıllı Oryantasyon (Navigator)
@@ -185,35 +259,54 @@ Proje veritabanı Supabase üzerinde PostgreSQL ile yapılandırılmıştır. T�
 - `activity_attempts`: Soru cevaplama ve puan denemeleri.
 - `badges` & `user_badges`: Başarı rozetleri ve kazanım kayıtları.
 
-### ⚡ Gerekli SQL Dosyaları:
+### 🔧 Gerekli SQL Dosyaları (Çalıştırma Sırası):
 1. `supabase/migration.sql`: Temel veritabanı şeması ve RLS politikaları.
 2. `supabase/add_mandatory_elective_courses.sql`: Zorunlu/seçmeli kurs alanları ve enrollments güncellemesi.
 3. `supabase/seed_exact_courses.sql`: Farkındalık ve Teknik standart kurs müfredat verileri.
 
 ---
 
-## 💻 Kurulum & Çalıştırma
+## 🛠️ Kurulum & Çalıştırma
 
-### 1. Depoyu Klonlayın
+### Yöntem A: Otomatik Kurulum (Bash Script) 🚀
+Linux, macOS veya Windows (Git Bash / WSL) üzerinde tek komutla tüm ortamı kurmak ve başlatmak için:
+
+```bash
+# Script'e çalıştırma izni verin ve çalıştırın:
+chmod +x setup.sh
+./setup.sh
+```
+
+Bu script:
+- Node.js ve npm gereksinimlerini denetler.
+- Eksikse `.env.example` dosyasından otomatik `.env` üretir.
+- Bağımlılıkları (`npm install`) yükler.
+- Supabase SQL adımlarını hatırlatır ve sunucuyu başlatır.
+
+---
+
+### Yöntem B: Manuel Kurulum ⚙️
+
+#### 1. Depoyu Klonlayın
 ```bash
 git clone https://github.com/KadirDuyar/acikVeUzaktanOgrenme.git
 cd acikVeUzaktanOgrenme
 ```
 
-### 2. Bağımlılıkları Yükleyin
+#### 2. Bağımlılıkları Yükleyin
 ```bash
 npm install
 ```
 
-### 3. Çevre Değişkenlerini Tanımlayın (`.env`)
-Proje kök dizininde bir `.env` dosyası oluşturun:
+#### 3. Çevre Değişkenlerini Tanımlayın (`.env`)
+Proje kök dizininde bir `.env` dosyası oluşturun (veya `.env.example` dosyasını kopyalayın):
 ```env
-VITE_SUPABASE_URL=https://projeniz.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOi...anon-key
-VITE_GEMINI_API_KEY=AIzaSy...gemini-api-key
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOi...your-anon-key
+VITE_GEMINI_API_KEY=AIzaSy...your-gemini-key
 ```
 
-### 4. Geliştirme Sunucusunu Başlatın
+#### 4. Geliştirme Sunucusunu Başlatın
 ```bash
 npm run dev
 ```
