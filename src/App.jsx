@@ -107,7 +107,7 @@ export default function App() {
           <Route
             path="/student/achievements"
             element={
-              <ProtectedRoute allowedRoles={['student', 'admin', 'teacher']}>
+              <ProtectedRoute allowedRoles={['student']}>
                 <Achievements />
               </ProtectedRoute>
             }
