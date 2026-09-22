@@ -75,63 +75,63 @@ CyberEdu LMS öğrenci arayüzü; siber güvenlik farkındalığı ve teknik uzm
 ---
 
 #### 📊 Öğrenci Kontrol Paneli (Dashboard)
-Öğrencinin platformdaki aktif durumunu tek merkezden takip ettiği ana ekrandır[cite: 36]. "Kaldığın Yerden Devam Et" modülü üzerinden en son çalışılan ders tek tıkla açılabilir[cite: 36]. Öğrenme süresi, toplam kazanılan XP puanı ve mevcut kurs tamamlanma oranının yanı sıra aktif derslerin aşamaları ile sınıf geneli Canlı Liderlik Tablosu (Leaderboard) bu ekrandan dinamik olarak izlenir[cite: 36].
+Öğrencinin platformdaki aktif durumunu tek merkezden takip ettiği ana ekrandır. "Kaldığın Yerden Devam Et" modülü üzerinden en son çalışılan ders tek tıkla açılabilir. Öğrenme süresi, toplam kazanılan XP puanı ve mevcut kurs tamamlanma oranının yanı sıra aktif derslerin aşamaları ile sınıf geneli Canlı Liderlik Tablosu (Leaderboard) bu ekrandan dinamik olarak izlenir.
 
 ![Öğrenci Kontrol Paneli](docs/screenshots/student-dashboard.png)
 
 ---
 
 #### 🗺️ Öğrenme Yolculuğum (Sarmal Müfredat Haritası)
-Yalnızca zorunlu müfredat adımlarını içeren, ön koşullu ve sıralı kilit mekanizmasına sahip sarmal ilerleme rotasıdır[cite: 35]. Öğrenci bir kursu başarıyla tamamlamadan bir sonraki aşamanın kilidi açılmaz[cite: 35]. Tamamlanan kurslar yeşil onay simgesiyle işaretlenir, aktif kurs parlak rota göstergesiyle vurgulanır ve öğrencinin öğrenme disiplini korunur[cite: 35].
+Yalnızca zorunlu müfredat adımlarını içeren, ön koşullu ve sıralı kilit mekanizmasına sahip sarmal ilerleme rotasıdır. Öğrenci bir kursu başarıyla tamamlamadan bir sonraki aşamanın kilidi açılmaz. Tamamlanan kurslar yeşil onay simgesiyle işaretlenir, aktif kurs parlak rota göstergesiyle vurgulanır ve öğrencinin öğrenme disiplini korunur.
 
 ![Öğrenme Yolculuğum](docs/screenshots/student-learningPath.png)
 
 ---
 
 #### 📚 Kurslar ve Seçmeli Modül Kataloğu (`/student/courses`)
-Öğrencinin kendi ilgi alanına göre keşfedebileceği tüm eğitimlerin yer aldığı modül merkezidir[cite: 34]. Kurslar "Tüm Kurslar", "Seçmeli Kurslar" ve "Zorunlu Müfredat" sekmeleri altında filtrelenebilir[cite: 34]. Öğrenciler zorunlu yol haritasına bağlı kalmaksızın istedikleri seçmeli kurslara (MFA/2FA, Brute Force, Nmap vb.) doğrudan kaydolup bağımsız olarak tamamlayabilirler[cite: 34].
+Öğrencinin kendi ilgi alanına göre keşfedebileceği tüm eğitimlerin yer aldığı modül merkezidir. Kurslar "Tüm Kurslar", "Seçmeli Kurslar" ve "Zorunlu Müfredat" sekmeleri altında filtrelenebilir. Öğrenciler zorunlu yol haritasına bağlı kalmaksızın istedikleri seçmeli kurslara (MFA/2FA, Brute Force, Nmap vb.) doğrudan kaydolup bağımsız olarak tamamlayabilirler.
 
 ![Kurslar ve Seçmeli Modül Kataloğu](docs/screenshots/student-courses.png)
 
 ---
 
 #### 🤖 CyberEdu AI Mentor (Kişisel Siber Güvenlik Rehberi)
-7/24 kesintisiz rehberlik sunan tam sayfa yapay zekâ çalışma alanıdır[cite: 32]. Öğrenciler OWASP Top 10 zafiyetleri, ağ protokolleri, port güvenlik riskleri veya kariyer adımları gibi önerilen hazır konuları seçebilir ya da doğrudan serbest sorular yöneltebilir[cite: 32]. Model, doğrudan cevap vermek yerine yönlendirici ve Sokratik ipuçlarıyla öğrencinin analitik düşünmesini destekler[cite: 32].
+7/24 kesintisiz rehberlik sunan tam sayfa yapay zekâ çalışma alanıdır. Öğrenciler OWASP Top 10 zafiyetleri, ağ protokolleri, port güvenlik riskleri veya kariyer adımları gibi önerilen hazır konuları seçebilir ya da doğrudan serbest sorular yöneltebilir. Model, doğrudan cevap vermek yerine yönlendirici ve Sokratik ipuçlarıyla öğrencinin analitik düşünmesini destekler.
 
 ![AI Mentor Çalışma Alanı](docs/screenshots/student-aiMentor.png)
 
 ---
 
 #### 💬 Hızlı AI Asistan (Ders İçi Yüzen Sohbet)
-Ders çalışma veya etkinlik çözme anında sayfa değiştirmeden sağ alttan tetiklenebilen kompakt asistan penceresidir[cite: 31]. Öğrenci bir soruda takıldığında veya teorik bir kavramı anlamadığında "Bu konuyu basitçe özetle" veya hazır bağlamsal hızlı eylemlerle anında yardım alabilir[cite: 31].
+Ders çalışma veya etkinlik çözme anında sayfa değiştirmeden sağ alttan tetiklenebilen kompakt asistan penceresidir. Öğrenci bir soruda takıldığında veya teorik bir kavramı anlamadığında "Bu konuyu basitçe özetle" veya hazır bağlamsal hızlı eylemlerle anında yardım alabilir.
 
 ![Hızlı AI Asistan](docs/screenshots/student-fastAI.png)
 
 ---
 
 #### ✅ Anlık Etkinlik Doğrulama ve Başarı Geri Bildirimi
-İnteraktif sorularda (Eşleştirme, D/Y, Çoktan Seçmeli vb.) doğru yanıt verildiğinde devreye giren pozitif pekiştirme katmanıdır[cite: 30]. Öğrenciye anında kazanılan XP ödülü (+50 XP, +80 XP vb.) gösterilir ve teknik çözüm mantığı açıklanarak öğrenme süreci doğrulanır[cite: 30].
+İnteraktif sorularda (Eşleştirme, D/Y, Çoktan Seçmeli vb.) doğru yanıt verildiğinde devreye giren pozitif pekiştirme katmanıdır. Öğrenciye anında kazanılan XP ödülü (+50 XP, +80 XP vb.) gösterilir ve teknik çözüm mantığı açıklanarak öğrenme süreci doğrulanır.
 
 ![Doğru Cevap Geri Bildirimi](docs/screenshots/student-trueanAnswer.png)
 
 ---
 
 #### ❌ Çözüm Açıklamalı Hata Analizi
-Yanlış yanıt verildiğinde öğrenciyi cezalandırmak yerine eksik bilgiyi kapatmayı hedefleyen detaylı analiz panelidir[cite: 28]. Sistem doğru eşleşmeleri veya yanıt anahtarını net bir şekilde sergilerken, alt kısımda "Açıklama & Çözüm Mantığı" sunarak kavram yanılgısını anında giderir[cite: 28].
+Yanlış yanıt verildiğinde öğrenciyi cezalandırmak yerine eksik bilgiyi kapatmayı hedefleyen detaylı analiz panelidir. Sistem doğru eşleşmeleri veya yanıt anahtarını net bir şekilde sergilerken, alt kısımda "Açıklama & Çözüm Mantığı" sunarak kavram yanılgısını anında giderir.
 
 ![Hatalı Cevap ve Çözüm Analizi](docs/screenshots/student-wrongAnswer.png)
 
 ---
 
 #### 🏆 Kurs Bitirme ve Kutlama Ekranı (Greeting Modal)
-Bir kurstaki tüm dersler ve interaktif sınavlar başarıyla tamamlandığında açılan ödül penceresidir[cite: 29]. Öğrencinin kurstan kazandığı tüm XP puanlarının hesap bakiyesine aktarıldığını doğrular, motivasyonu artırır ve kullanıcıyı doğrudan rozetler veya yeni kurslar sayfasına yönlendirir[cite: 29].
+Bir kurstaki tüm dersler ve interaktif sınavlar başarıyla tamamlandığında açılan ödül penceresidir. Öğrencinin kurstan kazandığı tüm XP puanlarının hesap bakiyesine aktarıldığını doğrular, motivasyonu artırır ve kullanıcıyı doğrudan rozetler veya yeni kurslar sayfasına yönlendirir.
 
 ![Kurs Bitirme Kutlaması](docs/screenshots/student-greeting.png)
 
 ---
 
 #### 🎖️ Başarılar & Karakter Koleksiyonu Odası (`/student/achievements`)
-Platformun gamification omurgasını oluşturan vitrindir[cite: 33]. Öğrencinin tamamladığı kurslara göre kazandığı "Kurs Madalyaları", platform görevleriyle açılan "Başarı Rozetleri" ve kademe bazlı "Siber Unvanlar" burada listelenir[cite: 33]. Açılan siber kahraman avatarları (Siber Çırak, Kod Stratejisti, Dijital Kaşif vb.) incelenebilir ve "Karakteri Kuşan" özelliğiyle profil ikonu olarak atanabilir[cite: 33].
+Platformun gamification omurgasını oluşturan vitrindir. Öğrencinin tamamladığı kurslara göre kazandığı "Kurs Madalyaları", platform görevleriyle açılan "Başarı Rozetleri" ve kademe bazlı "Siber Unvanlar" burada listelenir. Açılan siber kahraman avatarları (Siber Çırak, Kod Stratejisti, Dijital Kaşif vb.) incelenebilir ve "Karakteri Kuşan" özelliğiyle profil ikonu olarak atanabilir.
 
 ![Başarılar ve Karakter Koleksiyonu](docs/screenshots/student-achievements.png)
 
@@ -142,70 +142,70 @@ CyberEdu LMS eğitmen modülü; siber güvenlik eğitimlerinin planlanması, mod
 ---
 
 #### 🏫 Eğitmen Kontrol Paneli (Dashboard)
-Platform üzerindeki aktif eğitim süreçlerinin üst düzey izlendiği ana yönetim merkezidir[cite: 30]. Toplam kurs adedi, yayındaki modüller ve sisteme kayıtlı öğrenci sayıları gibi genel metrikleri özetler[cite: 30]. Eğitmenler bu ekrandan doğrudan "Farkındalık Eğitimi" veya "Teknik Zafiyet Kursu" şablonlarını tetikleyebilir ve mevcut kurslarının durumunu inceleyebilir[cite: 30].
+Platform üzerindeki aktif eğitim süreçlerinin üst düzey izlendiği ana yönetim merkezidir. Toplam kurs adedi, yayındaki modüller ve sisteme kayıtlı öğrenci sayıları gibi genel metrikleri özetler. Eğitmenler bu ekrandan doğrudan "Farkındalık Eğitimi" veya "Teknik Zafiyet Kursu" şablonlarını tetikleyebilir ve mevcut kurslarının durumunu inceleyebilir.
 
 ![Eğitmen Kontrol Paneli](docs/screenshots/teacher-dashboard.png)
 
 ---
 
 #### 📚 Kurs Yönetimi ve Müfredat Listesi (`/teacher/courses`)
-Eğitmen tarafından oluşturulan tüm kursların kartlar halinde listelendiği, yayın durumlarının (Yayında / Taslak) ve hedef kitle kategorilerinin (Teknik / Farkındalık) yönetildiği paneldir[cite: 28]. Kurs içeriklerinin önizlenmesi, düzenlenmesi ve yeni eğitim oluşturma süreçleri bu alandan başlatılır[cite: 28].
+Eğitmen tarafından oluşturulan tüm kursların kartlar halinde listelendiği, yayın durumlarının (Yayında / Taslak) ve hedef kitle kategorilerinin (Teknik / Farkındalık) yönetildiği paneldir. Kurs içeriklerinin önizlenmesi, düzenlenmesi ve yeni eğitim oluşturma süreçleri bu alandan başlatılır.
 
 ![Kurslarım Ekranı](docs/screenshots/teacher-courses.png)
 
 ---
 
 #### ➕ Kurs Yapılandırma ve Tanımlama Ekranı (`/teacher/courses/new`)
-Yeni bir siber güvenlik modülü oluştururken meta verilerin girildiği form arayüzüdür[cite: 27]. Kurs başlığı, pedagojik açıklama metni, hedef kitle (Farkındalık / Teknik), müfredat türü (Zorunlu / Seçmeli), zorluk derecesi ve temsili görsel emoji bu adımda belirlenir[cite: 27].
+Yeni bir siber güvenlik modülü oluştururken meta verilerin girildiği form arayüzüdür. Kurs başlığı, pedagojik açıklama metni, hedef kitle (Farkındalık / Teknik), müfredat türü (Zorunlu / Seçmeli), zorluk derecesi ve temsili görsel emoji bu adımda belirlenir.
 
 ![Manuel Kurs Tanımlama](docs/screenshots/teacher-newCourse.png)
 
 ---
 
 #### 🤖 YZ Destekli Kurs Oluşturma Sihirbazı
-Eğitim planlama süresini minimuma indirmek amacıyla entegre edilen üretken yapay zekâ özelliğidir[cite: 21, 26]. Üst paneldeki *"✨ YZ ile Kurs Oluştur"* fonksiyonu tetiklendiğinde; girilen konu başlığına uygun detaylı açıklama, zorluk seviyesi, hedef kitle sınıflandırması ve görsel rozet otomatik olarak üretilip forma aktarılır[cite: 21, 26].
+Eğitim planlama süresini minimuma indirmek amacıyla entegre edilen üretken yapay zekâ özelliğidir. Üst paneldeki *"✨ YZ ile Kurs Oluştur"* fonksiyonu tetiklendiğinde; girilen konu başlığına uygun detaylı açıklama, zorluk seviyesi, hedef kitle sınıflandırması ve görsel rozet otomatik olarak üretilip forma aktarılır.
 
 ![YZ ile Kurs Üretimi](docs/screenshots/teacher-newCourseWithAi.png)
 
 ---
 
 #### 🗂️ Kurs Detayı ve Ders Sıralama Yönetimi
-Kaydedilen bir kursun genel ayarlarının güncellendiği ve kursa bağlı ders adımlarının kronolojik olarak yönetildiği çalışma alanıdır[cite: 21]. Bu ekrandan kursa yeni dersler eklenebilir, mevcut derslerin yayın durumu değiştirilebilir ve doğrudan içerik düzenleyicisine geçiş yapılabilir[cite: 21].
+Kaydedilen bir kursun genel ayarlarının güncellendiği ve kursa bağlı ders adımlarının kronolojik olarak yönetildiği çalışma alanıdır. Bu ekrandan kursa yeni dersler eklenebilir, mevcut derslerin yayın durumu değiştirilebilir ve doğrudan içerik düzenleyicisine geçiş yapılabilir.
 
 ![Kurs Detayı ve Ders Listesi](docs/screenshots/teacher-course.png)
 
 ---
 
 #### 🛠️ Modüler Ders & İçerik Düzenleyici (Lesson Builder)
-Ders akışının blok tabanlı bir mimariyle kurgulandığı merkezdir[cite: 22]. Teorik anlatımlar, video materyalleri ve interaktif sınavlar sıralı bloklar halinde düzenlenir[cite: 22]. Her blok için bağımsız XP puanı atanabilir, blok sıralamaları değiştirilebilir ve sistemde tanımlı 11 farklı aktivite türü (Çoktan Seçmeli, D/Y, Eşleştirme, Sıralama, Hafıza Kartı, Hotspot, Senaryo vb.) derse dahil edilebilir[cite: 22].
+Ders akışının blok tabanlı bir mimariyle kurgulandığı merkezdir. Teorik anlatımlar, video materyalleri ve interaktif sınavlar sıralı bloklar halinde düzenlenir. Her blok için bağımsız XP puanı atanabilir, blok sıralamaları değiştirilebilir ve sistemde tanımlı 11 farklı aktivite türü (Çoktan Seçmeli, D/Y, Eşleştirme, Sıralama, Hafıza Kartı, Hotspot, Senaryo vb.) derse dahil edilebilir.
 
 ![Ders İçi Blok Düzenleyici](docs/screenshots/teacher-Content.png)
 
 ---
 
 #### ✍️ YZ ile Teorik Anlatım & Metin Bloğu Üretimi
-Ders içi içerik bloklarında yer alan *"✨ YZ ile Üret"* aracı; eğitmenin belirlediği teknik başlık doğrultusunda pedagojik standartlara ve şablonlara uygun zengin Markdown formatında konu anlatımları türetir[cite: 24, 25].
+Ders içi içerik bloklarında yer alan *"✨ YZ ile Üret"* aracı; eğitmenin belirlediği teknik başlık doğrultusunda pedagojik standartlara ve şablonlara uygun zengin Markdown formatında konu anlatımları türetir.
 
 ![YZ ile Metin Üretimi](docs/screenshots/teacher-Promt.png)
 
 ---
 
 #### 🎯 YZ ile Otomatik İnteraktif Etkinlik Üretimi
-Ders akışına pratik soru ve değerlendirme adımları eklemek için kullanılan modal arayüzdür[cite: 22, 23]. Eğitmen hedef etkinlik türünü ve konu detayını belirttiğinde, sistem doğrudan doğru cevap anahtarı, seçenekleri, ipuçları ve hata açıklama mantığı tanımlanmış etkinlik objeleri üretir[cite: 23].
+Ders akışına pratik soru ve değerlendirme adımları eklemek için kullanılan modal arayüzdür. Eğitmen hedef etkinlik türünü ve konu detayını belirttiğinde, sistem doğrudan doğru cevap anahtarı, seçenekleri, ipuçları ve hata açıklama mantığı tanımlanmış etkinlik objeleri üretir.
 
 ![YZ Etkinlik Üretim Sihirbazı](docs/screenshots/teacher-promtContent.png)
 
 ---
 
 #### 📈 Öğrenci İlerleme & Ders İstatistikleri (`/teacher/stats`)
-Kayıtlı öğrencilerin eğitim çıktılarını gerçek zamanlı takip eden analitik merkezidir[cite: 32]. Toplam bitirilen ders adedi, ortalama öğrenci XP puanı, aktif katılım yüzdesi gibi makro göstergelerin yanı sıra her öğrencinin parkur türü, en son tamamladığı ders, zaman damgası (*"50 dk önce"* vb.), bitirdiği ders sayısı ve güncel seviyesi bu panel üzerinden izlenebilir[cite: 32].
+Kayıtlı öğrencilerin eğitim çıktılarını gerçek zamanlı takip eden analitik merkezidir. Toplam bitirilen ders adedi, ortalama öğrenci XP puanı, aktif katılım yüzdesi gibi makro göstergelerin yanı sıra her öğrencinin parkur türü, en son tamamladığı ders, zaman damgası (*"50 dk önce"* vb.), bitirdiği ders sayısı ve güncel seviyesi bu panel üzerinden izlenebilir.
 
 ![Öğrenci İlerleme & Ders İstatistikleri](docs/screenshots/teacher-stats.png)
 
 ---
 
 #### 👤 Eğitmen Profili ve Hesap Güvenliği (`/teacher/profile`)
-Eğitmenin platform üzerindeki kimlik ve yetki parametrelerini düzenlediği ekrandır[cite: 29]. Profil avatar emojisi seçimi, ad-soyad güncellemesi ve parola yenileme gibi hesap güvenliği işlemleri bu merkezden gerçekleştirilir[cite: 29].
+Eğitmenin platform üzerindeki kimlik ve yetki parametrelerini düzenlediği ekrandır. Profil avatar emojisi seçimi, ad-soyad güncellemesi ve parola yenileme gibi hesap güvenliği işlemleri bu merkezden gerçekleştirilir.
 
 ![Eğitmen Profil Yönetimi](docs/screenshots/teacher-profile.png)
 
@@ -213,19 +213,19 @@ Eğitmenin platform üzerindeki kimlik ve yetki parametrelerini düzenlediği ek
 
 ### 3. Sistem Yönetim ve Denetim (Admin) Modülü
 
-Platformun rol tabanlı erişim kontrolü (RBAC), veri bütünlüğü ve test süreçlerinin güvenle yürütülmesini sağlayan üst düzey yönetim arayüzüdür[cite: 34].
+Platformun rol tabanlı erişim kontrolü (RBAC), veri bütünlüğü ve test süreçlerinin güvenle yürütülmesini sağlayan üst düzey yönetim arayüzüdür.
 
 ---
 
 #### ⚙️ Yönetici Kontrol Paneli (`/admin`)
-Sistem genelindeki toplam kullanıcı sayısı, kayıtlı kurs hacmi, Row Level Security (RLS) veri güvenliği durumu ve kullanıcıların rol dağılımı (Öğrenci/Eğitmen) bu merkezden izlenir[cite: 34]. Tablo üzerinden kullanıcıların rolleri tek tıkla dinamik olarak değiştirilebilir (Öğrenciyi Eğitmen yapma veya tersi) ve test hesaplarının süreçlerini denetlemek için ilerleme sıfırlama mekanizması tetiklenebilir[cite: 34].
+Sistem genelindeki toplam kullanıcı sayısı, kayıtlı kurs hacmi, Row Level Security (RLS) veri güvenliği durumu ve kullanıcıların rol dağılımı (Öğrenci/Eğitmen) bu merkezden izlenir. Tablo üzerinden kullanıcıların rolleri tek tıkla dinamik olarak değiştirilebilir (Öğrenciyi Eğitmen yapma veya tersi) ve test hesaplarının süreçlerini denetlemek için ilerleme sıfırlama mekanizması tetiklenebilir.
 
 ![Yönetici Kontrol Paneli](docs/screenshots/admin-dashboard.png)
 
 ---
 
 #### 🔄 İlerleme Sıfırlama ve İşlem Onay Mekanizması
-Yanlışlıkla veri silinmesini önlemek amacıyla çift aşamalı onay (Modal Dialog) mekanizmasıyla korunur[cite: 33]. Bir öğrencinin ilerlemesi sıfırlanmak istendiğinde; tamamlanan dersler, çözülen aktiviteler ve kazanılan XP puanlarının kalıcı olarak silineceğini belirten uyarı ekranı açılır ve yönetici onayı alınır[cite: 33]. Arka planda çalışan `admin_reset_student` RPC fonksiyonu sayesinde ilgili öğrencinin ilerleme tablosundaki kayıtları güvenle temizlenir.
+Yanlışlıkla veri silinmesini önlemek amacıyla çift aşamalı onay (Modal Dialog) mekanizmasıyla korunur. Bir öğrencinin ilerlemesi sıfırlanmak istendiğinde; tamamlanan dersler, çözülen aktiviteler ve kazanılan XP puanlarının kalıcı olarak silineceğini belirten uyarı ekranı açılır ve yönetici onayı alınır. Arka planda çalışan `admin_reset_student` RPC fonksiyonu sayesinde ilgili öğrencinin ilerleme tablosundaki kayıtları güvenle temizlenir.
 
 ![İlerleme Sıfırlama Onay Ekranı](docs/screenshots/admin-approval.png)
 ## 🎓 Öğrenci Özellikleri
