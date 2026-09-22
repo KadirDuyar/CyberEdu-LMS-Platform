@@ -67,7 +67,6 @@ Sistemde 3 temel kullanıcı rolü bulunur ve her rol kendi yetki sınırları d
 
 ## 📸 Platform Ekran Görüntüleri
 
-> *Not: Ekran görüntülerinizi projedeki [`docs/screenshots/`](docs/screenshots/) klasörüne ilgili dosya isimleriyle yerleştirdiğinizde burada görüntülenecektir.*
 
 ### 1. Öğrenci Deneyimi ve Öğrenme Yönetim Modülü
 
