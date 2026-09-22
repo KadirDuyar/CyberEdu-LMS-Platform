@@ -6,13 +6,14 @@ Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eği
 ### 🌐 Canlı Demo
 
 👉 **[CyberEdu LMS'yi Canlı Gör](https://cyberedu-lms-platform.vercel.app)**
+
 ---
 
 ![CyberEdu Platformu](https://img.shields.io/badge/Platform-CyberEdu_LMS-blueviolet?style=for-the-badge)
-![React 18](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)
-![Supabase](https://img.shields.io/badge/Database-Supabase_PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase)
-![Google Gemini](https://img.shields.io/badge/AI-Google_Gemini-4285F4?style=for-the-badge&logo=google)
+![React 18](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge\&logo=react)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge\&logo=tailwind-css)
+![Supabase](https://img.shields.io/badge/Database-Supabase_PostgreSQL-3ECF8E?style=for-the-badge\&logo=supabase)
+![Google Gemini](https://img.shields.io/badge/AI-Google_Gemini-4285F4?style=for-the-badge\&logo=google)
 
 ---
 
