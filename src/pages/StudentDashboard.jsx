@@ -181,7 +181,9 @@ export default function StudentDashboard() {
               user_id: user.id,
               course_id: targetCourse.id,
               enrolled_at: new Date().toISOString(),
-            }, { onConflict: 'user_id,course_id' }).catch(() => {});
+            }, { onConflict: 'user_id,course_id' }).then(({ error }) => {
+              if (error) console.error('Otomatik kayıt hatası:', error);
+            });
             targetCourse.isEnrolled = true;
             enrolledIds.add(targetCourse.id);
           }
