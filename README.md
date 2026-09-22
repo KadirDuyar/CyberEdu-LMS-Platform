@@ -14,16 +14,6 @@ Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eği
 1. [Proje Hakkında](#-proje-hakkında)
 2. [Temel Teknolojiler](#-temel-teknolojiler)
 3. [Kullanıcı Rolleri & Mimari](#-kullanıcı-rolleri--mimari)
-<<<<<<< HEAD
-4. [Öğrenci Özellikleri](#-öğrenci-özellikleri)
-5. [Oyunlaştırma & Karakter Koleksiyonu](#-oyunlaştırma--karakter-koleksiyonu)
-6. [Yapay Zeka (AI) Entegrasyonu](#-yapay-zeka-ai-entegrasyonu)
-7. [Öğretmen / Eğitmen Özellikleri](#-öğretmen--eğitmen-özellikleri)
-8. [Yönetici (Admin) Özellikleri](#-yönetici-admin-özellikleri)
-9. [Veritabanı Şeması & Migrasyonlar](#-veritabanı-şeması--migrasyonlar)
-10. [Kurulum & Çalıştırma](#-kurulum--çalıştırma)
-11. [Canlıya Alma (Vercel Deployment)](#-canlıya-alma-vercel-deployment)
-=======
 4. [📸 Platform Ekran Görüntüleri](#-platform-ekran-görüntüleri)
    - [Öğrenci Arayüzleri](#1-öğrenci-paneli-ekran-görüntüleri)
    - [Öğretmen Arayüzleri](#2-öğretmen-paneli-ekran-görüntüleri)
@@ -31,12 +21,11 @@ Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eği
 5. [Öğrenci Özellikleri](#-öğrenci-özellikleri)
 6. [Oyunlaştırma & Karakter Koleksiyonu](#-oyunlaştırma--karakter-koleksiyonu)
 7. [Yapay Zeka (AI) Entegrasyonu](#-yapay-zeka-ai-entegrasyonu)
-8. [Öğretmen / Eğitmen Özellikleri](#-öğretmen--eğitmen-özellikleri)
-9. [Yönetici (Admin) Özellikleri](#-yönetici-admin-özellikleri)
-10. [Veritabanı Şeması & Migrasyonlar](#-veritabanı-şeması--migrasyonlar)
-11. [💻 Kurulum & Çalıştırma (Otomatik Bash & Manuel)](#-kurulum--çalıştırma)
+8. [👨‍🏫 Öğretmen / Eğitmen Özellikleri](#-öğretmen--eğitmen-özellikleri)
+9. [👑 Yönetici (Admin) Özellikleri](#-yönetici-admin-özellikleri)
+10. [🗄️ Veritabanı Şeması & Migrasyonlar](#-veritabanı-şeması--migrasyonlar)
+11. [🛠️ Kurulum & Çalıştırma](#-kurulum--çalıştırma)
 12. [🌐 Canlıya Alma (Vercel Deployment)](#-canlıya-alma-vercel-deployment)
->>>>>>> 8ddd324 (Fix UI, profile update bug, crashing stats page and handle electives/badges)
 
 ---
 
@@ -76,8 +65,6 @@ Sistemde 3 temel kullanıcı rolü bulunur ve her rol kendi yetki sınırları d
 
 ---
 
-<<<<<<< HEAD
-=======
 ## 📸 Platform Ekran Görüntüleri
 
 > *Not: Ekran görüntülerinizi projedeki [`docs/screenshots/`](docs/screenshots/) klasörüne ilgili dosya isimleriyle yerleştirdiğinizde burada görüntülenecektir.*
@@ -133,8 +120,6 @@ Kullanıcı rolleri değiştirme (Öğrenci, Öğretmen, Admin) ve test süreçl
 ![Yönetici Kontrol Paneli](docs/screenshots/admin-dashboard.png)
 
 ---
-
->>>>>>> 8ddd324 (Fix UI, profile update bug, crashing stats page and handle electives/badges)
 ## 🎓 Öğrenci Özellikleri
 
 ### 1. Akıllı Oryantasyon (Navigator)
@@ -214,24 +199,39 @@ Platformda Google Gemini API ile çalışan iki yönlü yapay zeka gücü bulunu
 ## 👨‍🏫 Öğretmen / Eğitmen Özellikleri
 
 ### 1. Eğitmen Kontrol Paneli (`/teacher`)
-- Toplam kurs, yayındaki kurs, kayıtlı öğrenci sayıları.
-- Hızlı farkındalık ve teknik kurs şablonu başlatma kısayolları.
-- Hazırlanan kursların yönetim listesi.
+Eğitmenlerin sisteme giriş yaptığında karşılaştığı ana komuta merkezidir. Öğretmenler bu ekranda toplam kurs sayılarını, yayında olan kurslarını ve platforma kayıtlı toplam öğrenci sayısını anlık metrikler üzerinden takip edebilir. Ayrıca, "Tek Tıkla Şablon Kurslar Yükle" butonu sayesinde yeni eğitmenler örnek müfredatları (Farkındalık ve Teknik parkurlar için) hızlıca kendi hesaplarına klonlayabilirler.
 
-### 2. Müfredat & Ders Editörü (`/teacher/courses/:id/edit`)
-- Kurs başlığı, açıklaması, kategorisi (Farkındalık / Teknik), seviyesi ve küçük resim emojisi düzenleme.
-- Ders ekleme, sıralama ve yayınlama kontrolleri.
+### 2. Kurslarım Sekmesi (`/teacher/courses`)
+Öğretmenlerin hazırladıkları tüm kursları listeleyen yönetim sayfasıdır. Bu sayfadan:
+- **Yeni Kurs Oluşturma:** Baştan sona yeni bir kurs müfredatı kurgulanabilir.
+- **Kurs Durumu:** Hangi kursların yayında olduğu, hangilerinin taslak halinde beklediği görülebilir.
+- **Düzenleme ve Silme:** Mevcut kursların içeriklerine saniyeler içinde müdahale edilebilir veya tamamen sistemden kaldırılabilir.
 
-### 3. Görsel Ders İnşa Edici (Lesson Builder)
-- Ders içerisine serbestçe blok ekleme:
-  - 📝 Anlatım & Markdown Metni
-  - ❓ Çoktan Seçmeli Test Sorusu
-  - 🧩 Eşleştirme Etkinliği
-  - 🎥 YouTube Video Eğitimi
-- Blokları yukarı/aşağı taşıma ve canlı önizleme.
+### 3. Kurs Oluşturma & Ders Ekleme (`/teacher/courses/new`)
+Eğitmenler esnek ve modern bir arayüz ile kurslarını detaylandırabilir:
+- **Kurs Detayları:** Kurs başlığı, açıklaması, zorluk seviyesi (Başlangıç, Orta, İleri), kategorisi (Farkındalık veya Teknik) belirlenir.
+- **Zorunlu / Seçmeli Ayrımı:** Kursun, öğrencilerin zorunlu yol haritasında mı çıkacağı, yoksa seçmeli katalogda mı listeleneceği tek bir butonla ayarlanabilir.
+- **Ders Sıralaması:** Sürükle bırak benzeri mantıkla derslerin sırası değiştirilebilir ve kilit mekanizmaları ayarlanabilir.
 
-### 4. Öğrenci Analiz & İstatistik Merkezi (`/teacher/stats`)
-- **🎯 En Son Tamamlanan Ders Takibi:** Her öğrencinin bitirdiği en son dersin adı, ait olduğu kurs ve zaman damgası (*"10 dk önce"*, *"Bugün"*, *"Dün"*) canlı olarak listelenir.
+### 4. Görsel Ders İnşa Edici (Lesson Builder) & Etkinlik Motoru
+Öğretmenler kod yazmadan, blok tabanlı bir sistemle ders içeriklerini tasarlar. Sisteme eklenebilen etkinlik türleri:
+- 📝 **H1 Başlık & Metin (Markdown):** Zengin metin editörüyle konu anlatımı.
+- 🎥 **YouTube Video Entegrasyonu:** Zaman etiketleriyle sınırlandırılabilen interaktif video blokları.
+- ❓ **Çoktan Seçmeli Sorular:** Şıklar, doğru cevap seçimi ve hata yapıldığında gösterilecek özel açıklamalar.
+- 🔘 **Doğru / Yanlış Soruları:** Hızlı test ve pekiştirme etkinlikleri.
+- 🔤 **Boşluk Doldurma:** Öğrencinin klavyeyle cevap girdiği interaktif metinler.
+- 🧩 **Eşleştirme (Matching):** Kavram ve tanımların sürüklenerek veya seçilerek eşleştirildiği etkinlikler.
+- 📍 **Resim Noktası (Hotspot) & Sıralama:** Gelişmiş etkileşim türleri.
+- 🌿 **Senaryo (Dallandırma):** Öğrencinin seçimine göre değişen olay örgüleri.
+
+### 5. ✨ Yapay Zeka (AI) Desteği ile Hızlı Üretim
+Ders hazırlama sürecini saniyelere indiren yapay zeka modülü, Gemini API ile entegre çalışır:
+- **YZ ile Kurs Oluştur:** Sadece "Linux Temelleri" yazarak kursun adını, açıklamasını ve seviyesini otomatik doldurtabilirsiniz.
+- **YZ ile Blok (Ders) Üretimi:** Dersin içine "Linux Komutları konu anlatımı yap" veya "Web güvenliği üzerine çoktan seçmeli zor bir soru hazırla" diyerek anında ilgili etkinliği (metin, soru, eşleştirme) oluşturabilirsiniz.
+
+### 6. Öğrenci Analiz & İstatistik Merkezi (`/teacher/stats`)
+Sistemdeki tüm öğrencilerin gelişimlerinin izlendiği detaylı analiz sayfasıdır.
+- **🎯 En Son Tamamlanan Ders Takibi:** Her öğrencinin en son bitirdiği dersin başlığı, ait olduğu kurs ve zaman damgası (*"10 dk önce"*, *"Bugün"*, *"Dün"*) canlı olarak listelenir.
 - **Öğrenci Kartları & İlerleme:** Tamamlanan ders sayısı, toplam XP, seviye ve parkur bilgisi.
 - **Filtreleme & Arama:** Öğrenci adına göre anlık arama, parkura göre (`Farkındalık` / `Teknik`) filtreleme ve `En Son Tamamlayanlar` sıralaması.
 
@@ -289,8 +289,8 @@ Bu script:
 
 #### 1. Depoyu Klonlayın
 ```bash
-git clone https://github.com/KadirDuyar/acikVeUzaktanOgrenme.git
-cd acikVeUzaktanOgrenme
+git clone https://github.com/KadirDuyar/CyberEdu-LMS-Platform.git
+cd CyberEdu-LMS-Platform
 ```
 
 #### 2. Bağımlılıkları Yükleyin
