@@ -99,7 +99,7 @@ Kurs tamamladıkça açılan 13 farklı siber kahraman avatarları, "Karakteri K
 
 ### 2. Eğitmen Modülü ve Yönetim Sistemi
 
-CyberEdu LMS eğitmen modülü; siber güvenlik eğitimlerinin planlanması, modüler ders içeriklerinin hazırlanması, interaktif etkinliklerin kurgulanması ve üretken yapay zekâ entegrasyonuyla içerik geliştirme süreçlerinin hızlandırılmasını sağlayan kapsamlı bir yönetim mimarisi sunar.
+CyberEdu LMS eğitmen modülü; siber güvenlik eğitimlerinin planlanması, modüler ders içeriklerinin hazırlanması, interaktif etkinliklerin kurgulanması, öğrenci başarı metriklerinin gerçek zamanlı izlenmesi ve üretken yapay zekâ entegrasyonuyla içerik geliştirme süreçlerinin hızlandırılmasını sağlayan kapsamlı bir yönetim mimarisi sunar.
 
 ---
 
@@ -159,18 +159,37 @@ Ders akışına pratik soru ve değerlendirme adımları eklemek için kullanıl
 
 ---
 
+#### 📈 Öğrenci İlerleme & Ders İstatistikleri (`/teacher/stats`)
+Kayıtlı öğrencilerin eğitim çıktılarını gerçek zamanlı takip eden analitik merkezidir[cite: 32]. Toplam bitirilen ders adedi, ortalama öğrenci XP puanı, aktif katılım yüzdesi gibi makro göstergelerin yanı sıra her öğrencinin parkur türü, en son tamamladığı ders, zaman damgası (*"50 dk önce"* vb.), bitirdiği ders sayısı ve güncel seviyesi bu panel üzerinden izlenebilir[cite: 32].
+
+![Öğrenci İlerleme & Ders İstatistikleri](docs/screenshots/teacher-stats.png)
+
+---
+
 #### 👤 Eğitmen Profili ve Hesap Güvenliği (`/teacher/profile`)
 Eğitmenin platform üzerindeki kimlik ve yetki parametrelerini düzenlediği ekrandır[cite: 29]. Profil avatar emojisi seçimi, ad-soyad güncellemesi ve parola yenileme gibi hesap güvenliği işlemleri bu merkezden gerçekleştirilir[cite: 29].
 
 ![Eğitmen Profil Yönetimi](docs/screenshots/teacher-profile.png)
 
-### 3. Yönetici (Admin) Paneli Ekran Görüntüsü
+---
 
-#### ⚙️ Yönetici Kontrol Paneli
-Kullanıcı rolleri değiştirme (Öğrenci, Öğretmen, Admin) ve test süreçleri için öğrenci ilerlemesini sıfırlama ekranı.
+### 3. Sistem Yönetim ve Denetim (Admin) Modülü
+
+Platformun rol tabanlı erişim kontrolü (RBAC), veri bütünlüğü ve test süreçlerinin güvenle yürütülmesini sağlayan üst düzey yönetim arayüzüdür[cite: 34].
+
+---
+
+#### ⚙️ Yönetici Kontrol Paneli (`/admin`)
+Sistem genelindeki toplam kullanıcı sayısı, kayıtlı kurs hacmi, Row Level Security (RLS) veri güvenliği durumu ve kullanıcıların rol dağılımı (Öğrenci/Eğitmen) bu merkezden izlenir[cite: 34]. Tablo üzerinden kullanıcıların rolleri tek tıkla dinamik olarak değiştirilebilir (Öğrenciyi Eğitmen yapma veya tersi) ve test hesaplarının süreçlerini denetlemek için ilerleme sıfırlama mekanizması tetiklenebilir[cite: 34].
+
 ![Yönetici Kontrol Paneli](docs/screenshots/admin-dashboard.png)
 
 ---
+
+#### 🔄 İlerleme Sıfırlama ve İşlem Onay Mekanizması
+Yanlışlıkla veri silinmesini önlemek amacıyla çift aşamalı onay (Modal Dialog) mekanizmasıyla korunur[cite: 33]. Bir öğrencinin ilerlemesi sıfırlanmak istendiğinde; tamamlanan dersler, çözülen aktiviteler ve kazanılan XP puanlarının kalıcı olarak silineceğini belirten uyarı ekranı açılır ve yönetici onayı alınır[cite: 33]. Arka planda çalışan `admin_reset_student` RPC fonksiyonu sayesinde ilgili öğrencinin ilerleme tablosundaki kayıtları güvenle temizlenir.
+
+![İlerleme Sıfırlama Onay Ekranı](docs/screenshots/admin-approval.png)
 ## 🎓 Öğrenci Özellikleri
 
 ### 1. Akıllı Oryantasyon (Navigator)
