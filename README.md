@@ -1,11 +1,12 @@
 # 🛡️ CyberEdu LMS — Açık ve Uzaktan Öğrenme Siber Güvenlik Platformu
 
 
-Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eğitim platformu. Üniversite, kurum veya bireysel eğitimler için hem genel siber farkındalık hem de ileri teknik zafiyet laboratuvarları sunar.
+Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eğitim platformu. Üniversite, kurum veya bireysel eğitimler için hem genel siber farkındalık hem de ileri teknik dersler sunar.
 
 ### 🌐 Canlı Demo
 
 👉 **[CyberEdu LMS'yi Canlı Gör](https://cyberedu-lms-platform.vercel.app)**
+---
 
 ![CyberEdu Platformu](https://img.shields.io/badge/Platform-CyberEdu_LMS-blueviolet?style=for-the-badge)
 ![React 18](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react)
