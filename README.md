@@ -69,33 +69,72 @@ Sistemde 3 temel kullanıcı rolü bulunur ve her rol kendi yetki sınırları d
 
 > *Not: Ekran görüntülerinizi projedeki [`docs/screenshots/`](docs/screenshots/) klasörüne ilgili dosya isimleriyle yerleştirdiğinizde burada görüntülenecektir.*
 
-### 1. Öğrenci Paneli Ekran Görüntüleri
+### 1. Öğrenci Deneyimi ve Öğrenme Yönetim Modülü
 
-#### 📊 Öğrenci Kontrol Paneli (Dashboard)
-Kaldığın yerden devam etme bannerı, yeni öğrenci karşılama modülü, canlı liderlik tablosu ve metrik sayaçları.
-![Öğrenci Kontrol Paneli](docs/screenshots/student-dashboard.png)
-
-#### 🧭 Akıllı Oryantasyon (Navigator)
-Öğrencinin alanını (Siber Farkındalık veya Web Güvenliği & Teknik) ve seviyesini belirlediği interaktif anket.
-![Akıllı Oryantasyon](docs/screenshots/student-navigator.png)
-
-#### 🗺️ Öğrenme Yolculuğum (Sarmal Yol Haritası)
-Yalnızca zorunlu dersleri adım adım ve kilit mekanizmasıyla takip ettiren sarmal müfredat haritası.
-![Öğrenme Yolculuğum](docs/screenshots/student-learning-path.png)
-
-#### 📝 İnteraktif Ders İlerlemesi & Etkinlikler
-Markdown anlatımlar, çoktan seçmeli sorular, eşleştirme ve gelişmiş zaman kontrollü YouTube video eğitimi.
-![Ders İlerlemesi ve Etkinlikler](docs/screenshots/student-lesson-progress.png)
-
-#### 🤖 Yapay Zeka Destekli AI Mentor
-Öğrenciye cevap vermeden rehberlik eden, ipuçları veren ve soruları açıklayan yüzen AI sohbet penceresi.
-![AI Mentor Sohbeti](docs/screenshots/student-ai-mentor.png)
-
-#### 🏆 Başarılar & Karakter Koleksiyonu Odası
-Kurs tamamladıkça açılan 13 farklı siber kahraman avatarları, "Karakteri Kuşan" özelliği, rozetler ve unvanlar.
-![Başarılar ve Karakter Koleksiyonu](docs/screenshots/student-achievements.png)
+CyberEdu LMS öğrenci arayüzü; siber güvenlik farkındalığı ve teknik uzmanlık alanlarına göre özelleşen dinamik bir pedagojik yapı sunar. Gamification (oyunlaştırma) unsurları, sarmal öğrenme yol haritası, interaktif zafiyet analizleri, yapay zekâ destekli mentorluk ve anlık geri bildirim sistemleriyle öğrencilerin pratik becerilerini kalıcı hale getirir.
 
 ---
+
+#### 📊 Öğrenci Kontrol Paneli (Dashboard)
+Öğrencinin platformdaki aktif durumunu tek merkezden takip ettiği ana ekrandır[cite: 36]. "Kaldığın Yerden Devam Et" modülü üzerinden en son çalışılan ders tek tıkla açılabilir[cite: 36]. Öğrenme süresi, toplam kazanılan XP puanı ve mevcut kurs tamamlanma oranının yanı sıra aktif derslerin aşamaları ile sınıf geneli Canlı Liderlik Tablosu (Leaderboard) bu ekrandan dinamik olarak izlenir[cite: 36].
+
+![Öğrenci Kontrol Paneli](docs/screenshots/student-dashboard.png)
+
+---
+
+#### 🗺️ Öğrenme Yolculuğum (Sarmal Müfredat Haritası)
+Yalnızca zorunlu müfredat adımlarını içeren, ön koşullu ve sıralı kilit mekanizmasına sahip sarmal ilerleme rotasıdır[cite: 35]. Öğrenci bir kursu başarıyla tamamlamadan bir sonraki aşamanın kilidi açılmaz[cite: 35]. Tamamlanan kurslar yeşil onay simgesiyle işaretlenir, aktif kurs parlak rota göstergesiyle vurgulanır ve öğrencinin öğrenme disiplini korunur[cite: 35].
+
+![Öğrenme Yolculuğum](docs/screenshots/student-learningPath.png)
+
+---
+
+#### 📚 Kurslar ve Seçmeli Modül Kataloğu (`/student/courses`)
+Öğrencinin kendi ilgi alanına göre keşfedebileceği tüm eğitimlerin yer aldığı modül merkezidir[cite: 34]. Kurslar "Tüm Kurslar", "Seçmeli Kurslar" ve "Zorunlu Müfredat" sekmeleri altında filtrelenebilir[cite: 34]. Öğrenciler zorunlu yol haritasına bağlı kalmaksızın istedikleri seçmeli kurslara (MFA/2FA, Brute Force, Nmap vb.) doğrudan kaydolup bağımsız olarak tamamlayabilirler[cite: 34].
+
+![Kurslar ve Seçmeli Modül Kataloğu](docs/screenshots/student-courses.png)
+
+---
+
+#### 🤖 CyberEdu AI Mentor (Kişisel Siber Güvenlik Rehberi)
+7/24 kesintisiz rehberlik sunan tam sayfa yapay zekâ çalışma alanıdır[cite: 32]. Öğrenciler OWASP Top 10 zafiyetleri, ağ protokolleri, port güvenlik riskleri veya kariyer adımları gibi önerilen hazır konuları seçebilir ya da doğrudan serbest sorular yöneltebilir[cite: 32]. Model, doğrudan cevap vermek yerine yönlendirici ve Sokratik ipuçlarıyla öğrencinin analitik düşünmesini destekler[cite: 32].
+
+![AI Mentor Çalışma Alanı](docs/screenshots/student-aiMentor.png)
+
+---
+
+#### 💬 Hızlı AI Asistan (Ders İçi Yüzen Sohbet)
+Ders çalışma veya etkinlik çözme anında sayfa değiştirmeden sağ alttan tetiklenebilen kompakt asistan penceresidir[cite: 31]. Öğrenci bir soruda takıldığında veya teorik bir kavramı anlamadığında "Bu konuyu basitçe özetle" veya hazır bağlamsal hızlı eylemlerle anında yardım alabilir[cite: 31].
+
+![Hızlı AI Asistan](docs/screenshots/student-fastAI.png)
+
+---
+
+#### ✅ Anlık Etkinlik Doğrulama ve Başarı Geri Bildirimi
+İnteraktif sorularda (Eşleştirme, D/Y, Çoktan Seçmeli vb.) doğru yanıt verildiğinde devreye giren pozitif pekiştirme katmanıdır[cite: 30]. Öğrenciye anında kazanılan XP ödülü (+50 XP, +80 XP vb.) gösterilir ve teknik çözüm mantığı açıklanarak öğrenme süreci doğrulanır[cite: 30].
+
+![Doğru Cevap Geri Bildirimi](docs/screenshots/student-trueanAnswer.png)
+
+---
+
+#### ❌ Çözüm Açıklamalı Hata Analizi
+Yanlış yanıt verildiğinde öğrenciyi cezalandırmak yerine eksik bilgiyi kapatmayı hedefleyen detaylı analiz panelidir[cite: 28]. Sistem doğru eşleşmeleri veya yanıt anahtarını net bir şekilde sergilerken, alt kısımda "Açıklama & Çözüm Mantığı" sunarak kavram yanılgısını anında giderir[cite: 28].
+
+![Hatalı Cevap ve Çözüm Analizi](docs/screenshots/student-wrongAnswer.png)
+
+---
+
+#### 🏆 Kurs Bitirme ve Kutlama Ekranı (Greeting Modal)
+Bir kurstaki tüm dersler ve interaktif sınavlar başarıyla tamamlandığında açılan ödül penceresidir[cite: 29]. Öğrencinin kurstan kazandığı tüm XP puanlarının hesap bakiyesine aktarıldığını doğrular, motivasyonu artırır ve kullanıcıyı doğrudan rozetler veya yeni kurslar sayfasına yönlendirir[cite: 29].
+
+![Kurs Bitirme Kutlaması](docs/screenshots/student-greeting.png)
+
+---
+
+#### 🎖️ Başarılar & Karakter Koleksiyonu Odası (`/student/achievements`)
+Platformun gamification omurgasını oluşturan vitrindir[cite: 33]. Öğrencinin tamamladığı kurslara göre kazandığı "Kurs Madalyaları", platform görevleriyle açılan "Başarı Rozetleri" ve kademe bazlı "Siber Unvanlar" burada listelenir[cite: 33]. Açılan siber kahraman avatarları (Siber Çırak, Kod Stratejisti, Dijital Kaşif vb.) incelenebilir ve "Karakteri Kuşan" özelliğiyle profil ikonu olarak atanabilir[cite: 33].
+
+![Başarılar ve Karakter Koleksiyonu](docs/screenshots/student-achievements.png)
 
 ### 2. Eğitmen Modülü ve Yönetim Sistemi
 
