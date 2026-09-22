@@ -97,21 +97,72 @@ Kurs tamamladıkça açılan 13 farklı siber kahraman avatarları, "Karakteri K
 
 ---
 
-### 2. Öğretmen Paneli Ekran Görüntüleri
+### 2. Eğitmen Modülü ve Yönetim Sistemi
 
-#### 🏫 Eğitmen Kontrol Paneli
-Kurs ve öğrenci genel görünümü, istatistik özetleri ve tek tıkla kurs şablonu oluşturma.
-![Öğretmen Kontrol Paneli](docs/screenshots/teacher-dashboard.png)
-
-#### 🛠️ Ders & Blok İnşa Edici (Lesson Builder - YZ ile Üretim)
-İçerik, soru, eşleştirme ve video bloklarını görsel olarak tasarlama ve Gemini yapay zekasıyla otomatik ders üretimi.
-![Ders İnşa Edici](docs/screenshots/teacher-lesson-builder.png)
-
-#### 📈 Öğrenci İstatistikleri & En Son Tamamlanan Ders Takibi (`/teacher/stats`)
-Her öğrencinin en son bitirdiği dersin başlığı, ait olduğu kurs, zaman damgası (*"10 dk önce"*, *"Bugün"*), XP ve tamamlanma oranları.
-![Öğrenci İstatistikleri](docs/screenshots/teacher-student-stats.png)
+CyberEdu LMS eğitmen modülü; siber güvenlik eğitimlerinin planlanması, modüler ders içeriklerinin hazırlanması, interaktif etkinliklerin kurgulanması ve üretken yapay zekâ entegrasyonuyla içerik geliştirme süreçlerinin hızlandırılmasını sağlayan kapsamlı bir yönetim mimarisi sunar.
 
 ---
+
+#### 🏫 Eğitmen Kontrol Paneli (Dashboard)
+Platform üzerindeki aktif eğitim süreçlerinin üst düzey izlendiği ana yönetim merkezidir[cite: 30]. Toplam kurs adedi, yayındaki modüller ve sisteme kayıtlı öğrenci sayıları gibi genel metrikleri özetler[cite: 30]. Eğitmenler bu ekrandan doğrudan "Farkındalık Eğitimi" veya "Teknik Zafiyet Kursu" şablonlarını tetikleyebilir ve mevcut kurslarının durumunu inceleyebilir[cite: 30].
+
+![Eğitmen Kontrol Paneli](docs/screenshots/teacher-dashboard.png)
+
+---
+
+#### 📚 Kurs Yönetimi ve Müfredat Listesi (`/teacher/courses`)
+Eğitmen tarafından oluşturulan tüm kursların kartlar halinde listelendiği, yayın durumlarının (Yayında / Taslak) ve hedef kitle kategorilerinin (Teknik / Farkındalık) yönetildiği paneldir[cite: 28]. Kurs içeriklerinin önizlenmesi, düzenlenmesi ve yeni eğitim oluşturma süreçleri bu alandan başlatılır[cite: 28].
+
+![Kurslarım Ekranı](docs/screenshots/teacher-courses.png)
+
+---
+
+#### ➕ Kurs Yapılandırma ve Tanımlama Ekranı (`/teacher/courses/new`)
+Yeni bir siber güvenlik modülü oluştururken meta verilerin girildiği form arayüzüdür[cite: 27]. Kurs başlığı, pedagojik açıklama metni, hedef kitle (Farkındalık / Teknik), müfredat türü (Zorunlu / Seçmeli), zorluk derecesi ve temsili görsel emoji bu adımda belirlenir[cite: 27].
+
+![Manuel Kurs Tanımlama](docs/screenshots/teacher-newCourse.png)
+
+---
+
+#### 🤖 YZ Destekli Kurs Oluşturma Sihirbazı
+Eğitim planlama süresini minimuma indirmek amacıyla entegre edilen üretken yapay zekâ özelliğidir[cite: 21, 26]. Üst paneldeki *"✨ YZ ile Kurs Oluştur"* fonksiyonu tetiklendiğinde; girilen konu başlığına uygun detaylı açıklama, zorluk seviyesi, hedef kitle sınıflandırması ve görsel rozet otomatik olarak üretilip forma aktarılır[cite: 21, 26].
+
+![YZ ile Kurs Üretimi](docs/screenshots/teacher-newCourseWithAi.png)
+
+---
+
+#### 🗂️ Kurs Detayı ve Ders Sıralama Yönetimi
+Kaydedilen bir kursun genel ayarlarının güncellendiği ve kursa bağlı ders adımlarının kronolojik olarak yönetildiği çalışma alanıdır[cite: 21]. Bu ekrandan kursa yeni dersler eklenebilir, mevcut derslerin yayın durumu değiştirilebilir ve doğrudan içerik düzenleyicisine geçiş yapılabilir[cite: 21].
+
+![Kurs Detayı ve Ders Listesi](docs/screenshots/teacher-course.png)
+
+---
+
+#### 🛠️ Modüler Ders & İçerik Düzenleyici (Lesson Builder)
+Ders akışının blok tabanlı bir mimariyle kurgulandığı merkezdir[cite: 22]. Teorik anlatımlar, video materyalleri ve interaktif sınavlar sıralı bloklar halinde düzenlenir[cite: 22]. Her blok için bağımsız XP puanı atanabilir, blok sıralamaları değiştirilebilir ve sistemde tanımlı 11 farklı aktivite türü (Çoktan Seçmeli, D/Y, Eşleştirme, Sıralama, Hafıza Kartı, Hotspot, Senaryo vb.) derse dahil edilebilir[cite: 22].
+
+![Ders İçi Blok Düzenleyici](docs/screenshots/teacher-Content.png)
+
+---
+
+#### ✍️ YZ ile Teorik Anlatım & Metin Bloğu Üretimi
+Ders içi içerik bloklarında yer alan *"✨ YZ ile Üret"* aracı; eğitmenin belirlediği teknik başlık doğrultusunda pedagojik standartlara ve şablonlara uygun zengin Markdown formatında konu anlatımları türetir[cite: 24, 25].
+
+![YZ ile Metin Üretimi](docs/screenshots/teacher-Promt.png)
+
+---
+
+#### 🎯 YZ ile Otomatik İnteraktif Etkinlik Üretimi
+Ders akışına pratik soru ve değerlendirme adımları eklemek için kullanılan modal arayüzdür[cite: 22, 23]. Eğitmen hedef etkinlik türünü ve konu detayını belirttiğinde, sistem doğrudan doğru cevap anahtarı, seçenekleri, ipuçları ve hata açıklama mantığı tanımlanmış etkinlik objeleri üretir[cite: 23].
+
+![YZ Etkinlik Üretim Sihirbazı](docs/screenshots/teacher-promtContent.png)
+
+---
+
+#### 👤 Eğitmen Profili ve Hesap Güvenliği (`/teacher/profile`)
+Eğitmenin platform üzerindeki kimlik ve yetki parametrelerini düzenlediği ekrandır[cite: 29]. Profil avatar emojisi seçimi, ad-soyad güncellemesi ve parola yenileme gibi hesap güvenliği işlemleri bu merkezden gerçekleştirilir[cite: 29].
+
+![Eğitmen Profil Yönetimi](docs/screenshots/teacher-profile.png)
 
 ### 3. Yönetici (Admin) Paneli Ekran Görüntüsü
 
