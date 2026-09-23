@@ -420,6 +420,8 @@ export default function ProfilePage() {
               </div>
             )}
           </Card>
+        )}
+
         {/* Tehlikeli Bölge: Hesabı Sil */}
         <Card className="p-6 border-rose-500/20 bg-rose-950/10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
