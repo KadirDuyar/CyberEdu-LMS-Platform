@@ -4,11 +4,11 @@
 
 const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
 const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
-const configuredGeminiModel = import.meta.env.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
+const configuredGeminiModel = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
 const configuredGroqModel = import.meta.env.VITE_GROQ_MODEL;
 
 /**
- * Groq Cloud REST API Çağrısı (Llama 3.3 / Llama 3 - Ultra Düşük Gecikme)
+ * Groq Cloud REST API Çağrısı (openai/gpt-oss-120b / Llama 3.3 / Llama 3)
  */
 async function callGroq({ prompt, systemInstruction = '', history = [], signal }) {
   if (!groqApiKey) {
@@ -40,14 +40,14 @@ async function callGroq({ prompt, systemInstruction = '', history = [], signal }
       ? 'llama-3.3-70b-versatile'
       : configuredGroqModel;
 
-  // Aktif ve en güncel Groq modelleri (Öncelik: Llama 3.3 70B -> Llama 3 8B -> Llama 3.1 70B)
+  // Aktif modeller (Öncelik: openai/gpt-oss-120b -> Llama 3.3 70B -> Llama 3 8B -> Llama 3.1 70B)
   const candidateModels = Array.from(
     new Set([
+      'openai/gpt-oss-120b',
       sanitizedConfigModel,
       'llama-3.3-70b-versatile',
       'llama3-8b-8192',
-      'llama-3.1-70b-versatile',
-      'llama3-70b-8192'
+      'llama-3.1-70b-versatile'
     ].filter(Boolean))
   );
 
@@ -93,7 +93,7 @@ async function callGroq({ prompt, systemInstruction = '', history = [], signal }
 }
 
 /**
- * Google Gemini REST API Çağrısı (Kararlı v1 Endpoint & Model Fallback Destekli)
+ * Google Gemini REST API Çağrısı (Gemini 2.5 Flash / Gemini 2.5 Pro & Fallback)
  */
 async function callGemini({ prompt, systemInstruction = '', history = [], signal }) {
   if (!geminiApiKey) {
@@ -111,8 +111,7 @@ async function callGemini({ prompt, systemInstruction = '', history = [], signal
     }
   }
 
-  // Gemini v1 endpoint'lerinde system_instruction alanı desteklenmediği için (400 verir),
-  // sistem talimatı kullanıcı mesajının başına eklenerek %100 uyumluluk sağlanır.
+  // Gemini v1 ve v1beta endpoint'lerinde %100 uyumluluk için sistem talimatını kullanıcı mesajına ekle
   const userPromptText = systemInstruction
     ? `${systemInstruction}\n\n---\nKULLANICI TALEBİ:\n${prompt}`
     : prompt;
@@ -124,19 +123,21 @@ async function callGemini({ prompt, systemInstruction = '', history = [], signal
 
   const payload = { contents };
 
-  // Bilinen eski veya geçersiz modelleri temizle
+  // Bilinen eski modelleri temizle
   const sanitizedGeminiModel =
     configuredGeminiModel === 'gemini-2.0-flash' || configuredGeminiModel === 'gemini-1.0-pro'
-      ? 'gemini-1.5-flash'
+      ? 'gemini-2.5-flash'
       : configuredGeminiModel;
 
-  // Sırasıyla en kararlı v1 modelleri (gemini-1.5-flash -> gemini-1.5-flash-latest -> gemini-1.5-pro -> v1beta)
+  // Kullanıcının API anahtarında tam yetkili Gemini 2.5 Flash & 2.5 Pro modelleri
   const candidateEndpoints = [
+    `https://generativelanguage.googleapis.com/v1beta/models/${sanitizedGeminiModel}:generateContent?key=${geminiApiKey}`,
     `https://generativelanguage.googleapis.com/v1/models/${sanitizedGeminiModel}:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`
   ];
 
   // Tekrarlayan endpoint'leri kaldır
@@ -159,7 +160,12 @@ async function callGemini({ prompt, systemInstruction = '', history = [], signal
         const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (text) {
           const duration = Math.round(performance.now() - startTime);
-          return { provider: 'Google Gemini (v1/gemini-1.5-flash)', text, duration };
+          const matchedModel = url.includes('gemini-2.5-flash')
+            ? 'Gemini 2.5 Flash'
+            : url.includes('gemini-2.5-pro')
+              ? 'Gemini 2.5 Pro'
+              : 'Gemini 1.5 Flash';
+          return { provider: `Google ${matchedModel}`, text, duration };
         }
       } else {
         const errorData = await res.json().catch(() => null);
