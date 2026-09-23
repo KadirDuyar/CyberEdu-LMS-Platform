@@ -108,6 +108,47 @@ export default function AiChatWidget() {
     }
   }, [isOpen, isMinimized, messages]);
 
+  // Sayfadaki güncel ders, kurs veya içerik bağlamını ayıkla
+  const extractCurrentContext = () => {
+    const path = location.pathname;
+    let pageName = 'Kontrol Paneli';
+    let details = '';
+    let courseTitle = '';
+    let lessonTitle = '';
+
+    if (path.includes('/student/lessons/')) {
+      pageName = 'İnteraktif Ders Ekranı';
+      const h1Text = document.querySelector('h1')?.innerText || '';
+      lessonTitle = h1Text;
+      const questionText = document.querySelector('.prose-custom p, h2, h3')?.innerText || '';
+      details = `Ders: "${h1Text}". İçerik detayı: "${questionText.slice(0, 300)}"`;
+    } else if (path.includes('/student/courses/')) {
+      pageName = 'Kurs Bilgi Sayfası';
+      const h1Text = document.querySelector('h1')?.innerText || '';
+      courseTitle = h1Text;
+      details = `İncelenen Kurs: "${h1Text}"`;
+    } else if (path.includes('/student/learning-path')) {
+      pageName = 'Öğrenme Yolculuğu Haritası';
+      details = 'Öğrenci zorunlu müfredat sarmal haritasını inceliyor.';
+    } else if (path.includes('/student/achievements')) {
+      pageName = 'Başarılar & Rozetler Odası';
+      details = 'Öğrenci kazandığı rozetleri, unvanları ve kilitli siber avatarları inceliyor.';
+    } else if (path.includes('/teacher')) {
+      pageName = 'Eğitmen Paneli';
+      const title = document.querySelector('h1, h2')?.innerText || '';
+      details = title ? `Eğitmen Sayfa Başlığı: "${title}"` : 'Eğitmen kurs veya ders yönetiminde.';
+    }
+
+    return {
+      role: role === 'teacher' ? 'Eğitmen' : role === 'admin' ? 'Yönetici' : 'Öğrenci',
+      pageName,
+      pathname: path,
+      lessonTitle,
+      courseTitle,
+      details
+    };
+  };
+
   const handleSend = async (customText = null) => {
     const textToSend = (customText || input).trim();
     if (!textToSend || loading) return;
@@ -123,12 +164,8 @@ export default function AiChatWidget() {
     setLoading(true);
 
     try {
-      // Bağlam bilgisi hazırla
-      const context = {
-        role: role === 'teacher' ? 'Eğitmen' : role === 'admin' ? 'Yönetici' : 'Öğrenci',
-        pageTitle: location.pathname,
-        pathname: location.pathname
-      };
+      // Dinamik bağlam bilgisi hazırla
+      const context = extractCurrentContext();
 
       const history = messages.slice(-8).map((m) => ({
         role: m.role,
@@ -251,6 +288,21 @@ export default function AiChatWidget() {
           {/* Body */}
           {!isMinimized && (
             <>
+              {/* Güncel Bağlam / Konum Göstergesi */}
+              {(() => {
+                const ctx = extractCurrentContext();
+                return (
+                  <div className="px-4 py-1.5 bg-violet-950/40 border-b border-violet-800/30 flex items-center justify-between gap-2 text-[10px] text-violet-300">
+                    <span className="truncate flex items-center gap-1">
+                      <span className="text-amber-400 font-bold shrink-0">📍 {ctx.pageName}:</span>
+                      <span className="truncate text-slate-300">{ctx.lessonTitle || ctx.courseTitle || 'Genel Konular'}</span>
+                    </span>
+                    <span className="shrink-0 font-bold text-violet-400 bg-violet-500/10 px-1.5 py-0.5 rounded border border-violet-500/20">
+                      Bağlamsal
+                    </span>
+                  </div>
+                );
+              })()}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map((msg) => {
                   const isUser = msg.role === 'user';

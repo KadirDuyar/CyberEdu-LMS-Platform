@@ -7,14 +7,14 @@ import Card from '../components/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import {
   User, Lock, Shield, Zap, CheckCircle2,
-  Calendar, Key, BookOpen, Save, Award, AlertCircle, ArrowRight, Sparkles
+  Calendar, Key, BookOpen, Save, Award, AlertCircle, ArrowRight, Sparkles, Trash2
 } from 'lucide-react';
 
 const AVATAR_OPTIONS = ['👨‍💻', '👩‍💻', '🚀', '🛡️', '🕵️‍♂️', '🔑', '⚡', '🌐', '🥷', '🧙‍♂️', '🦾', '🦅', '👑', '🤖', '👾'];
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user, profile, updateProfile } = useAuth();
+  const { user, profile, updateProfile, logout } = useAuth();
 
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [avatar, setAvatar] = useState(profile?.avatar_emoji || '👤');
@@ -32,6 +32,48 @@ export default function ProfilePage() {
   const [completedLessons, setCompletedLessons] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [statsLoading, setStatsLoading] = useState(true);
+
+  // Hesap Silme (Danger Zone)
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    if (deleteConfirmText.trim() !== 'HESABIMI SİL') {
+      setDeleteError('Lütfen onaylamak için metin kutusuna tam olarak "HESABIMI SİL" yazın.');
+      return;
+    }
+
+    if (!user) return;
+    setDeleteLoading(true);
+    setDeleteError('');
+
+    try {
+      // İlişkili tabloları temizle
+      await supabase.from('course_feedbacks').delete().eq('user_id', user.id);
+      await supabase.from('notifications').delete().eq('user_id', user.id);
+      await supabase.from('user_follows').delete().eq('follower_id', user.id);
+      await supabase.from('user_follows').delete().eq('following_id', user.id);
+      await supabase.from('lesson_progress').delete().eq('user_id', user.id);
+      await supabase.from('enrollments').delete().eq('user_id', user.id);
+      await supabase.from('activity_attempts').delete().eq('user_id', user.id);
+      await supabase.from('user_badges').delete().eq('user_id', user.id);
+
+      // Profili sil
+      const { error: profErr } = await supabase.from('profiles').delete().eq('id', user.id);
+      if (profErr) throw profErr;
+
+      // Oturumu kapat ve login sayfasına yönlendir
+      await logout();
+      navigate('/login', { replace: true });
+    } catch (err) {
+      console.error('Hesap silme hatası:', err);
+      setDeleteError('Hesap silinirken bir hata oluştu: ' + (err.message || 'Lütfen tekrar deneyin.'));
+      setDeleteLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (profile) {
@@ -378,6 +420,84 @@ export default function ProfilePage() {
               </div>
             )}
           </Card>
+        {/* Tehlikeli Bölge: Hesabı Sil */}
+        <Card className="p-6 border-rose-500/20 bg-rose-950/10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-base font-bold text-rose-400 flex items-center gap-2">
+                <Trash2 size={18} /> Tehlikeli Bölge: Hesabı Sil
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 max-w-lg leading-relaxed">
+                Hesabınızı sildiğinizde kazandığınız tüm XP'ler, seviyeniz, rozetleriniz ve tamamladığınız ders kayıtları kalıcı olarak kaldırılır. Bu işlem geri alınamaz.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowDeleteModal(true);
+                setDeleteConfirmText('');
+                setDeleteError('');
+              }}
+              className="px-4 py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 text-xs font-bold transition-all shrink-0 flex items-center justify-center gap-2"
+            >
+              <Trash2 size={14} /> Hesabımı Sil
+            </button>
+          </div>
+        </Card>
+
+        {/* Hesap Silme Onay Modalı */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+            <div className="relative w-full max-w-md rounded-3xl glass border border-rose-500/30 p-6 md:p-8 shadow-2xl bg-slate-900/95 space-y-5 animate-scale-up">
+              <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
+                <Trash2 size={24} />
+              </div>
+
+              <div className="text-center">
+                <h3 className="font-display font-black text-xl text-white">Hesabınızı Silmek İstiyor Musunuz?</h3>
+                <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                  Tüm ilerlemeniz, rozetleriniz ve kayıtlarınız tamamen silinecektir. Onaylamak için lütfen aşağıdaki kutuya büyük harflerle <strong className="text-rose-400">HESABIMI SİL</strong> yazın:
+                </p>
+              </div>
+
+              {deleteError && (
+                <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs text-center font-medium">
+                  {deleteError}
+                </div>
+              )}
+
+              <form onSubmit={handleDeleteAccount} className="space-y-4">
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder='HESABIMI SİL'
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-rose-500/40 text-white placeholder-slate-600 text-center font-mono font-bold text-sm tracking-wider focus:outline-none focus:border-rose-400"
+                  autoFocus
+                />
+
+                <div className="flex gap-2.5 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteModal(false)}
+                    disabled={deleteLoading}
+                    className="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 font-semibold text-xs transition-colors"
+                  >
+                    Vazgeç
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={deleteLoading || deleteConfirmText.trim() !== 'HESABIMI SİL'}
+                    className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-all shadow-lg shadow-rose-600/30 flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {deleteLoading ? <LoadingSpinner size="sm" /> : <><Trash2 size={14} /> Evet, Sil</>}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
 
       </div>

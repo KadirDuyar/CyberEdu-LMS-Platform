@@ -83,10 +83,11 @@ export default function RegisterPage() {
 
   const handleGoogleLogin = async () => {
     try {
+      localStorage.setItem('cyberedu_oauth_intent_role', selectedRole);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/student`
+          redirectTo: `${window.location.origin}/login`
         }
       });
       if (error) {

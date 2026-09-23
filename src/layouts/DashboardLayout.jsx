@@ -3,10 +3,11 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, LogOut, ChevronLeft, ChevronRight,
   Star, Zap, Bell, Map, Trophy, Bot, BookOpen,
-  BarChart3, Settings, Users, Shield, PlusCircle, Menu, X, Sun, Moon, User
+  BarChart3, Settings, Users, Shield, PlusCircle, Menu, X, Sun, Moon, User, Check
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import AiChatWidget from '../components/AiChatWidget';
+import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../services/socialService';
 
 // ─── Sidebar menü konfigürasyonu ──────────────────────────────────────────────
 const NAV_ITEMS = [
@@ -116,11 +117,44 @@ function SidebarItem({ item, collapsed, userRole }) {
 }
 
 export default function DashboardLayout({ children }) {
-  const { profile, role, logout } = useAuth();
+  const { user, profile, role, logout } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    if (user) {
+      loadNotifications();
+      const interval = setInterval(loadNotifications, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  async function loadNotifications() {
+    if (!user) return;
+    const data = await getNotifications(user.id);
+    setNotifications(data);
+  }
+
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
+
+  const handleMarkAsRead = async (notif) => {
+    if (!notif.is_read) {
+      setNotifications((prev) => prev.map((n) => n.id === notif.id ? { ...n, is_read: true } : n));
+      await markNotificationAsRead(notif.id);
+    }
+    if (notif.data?.courseId) {
+      navigate(`/student/courses/${notif.data.courseId}`);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    if (!user || unreadCount === 0) return;
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    await markAllNotificationsAsRead(user.id);
+  };
   
   const [isLightMode, setIsLightMode] = useState(() => {
     return localStorage.getItem('cyberedu_theme') === 'light';
@@ -331,29 +365,85 @@ export default function DashboardLayout({ children }) {
               <button
                 onClick={() => setNotifOpen((n) => !n)}
                 className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-white/10 hover:border-violet-500/50 transition-colors relative"
+                title="Bildirimler"
               >
                 <Bell size={17} className="text-slate-300" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white rounded-full text-[10px] font-black flex items-center justify-center animate-pulse shadow-md shadow-rose-500/50">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </button>
+
               {notifOpen && (
                 <div
-                  className="absolute right-0 top-12 w-72 glass-light border border-white/15 rounded-2xl p-4 z-50 shadow-2xl"
+                  className="absolute right-0 top-12 w-80 sm:w-88 glass-light border border-white/15 rounded-2xl p-4 z-50 shadow-2xl bg-slate-900/95 backdrop-blur-xl animate-scale-up"
                   onMouseLeave={() => setNotifOpen(false)}
                 >
-                  <p className="font-bold text-sm text-white mb-3">Bildirimler</p>
-                  <div className="space-y-2">
-                    {[
-                      { icon: '🛡️', text: 'Siber Güvenlik Platformuna hoş geldiniz!', time: 'Şimdi' },
-                      { icon: '📚', text: 'Phishing Analizi modülü hazırlandı', time: '2 saat önce' },
-                    ].map((n, i) => (
-                      <div key={i} className="flex gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer">
-                        <span className="text-lg">{n.icon}</span>
-                        <div>
-                          <p className="text-xs text-white font-medium">{n.text}</p>
-                          <p className="text-[10px] text-slate-400">{n.time}</p>
-                        </div>
+                  <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-sm text-white">Bildirimler</p>
+                      {unreadCount > 0 && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                          {unreadCount} yeni
+                        </span>
+                      )}
+                    </div>
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleMarkAllRead}
+                        className="text-[11px] text-violet-400 hover:text-violet-300 font-bold transition-colors flex items-center gap-1"
+                      >
+                        <Check size={12} /> Tümünü Oku
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                    {notifications.length === 0 ? (
+                      <div className="py-8 text-center">
+                        <span className="text-2xl block mb-1">🔔</span>
+                        <p className="text-xs text-slate-400">Henüz yeni bir bildiriminiz yok.</p>
                       </div>
-                    ))}
+                    ) : (
+                      notifications.map((n) => {
+                        const icon =
+                          n.type === 'course_feedback' ? '💬' :
+                          n.type === 'new_follower' ? '🤝' :
+                          n.type === 'friend_completed_course' ? '🎓' : '🛡️';
+
+                        return (
+                          <div
+                            key={n.id}
+                            onClick={() => handleMarkAsRead(n)}
+                            className={`flex gap-3 p-2.5 rounded-xl border transition-all cursor-pointer ${
+                              !n.is_read
+                                ? 'bg-violet-950/30 border-violet-500/30 hover:bg-violet-900/40'
+                                : 'bg-white/5 border-white/5 hover:bg-white/10'
+                            }`}
+                          >
+                            <span className="text-lg shrink-0 mt-0.5">{icon}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-1">
+                                <p className={`text-xs truncate ${!n.is_read ? 'font-bold text-white' : 'font-medium text-slate-300'}`}>
+                                  {n.title}
+                                </p>
+                                {!n.is_read && (
+                                  <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
+                                {n.message}
+                              </p>
+                              <p className="text-[9px] text-slate-500 mt-1">
+                                {new Date(n.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               )}

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+import RoleSelectModal from '../components/auth/RoleSelectModal';
 
 // ─── Context ───────────────────────────────────────────────────────────────────
 const AuthContext = createContext(null);
@@ -26,13 +27,36 @@ export function AuthProvider({ children }) {
     return data;
   }, []);
 
+  const [needsRoleSelection, setNeedsRoleSelection] = useState(false);
+
   // ── Oturum başlatma / değişim dinleyicisi ─────────────────────────────────────
   useEffect(() => {
     // İlk yükleme: mevcut oturumu kontrol et
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user);
-        const prof = await fetchProfile(session.user.id);
+        let prof = await fetchProfile(session.user.id);
+
+        if (!prof || !prof.role) {
+          const intentRole = localStorage.getItem('cyberedu_oauth_intent_role');
+          if (intentRole) {
+            const fullName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Kullanıcı';
+            const { data: newProf } = await supabase.from('profiles').upsert({
+              id: session.user.id,
+              full_name: fullName,
+              role: intentRole,
+              avatar_emoji: intentRole === 'teacher' ? '🎓' : '🚀',
+              xp: 0,
+              level: 1,
+              onboarding_completed: intentRole === 'teacher'
+            }).select().single();
+            localStorage.removeItem('cyberedu_oauth_intent_role');
+            if (newProf) prof = newProf;
+          } else {
+            setNeedsRoleSelection(true);
+          }
+        }
+
         setProfile(prof);
       }
       setLoading(false);
@@ -42,7 +66,6 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'TOKEN_REFRESHED') {
-          // Token yenilendiğinde kullanıcı oturumu devam ediyor; tüm sayfayı yeniden yüklememek için profile re-fetch yapma
           if (session?.user) {
             setUser((prev) => (prev?.id === session.user.id ? prev : session.user));
           }
@@ -51,7 +74,28 @@ export function AuthProvider({ children }) {
 
         if (session?.user) {
           setUser((prev) => (prev?.id === session.user.id ? prev : session.user));
-          const prof = await fetchProfile(session.user.id);
+          let prof = await fetchProfile(session.user.id);
+
+          if (!prof || !prof.role) {
+            const intentRole = localStorage.getItem('cyberedu_oauth_intent_role');
+            if (intentRole) {
+              const fullName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Kullanıcı';
+              const { data: newProf } = await supabase.from('profiles').upsert({
+                id: session.user.id,
+                full_name: fullName,
+                role: intentRole,
+                avatar_emoji: intentRole === 'teacher' ? '🎓' : '🚀',
+                xp: 0,
+                level: 1,
+                onboarding_completed: intentRole === 'teacher'
+              }).select().single();
+              localStorage.removeItem('cyberedu_oauth_intent_role');
+              if (newProf) prof = newProf;
+            } else {
+              setNeedsRoleSelection(true);
+            }
+          }
+
           setProfile((prev) => {
             if (prev && JSON.stringify(prev) === JSON.stringify(prof)) return prev;
             return prof;
@@ -59,6 +103,7 @@ export function AuthProvider({ children }) {
         } else {
           setUser(null);
           setProfile(null);
+          setNeedsRoleSelection(false);
         }
       }
     );
@@ -266,6 +311,15 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={value}>
       {children}
+      {needsRoleSelection && user && (
+        <RoleSelectModal
+          user={user}
+          onRoleSelected={(newProf) => {
+            setProfile(newProf);
+            setNeedsRoleSelection(false);
+          }}
+        />
+      )}
     </AuthContext.Provider>
   );
 }

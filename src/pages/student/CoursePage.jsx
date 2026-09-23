@@ -7,6 +7,7 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import Card from '../../components/Card';
 import ProgressBar from '../../components/ui/ProgressBar';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import CourseFeedbackSection from '../../components/courses/CourseFeedbackSection';
 import {
   ArrowLeft, BookOpen, Zap, CheckCircle, Lock,
   Play, ChevronRight, Users, ArrowRight,
@@ -332,6 +333,9 @@ export default function CoursePage() {
             <p className="text-xs text-slate-400">Bu kursu başarıyla bitirdin. Diğer kurslara göz atabilirsin.</p>
           </Card>
         )}
+
+        {/* Kurs Geri Bildirimleri & Değerlendirme */}
+        <CourseFeedbackSection courseId={courseId} currentUser={user} />
           </>
         )}
 

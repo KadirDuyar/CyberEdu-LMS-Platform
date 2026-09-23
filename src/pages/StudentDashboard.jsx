@@ -5,10 +5,12 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import {
   Map, Zap, Clock, ArrowRight, ShieldCheck, Trophy,
-  CheckCircle2, BookOpen, Sparkles
+  CheckCircle2, BookOpen, Sparkles, UserPlus, UserCheck
 } from 'lucide-react';
 import Card from '../components/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import OnboardingTour from '../components/ui/OnboardingTour';
+import { getFollowingIds, followUser, unfollowUser } from '../services/socialService';
 
 export default function StudentDashboard() {
   const { user, profile } = useAuth();
@@ -17,6 +19,7 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [completedLessonIds, setCompletedLessonIds] = useState(new Set());
   const [leaderboard, setLeaderboard] = useState([]);
+  const [followingIds, setFollowingIds] = useState(new Set());
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [activeCourse, setActiveCourse] = useState(null);
   const [isCourseFinished, setIsCourseFinished] = useState(false);
@@ -32,8 +35,34 @@ export default function StudentDashboard() {
       const isInitial = !initialLoadDone.current;
       initialLoadDone.current = true;
       loadDashboardData(isInitial);
+      loadFollowing();
     }
   }, [profile?.onboarding_completed, profile?.learning_area, profile?.xp, profile?.level, user?.id]);
+
+  async function loadFollowing() {
+    if (!user) return;
+    const ids = await getFollowingIds(user.id);
+    setFollowingIds(ids);
+  }
+
+  const handleToggleFollow = async (targetStudent) => {
+    if (!user || targetStudent.id === user.id) return;
+    const isFollowing = followingIds.has(targetStudent.id);
+
+    // Optimistic update
+    setFollowingIds((prev) => {
+      const next = new Set(prev);
+      if (isFollowing) next.delete(targetStudent.id);
+      else next.add(targetStudent.id);
+      return next;
+    });
+
+    if (isFollowing) {
+      await unfollowUser(user.id, targetStudent.id);
+    } else {
+      await followUser(user.id, targetStudent.id, profile?.full_name || 'Bir arkadaşın');
+    }
+  };
 
   async function loadDashboardData(isInitial = false) {
     if (isInitial || !activeCourse) {
@@ -522,11 +551,39 @@ export default function StudentDashboard() {
                       <p className="text-xs font-bold text-white truncate">
                         {st.full_name} {isMe && '(Sen)'}
                       </p>
-                      <p className="text-[10px] text-slate-400">Seviye {st.level || 1}</p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-slate-400">Lv.{st.level || 1}</span>
+                        <span className="text-[10px] font-black text-amber-400 font-mono">
+                          {st.xp} XP
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-xs font-black text-amber-400 font-mono">
-                      {st.xp} XP
-                    </span>
+
+                    {!isMe && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleFollow(st);
+                        }}
+                        className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 ${
+                          followingIds.has(st.id)
+                            ? 'bg-violet-500/20 text-violet-300 border border-violet-500/40'
+                            : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10'
+                        }`}
+                        title={followingIds.has(st.id) ? 'Takibi Bırak' : 'Takip Et'}
+                      >
+                        {followingIds.has(st.id) ? (
+                          <>
+                            <UserCheck size={11} className="text-violet-400" /> Takipte
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus size={11} /> Takip Et
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -550,6 +607,9 @@ export default function StudentDashboard() {
           </div>
 
         </div>
+
+        {/* Tek Gösterimlik Platform Tanıtım Rehberi */}
+        <OnboardingTour />
 
       </div>
     </DashboardLayout>

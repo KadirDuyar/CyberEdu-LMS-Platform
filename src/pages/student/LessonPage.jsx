@@ -11,6 +11,7 @@ import {
   Trophy, RotateCcw, Sparkles
 } from 'lucide-react';
 import { findNewUnlockedReward } from '../../data/achievementsData';
+import { notifyFollowersCourseCompleted } from '../../services/socialService';
 
 const PASS_PERCENT = 80;
 
@@ -229,6 +230,31 @@ export default function LessonPage() {
             .update({ status: 'completed', completed_at: new Date().toISOString() })
             .eq('user_id', user.id)
             .eq('course_id', lesson.course_id);
+
+          // Takipçilere arkadaşın kursu tamamladı bildirimi gönder
+          try {
+            const { data: cData } = await supabase
+              .from('courses')
+              .select('title')
+              .eq('id', lesson.course_id)
+              .single();
+
+            const { data: profData } = await supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('id', user.id)
+              .single();
+
+            notifyFollowersCourseCompleted({
+              userId: user.id,
+              userName: profData?.full_name || 'Arkadaşın',
+              courseId: lesson.course_id,
+              courseTitle: cData?.title || 'Siber Güvenlik'
+            });
+          } catch (notifErr) {
+            console.warn('Takipçilere bildirim gönderilemedi:', notifErr);
+          }
+
           return true;
         }
       }
