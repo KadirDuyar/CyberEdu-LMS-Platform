@@ -72,9 +72,9 @@ export default function AdminDashboard() {
   const handleResetProgress = (userId, userName) => {
     setConfirmModal({
       isOpen: true,
-      title: 'İlerlemeyi Sıfırla',
-      message: `${userName} adlı öğrencinin tamamladığı tüm dersler, sınavlar ve XP puanları kalıcı olarak sıfırlanacaktır. Bu işlemi onaylıyor musunuz?`,
-      confirmText: 'Evet, Sıfırla',
+      title: 'Öğrenci Verilerini ve İlerlemesini Sıfırla',
+      message: `${userName} adlı öğrencinin e-postası ve şifresi hariç; tüm ders ilerlemeleri, sınav sonuçları, kayıtlı kursları, yorumları, takipleri ve rozetleri kalıcı olarak silinecektir. Bu işlemi onaylıyor musunuz?`,
+      confirmText: 'Evet, Tamamen Sıfırla',
       isDanger: true,
       onConfirm: async () => {
         setConfirmModal((m) => ({ ...m, isOpen: false }));

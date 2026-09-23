@@ -161,20 +161,25 @@ export default function StudentDashboard() {
           .sort((a, b) => b.latestActivityTime - a.latestActivityTime);
 
         // B) Eğer localStorage'daki kurs geçerliyse:
-        if (savedLastCourseId) {
+        // YALNIZCA kullanıcının veritabanında gerçekten kayıtlı olduğu kursu kabul et
+        if (savedLastCourseId && enrolledIds.has(savedLastCourseId)) {
           const found = processedCourses.find((c) => c.id === savedLastCourseId);
           if (found) {
             // Eğer localStorage'daki kurs bitmemişse veya aktif olarak üzerinde çalışılıyorsa öncelik ver
             if (!found.isCompleted) {
               targetCourse = found;
             } else if (inProgressCourses.length > 0) {
-              // localStorage'daki kurs bitti ama başka devam eden kurs varsa o devam eden kursa geç
               targetCourse = inProgressCourses[0];
             } else {
-              // Başka devam eden kurs yoksa bitirilen kursu göster (Tebrik banner'ı için)
               targetCourse = found;
             }
           }
+        } else if (savedLastCourseId && !enrolledIds.has(savedLastCourseId)) {
+          // Eski/sıfırlanmış kullanıcılar için geçersiz önbellek anahtarını temizle
+          try {
+            localStorage.removeItem(`cyberedu_last_active_course_${user.id}`);
+            localStorage.removeItem('cyberedu_last_active_course');
+          } catch (e) {}
         }
 
         // C) Eğer hala belirlenmediyse: Devam eden ilk kurs
@@ -204,8 +209,8 @@ export default function StudentDashboard() {
         }
 
         if (targetCourse) {
-          // Hedef kursa kaydı yoksa kaydet
-          if (!targetCourse.isEnrolled) {
+          // Hedef kursa kaydı yoksa ve öğrencinin henüz HİÇ kaydı yoksa kaydet
+          if (!targetCourse.isEnrolled && enrolledIds.size === 0) {
             supabase.from('enrollments').upsert({
               user_id: user.id,
               course_id: targetCourse.id,
@@ -230,8 +235,8 @@ export default function StudentDashboard() {
           localStorage.setItem('cyberedu_last_active_course', targetCourse.id);
         }
 
-        // Kayıtlı kurslar listesini güncelle
-        setEnrolledCourses(processedCourses.filter((c) => c.isEnrolled || enrolledIds.has(c.id) || c.id === targetCourse?.id));
+        // Kayıtlı kurslar listesini güncelle: SADECE veritabanında gerçekten kayıtlı olan kurslar
+        setEnrolledCourses(processedCourses.filter((c) => enrolledIds.has(c.id)));
       }
     } catch (err) {
       console.error('Dashboard yükleme hatası:', err);

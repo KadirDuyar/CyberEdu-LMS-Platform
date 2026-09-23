@@ -314,10 +314,20 @@ CREATE POLICY "enrollments_select_own" ON public.enrollments
 CREATE POLICY "enrollments_insert_own" ON public.enrollments
   FOR INSERT WITH CHECK (user_id = auth.uid());
 
+-- Student kendi kaydını silebilir
+CREATE POLICY "enrollments_delete_own" ON public.enrollments
+  FOR DELETE USING (user_id = auth.uid());
+
 -- Teacher ve admin kayıt verilerini okuyabilir
 CREATE POLICY "enrollments_teacher_select" ON public.enrollments
   FOR SELECT USING (
     public.get_my_role() IN ('teacher', 'admin')
+  );
+
+-- Admin tüm kurs kayıtlarını yönetebilir ve silebilir
+CREATE POLICY "enrollments_admin_all" ON public.enrollments
+  FOR ALL USING (
+    public.get_my_role() = 'admin'
   );
 
 -- ─── LESSON_PROGRESS RLS ─────────────────────────────────────────────────────
@@ -331,6 +341,12 @@ CREATE POLICY "lesson_progress_teacher_select" ON public.lesson_progress
     public.get_my_role() IN ('teacher', 'admin')
   );
 
+-- Admin tüm ders ilerlemelerini yönetebilir ve silebilir
+CREATE POLICY "lesson_progress_admin_all" ON public.lesson_progress
+  FOR ALL USING (
+    public.get_my_role() = 'admin'
+  );
+
 -- ─── ACTIVITY_ATTEMPTS RLS ───────────────────────────────────────────────────
 -- Student kendi denemelerini görebilir ve oluşturabilir
 CREATE POLICY "activity_attempts_own" ON public.activity_attempts
@@ -339,8 +355,13 @@ CREATE POLICY "activity_attempts_own" ON public.activity_attempts
 -- Teacher deneme verilerini okuyabilir
 CREATE POLICY "activity_attempts_teacher_select" ON public.activity_attempts
   FOR SELECT USING (
-      WHERE p.id = auth.uid() AND p.role IN ('teacher', 'admin')
-    )
+    public.get_my_role() IN ('teacher', 'admin')
+  );
+
+-- Admin tüm sınav/aktivite denemelerini yönetebilir ve silebilir
+CREATE POLICY "activity_attempts_admin_all" ON public.activity_attempts
+  FOR ALL USING (
+    public.get_my_role() = 'admin'
   );
 
 -- ─── BADGES RLS ──────────────────────────────────────────────────────────────
@@ -351,10 +372,7 @@ CREATE POLICY "badges_select_all" ON public.badges
 -- Admin badge ekleyebilir/güncelleyebilir
 CREATE POLICY "badges_admin_manage" ON public.badges
   FOR ALL USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role = 'admin'
-    )
+    public.get_my_role() = 'admin'
   );
 
 -- ─── USER_BADGES RLS ─────────────────────────────────────────────────────────
@@ -365,10 +383,13 @@ CREATE POLICY "user_badges_select_own" ON public.user_badges
 -- Teacher ve admin kullanıcı badge'lerini görebilir
 CREATE POLICY "user_badges_teacher_select" ON public.user_badges
   FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles p
-      WHERE p.id = auth.uid() AND p.role IN ('teacher', 'admin')
-    )
+    public.get_my_role() IN ('teacher', 'admin')
+  );
+
+-- Admin tüm kullanıcı badge'lerini yönetebilir ve silebilir
+CREATE POLICY "user_badges_admin_all" ON public.user_badges
+  FOR ALL USING (
+    public.get_my_role() = 'admin'
   );
 
 -- ============================================================
@@ -460,11 +481,21 @@ CREATE INDEX IF NOT EXISTS idx_follows_follower ON public.user_follows(follower_
 CREATE INDEX IF NOT EXISTS idx_follows_following ON public.user_follows(following_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id, is_read);
 
+CREATE POLICY "notifications_admin_all" ON public.notifications
+  FOR ALL USING (public.get_my_role() = 'admin');
+
+CREATE POLICY "follows_admin_all" ON public.user_follows
+  FOR ALL USING (public.get_my_role() = 'admin');
+
 -- ============================================================
 -- 12. ADMIN İLERLEME VE VERİ SIFIRLAMA RPC
 -- ============================================================
 CREATE OR REPLACE FUNCTION public.admin_reset_student(target_user_id UUID)
-RETURNS JSONB AS $$
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
   -- Öğrencinin öğrenme ve etkileşim verilerini tamamen temizle (şifre ve e-posta korunur)
   DELETE FROM public.activity_attempts WHERE user_id = target_user_id;
@@ -482,13 +513,16 @@ BEGIN
       learning_area = NULL,
       skill_level = NULL,
       onboarding_completed = FALSE,
-      avatar_emoji = '🚀',
+      avatar_emoji = '🛡️',
+      bio = NULL,
       updated_at = NOW()
   WHERE id = target_user_id;
 
   RETURN jsonb_build_object('success', true, 'message', 'Öğrencinin tüm verileri başarıyla sıfırlandı.');
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.admin_reset_student(UUID) TO authenticated, service_role;
 
 -- ============================================================
 -- 13. KULLANICI KENDİ HESABINI SİLME RPC'Sİ VE POLİTİKALARI

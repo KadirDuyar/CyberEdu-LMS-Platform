@@ -130,6 +130,14 @@ export default function Navigator() {
     setSaving(true);
     await completeOnboarding({ learningArea, skillLevel });
 
+    // Önceki aktif kurs ve tanıtım turu önbelleklerini temizle
+    try {
+      localStorage.removeItem(`cyberedu_last_active_course_${user?.id}`);
+      localStorage.removeItem('cyberedu_last_active_course');
+      localStorage.removeItem(`cyberedu_tour_completed_${user?.id}`);
+      localStorage.removeItem('cyberedu_tour_completed');
+    } catch (e) {}
+
     // İlk kursu bulup öğrenciyi otomatik kaydet (enroll)
     try {
       if (user) {
@@ -146,17 +154,14 @@ export default function Navigator() {
           await supabase.from('enrollments').upsert([
             { user_id: user.id, course_id: firstCourse.id }
           ], { onConflict: 'user_id,course_id' });
+
+          localStorage.setItem(`cyberedu_last_active_course_${user.id}`, firstCourse.id);
+          localStorage.setItem('cyberedu_last_active_course', firstCourse.id);
         }
       }
     } catch (e) {
       console.warn('İlk kurs kaydı hatası:', e);
     }
-
-    // Turu sıfırla ki Dashboard'a gidildiğinde tanıtım rehberi açılsın (Admin sıfırlasa dahi navigator bitince 1 kez gösterilir)
-    try {
-      localStorage.removeItem(`cyberedu_tour_completed_${user?.id}`);
-      localStorage.removeItem('cyberedu_tour_completed');
-    } catch (e) {}
 
     navigate('/student', { replace: true });
   };

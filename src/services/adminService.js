@@ -9,17 +9,22 @@ export async function getAllProfiles() {
 }
 
 export async function resetStudentProgress(userId) {
-  // Tanıtım turu durumunu sıfırla ki kullanıcı tekrar giriş yapıp navigatörü tamamladığında tur açılsın
+  // Tanıtım turu ve aktif kurs durumunu sıfırla
   try {
     localStorage.removeItem(`cyberedu_tour_completed_${userId}`);
     localStorage.removeItem('cyberedu_tour_completed');
     localStorage.removeItem(`cyberedu_last_active_course_${userId}`);
+    localStorage.removeItem('cyberedu_last_active_course');
   } catch (e) {}
 
-  // 1. RPC fonksiyonunu çağır (Varsa SECURITY DEFINER ile tüm RLS'leri aşarak tek seferde siler)
+  // 1. RPC fonksiyonunu çağır (SECURITY DEFINER ile tüm RLS'leri aşarak tek seferde siler)
   const { data: rpcResult, error: rpcError } = await supabase.rpc('admin_reset_student', { target_user_id: userId });
   
-  // 2. Client-side alternatif / garanti silme (RPC başarısız olsa veya fonksiyon henüz oluşturulmamış olsa bile)
+  if (!rpcError && rpcResult?.success) {
+    return { data: rpcResult, error: null };
+  }
+
+  // 2. Client-side alternatif / garanti silme (RPC henüz oluşturulmamış veya hata vermişse)
   try {
     await Promise.allSettled([
       supabase.from('activity_attempts').delete().eq('user_id', userId),
@@ -34,22 +39,24 @@ export async function resetStudentProgress(userId) {
     ]);
 
     // Profili sıfırla (Ad soyad, rol ve e-posta korunur)
-    await supabase.from('profiles').update({
+    const { error: profError } = await supabase.from('profiles').update({
       learning_area: null,
       skill_level: null,
       onboarding_completed: false,
       xp: 0,
       level: 1,
-      avatar_emoji: '🚀',
+      avatar_emoji: '🛡️',
+      bio: null,
       updated_at: new Date().toISOString()
     }).eq('id', userId);
+
+    if (profError) {
+      return { data: null, error: profError };
+    }
+
+    return { data: { success: true, message: 'Öğrenci verileri başarıyla sıfırlandı.' }, error: null };
   } catch (clientErr) {
-    console.warn('Doğrudan veritabanı sıfırlama adımı uyarısı:', clientErr);
+    console.error('Veritabanı sıfırlama hatası:', clientErr);
+    return { data: null, error: clientErr };
   }
-
-  if (rpcError) {
-    console.warn('RPC admin_reset_student hatası (client-side silme uygulandı):', rpcError.message);
-  }
-
-  return { data: rpcResult || { success: true }, error: null };
 }

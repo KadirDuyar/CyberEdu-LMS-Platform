@@ -74,6 +74,15 @@ export function AuthProvider({ children }) {
         }
       }
 
+      if (prof && !prof.onboarding_completed) {
+        try {
+          localStorage.removeItem(`cyberedu_last_active_course_${prof.id}`);
+          localStorage.removeItem('cyberedu_last_active_course');
+          localStorage.removeItem(`cyberedu_tour_completed_${prof.id}`);
+          localStorage.removeItem('cyberedu_tour_completed');
+        } catch (e) {}
+      }
+
       setProfile(prof);
       setLoading(false);
     });
@@ -116,6 +125,15 @@ export function AuthProvider({ children }) {
                 return;
               }
             }
+          }
+
+          if (prof && !prof.onboarding_completed) {
+            try {
+              localStorage.removeItem(`cyberedu_last_active_course_${prof.id}`);
+              localStorage.removeItem('cyberedu_last_active_course');
+              localStorage.removeItem(`cyberedu_tour_completed_${prof.id}`);
+              localStorage.removeItem('cyberedu_tour_completed');
+            } catch (e) {}
           }
 
           setProfile((prev) => {
