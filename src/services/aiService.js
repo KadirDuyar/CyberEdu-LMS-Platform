@@ -32,15 +32,26 @@ async function callGroq({ prompt, systemInstruction = '', history = [], signal }
 
   messages.push({ role: 'user', content: prompt });
 
-  // Aktif Groq model adayları (llama-3.1-8b-instant groq tarafından kaldırıldığı için güncellendi)
-  const candidateModels = [
-    configuredGroqModel,
-    'llama-3.3-70b-versatile',
-    'llama3-8b-8192',
-    'gemma2-9b-it'
-  ].filter(Boolean);
+  // Bilinen ve kullanımdan kaldırılmış (decommissioned) modelleri filtrele veya en güncele yönlendir
+  const sanitizedConfigModel =
+    configuredGroqModel === 'llama-3.1-8b-instant' ||
+    configuredGroqModel === 'gemma2-9b-it' ||
+    configuredGroqModel === 'gemma-7b-it'
+      ? 'llama-3.3-70b-versatile'
+      : configuredGroqModel;
 
-  let lastError = null;
+  // Aktif ve en güncel Groq modelleri (Öncelik: Llama 3.3 70B -> Llama 3 8B -> Llama 3.1 70B)
+  const candidateModels = Array.from(
+    new Set([
+      sanitizedConfigModel,
+      'llama-3.3-70b-versatile',
+      'llama3-8b-8192',
+      'llama-3.1-70b-versatile',
+      'llama3-70b-8192'
+    ].filter(Boolean))
+  );
+
+  const errorDetails = [];
 
   for (const model of candidateModels) {
     const startTime = performance.now();
@@ -67,21 +78,22 @@ async function callGroq({ prompt, systemInstruction = '', history = [], signal }
           return { provider: `Groq (${model})`, text, duration };
         }
       } else {
-        const errorText = await res.text();
-        console.warn(`⚠️ [Groq Modeli Başarısız (${model})]: HTTP ${res.status} - ${errorText}`);
-        lastError = new Error(`[Groq Hatası (${model})]: ${res.status} - ${errorText}`);
+        const errorData = await res.json().catch(() => null);
+        const errorMsg = errorData?.error?.message || (await res.text().catch(() => ''));
+        console.warn(`⚠️ [Groq Modeli Başarısız (${model})]: HTTP ${res.status} - ${errorMsg}`);
+        errorDetails.push(`[${model}: ${res.status} - ${errorMsg}]`);
       }
     } catch (err) {
       if (err.name === 'AbortError') throw err;
-      lastError = err;
+      errorDetails.push(`[${model}: ${err.message}]`);
     }
   }
 
-  throw lastError || new Error('[Groq Hatası]: Tüm Groq modelleri başarısız oldu.');
+  throw new Error(`[Groq Hatası]: ${errorDetails.join(' | ')}`);
 }
 
 /**
- * Google Gemini REST API Çağrısı (v1 ve v1beta Fallback Destekli)
+ * Google Gemini REST API Çağrısı (Kararlı v1 Endpoint & Model Fallback Destekli)
  */
 async function callGemini({ prompt, systemInstruction = '', history = [], signal }) {
   if (!geminiApiKey) {
@@ -89,6 +101,7 @@ async function callGemini({ prompt, systemInstruction = '', history = [], signal
   }
 
   const contents = [];
+
   if (Array.isArray(history) && history.length > 0) {
     for (const msg of history) {
       contents.push({
@@ -97,25 +110,41 @@ async function callGemini({ prompt, systemInstruction = '', history = [], signal
       });
     }
   }
+
+  // Gemini v1 endpoint'lerinde system_instruction alanı desteklenmediği için (400 verir),
+  // sistem talimatı kullanıcı mesajının başına eklenerek %100 uyumluluk sağlanır.
+  const userPromptText = systemInstruction
+    ? `${systemInstruction}\n\n---\nKULLANICI TALEBİ:\n${prompt}`
+    : prompt;
+
   contents.push({
     role: 'user',
-    parts: [{ text: prompt }]
+    parts: [{ text: userPromptText }]
   });
 
   const payload = { contents };
-  if (systemInstruction) {
-    payload.system_instruction = { parts: [{ text: systemInstruction }] };
-  }
 
-  const endpoints = [
-    `https://generativelanguage.googleapis.com/v1/models/${configuredGeminiModel}:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1beta/models/${configuredGeminiModel}:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`
+  // Bilinen eski veya geçersiz modelleri temizle
+  const sanitizedGeminiModel =
+    configuredGeminiModel === 'gemini-2.0-flash' || configuredGeminiModel === 'gemini-1.0-pro'
+      ? 'gemini-1.5-flash'
+      : configuredGeminiModel;
+
+  // Sırasıyla en kararlı v1 modelleri (gemini-1.5-flash -> gemini-1.5-flash-latest -> gemini-1.5-pro -> v1beta)
+  const candidateEndpoints = [
+    `https://generativelanguage.googleapis.com/v1/models/${sanitizedGeminiModel}:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`
   ];
 
-  let lastError = null;
+  // Tekrarlayan endpoint'leri kaldır
+  const uniqueEndpoints = Array.from(new Set(candidateEndpoints));
 
-  for (const url of endpoints) {
+  const errorDetails = [];
+
+  for (const url of uniqueEndpoints) {
     const startTime = performance.now();
     try {
       const res = await fetch(url, {
@@ -130,19 +159,20 @@ async function callGemini({ prompt, systemInstruction = '', history = [], signal
         const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (text) {
           const duration = Math.round(performance.now() - startTime);
-          return { provider: 'Google Gemini Flash', text, duration };
+          return { provider: 'Google Gemini (v1/gemini-1.5-flash)', text, duration };
         }
       } else {
-        const errorText = await res.text();
-        lastError = new Error(`[Gemini Hatası]: ${res.status} - ${errorText}`);
+        const errorData = await res.json().catch(() => null);
+        const errorMsg = errorData?.error?.message || (await res.text().catch(() => ''));
+        errorDetails.push(`[HTTP ${res.status}: ${errorMsg}]`);
       }
     } catch (err) {
       if (err.name === 'AbortError') throw err;
-      lastError = err;
+      errorDetails.push(`[${err.message}]`);
     }
   }
 
-  throw lastError || new Error('[Gemini Hatası]: İstek başarısız.');
+  throw new Error(`[Gemini Hatası]: ${errorDetails.join(' | ')}`);
 }
 
 /**
