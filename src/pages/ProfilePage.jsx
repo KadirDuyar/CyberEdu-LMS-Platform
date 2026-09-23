@@ -54,19 +54,30 @@ export default function ProfilePage() {
     setDeleteError('');
 
     try {
-      // İlişkili tabloları temizle
-      await supabase.from('course_feedbacks').delete().eq('user_id', user.id);
-      await supabase.from('notifications').delete().eq('user_id', user.id);
-      await supabase.from('user_follows').delete().eq('follower_id', user.id);
-      await supabase.from('user_follows').delete().eq('following_id', user.id);
-      await supabase.from('lesson_progress').delete().eq('user_id', user.id);
-      await supabase.from('enrollments').delete().eq('user_id', user.id);
-      await supabase.from('activity_attempts').delete().eq('user_id', user.id);
-      await supabase.from('user_badges').delete().eq('user_id', user.id);
+      // 1. Güvenli veritabanı RPC fonksiyonunu çağır (Varsa SECURITY DEFINER ile tüm RLS'leri aşarak yorumlar, beğeniler, takipler, rozetler ve profil anında temizlenir)
+      await supabase.rpc('delete_own_user_account');
 
-      // Profili sil
-      const { error: profErr } = await supabase.from('profiles').delete().eq('id', user.id);
-      if (profErr) throw profErr;
+      // 2. Client-side tam temizlik (Garanti silme adımı)
+      await Promise.allSettled([
+        supabase.from('course_feedbacks').delete().eq('user_id', user.id),
+        supabase.from('notifications').delete().eq('user_id', user.id),
+        supabase.from('notifications').delete().eq('actor_id', user.id),
+        supabase.from('user_follows').delete().eq('follower_id', user.id),
+        supabase.from('user_follows').delete().eq('following_id', user.id),
+        supabase.from('lesson_progress').delete().eq('user_id', user.id),
+        supabase.from('enrollments').delete().eq('user_id', user.id),
+        supabase.from('activity_attempts').delete().eq('user_id', user.id),
+        supabase.from('user_badges').delete().eq('user_id', user.id),
+        supabase.from('profiles').delete().eq('id', user.id),
+      ]);
+
+      // 3. Tarayıcı önbelleğindeki kullanıcıya ait anahtarları sil
+      try {
+        localStorage.removeItem(`cyberedu_tour_completed_${user.id}`);
+        localStorage.removeItem(`cyberedu_tour_last_seen_${user.id}`);
+        localStorage.removeItem(`cyberedu_last_active_course_${user.id}`);
+        localStorage.removeItem('cyberedu_tour_completed');
+      } catch (locErr) {}
 
       // Oturumu kapat ve login sayfasına yönlendir
       await logout();

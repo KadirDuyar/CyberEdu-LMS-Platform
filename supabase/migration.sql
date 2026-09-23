@@ -491,6 +491,54 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================
+-- 13. KULLANICI KENDİ HESABINI SİLME RPC'Sİ VE POLİTİKALARI
+-- ============================================================
+DROP POLICY IF EXISTS "profiles_delete_own" ON public.profiles;
+CREATE POLICY "profiles_delete_own" ON public.profiles
+  FOR DELETE USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "user_badges_delete_own" ON public.user_badges;
+CREATE POLICY "user_badges_delete_own" ON public.user_badges
+  FOR DELETE USING (auth.uid() = user_id);
+
+CREATE OR REPLACE FUNCTION public.delete_own_user_account()
+RETURNS JSONB AS $$
+DECLARE
+  current_user_id UUID;
+BEGIN
+  current_user_id := auth.uid();
+  IF current_user_id IS NULL THEN
+    RAISE EXCEPTION 'Yetkilendirilmemiş kullanıcı!';
+  END IF;
+
+  -- 1. Kurs yorumları ve beğenileri
+  DELETE FROM public.course_feedbacks WHERE user_id = current_user_id;
+
+  -- 2. Bildirimler
+  DELETE FROM public.notifications WHERE user_id = current_user_id OR actor_id = current_user_id;
+
+  -- 3. Takip ilişkileri
+  DELETE FROM public.user_follows WHERE follower_id = current_user_id OR following_id = current_user_id;
+
+  -- 4. Ders ilerleme, sınav girişimleri ve kurs kayıtları
+  DELETE FROM public.activity_attempts WHERE user_id = current_user_id;
+  DELETE FROM public.lesson_progress WHERE user_id = current_user_id;
+  DELETE FROM public.enrollments WHERE user_id = current_user_id;
+
+  -- 5. Başarılar / rozetler
+  DELETE FROM public.user_badges WHERE user_id = current_user_id;
+
+  -- 6. Eğer eğitmen ise kurs sahipliğini boşa çıkar
+  UPDATE public.courses SET created_by = NULL WHERE created_by = current_user_id;
+
+  -- 7. Profil
+  DELETE FROM public.profiles WHERE id = current_user_id;
+
+  RETURN jsonb_build_object('success', true, 'message', 'Hesap ve tüm veriler başarıyla silindi.');
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================
 -- SEED DATA — Demo içerikler
 -- ============================================================
 
