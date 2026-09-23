@@ -44,8 +44,8 @@ const STRENGTH_LABELS = ['', 'Zayıf', 'Orta', 'İyi', 'Güçlü'];
 const STRENGTH_COLORS = ['', 'bg-rose-500', 'bg-amber-500', 'bg-yellow-400', 'bg-emerald-500'];
 
 export default function RegisterPage() {
-  const navigate               = useNavigate();
-  const { register, loading, error } = useAuth();
+  const navigate                     = useNavigate();
+  const { register, loading, error, user, refreshProfile } = useAuth();
 
   const [step, setStep]         = useState(1); // 1: Bilgiler, 2: Rol seçimi
   const [fullName, setFullName] = useState('');
@@ -57,6 +57,21 @@ export default function RegisterPage() {
   const [showCf, setShowCf]     = useState(false);
   const [touched, setTouched]   = useState({});
   const [localError, setLocalError] = useState('');
+  const [isGoogleOAuth, setIsGoogleOAuth] = useState(false);
+
+  useEffect(() => {
+    // Google ile girişten yönlendirilen kullanıcıyı yakala
+    const params = new URLSearchParams(window.location.search);
+    const gEmail = sessionStorage.getItem('cyberedu_google_signup_email') || user?.email;
+    const gName = sessionStorage.getItem('cyberedu_google_signup_name') || user?.user_metadata?.full_name;
+
+    if (params.get('google_signup') || gEmail) {
+      setIsGoogleOAuth(true);
+      if (gEmail) setEmail(gEmail);
+      if (gName) setFullName(gName);
+      setStep(2); // Doğrudan rol seçimine al
+    }
+  }, [user]);
 
   const strength = getPasswordStrength(password);
 
@@ -100,6 +115,39 @@ export default function RegisterPage() {
 
   // ── Kayıt tamamla ─────────────────────────────────────────────────────────
   const handleSubmit = async () => {
+    if (isGoogleOAuth && user) {
+      try {
+        const { error: profErr } = await supabase.from('profiles').upsert({
+          id: user.id,
+          full_name: (fullName.trim() || user.user_metadata?.full_name || email.split('@')[0] || 'Kullanıcı'),
+          role: selectedRole,
+          avatar_emoji: selectedRole === 'teacher' ? '🎓' : '🚀',
+          xp: 0,
+          level: 1,
+          onboarding_completed: selectedRole === 'teacher'
+        });
+
+        if (profErr) {
+          setLocalError('Profil oluşturulurken hata: ' + profErr.message);
+          return;
+        }
+
+        sessionStorage.removeItem('cyberedu_google_signup_email');
+        sessionStorage.removeItem('cyberedu_google_signup_name');
+        await refreshProfile();
+
+        if (selectedRole === 'student') {
+          navigate('/student/navigator', { replace: true });
+        } else {
+          navigate('/teacher', { replace: true });
+        }
+        return;
+      } catch (err) {
+        setLocalError('Beklenmeyen bir hata oluştu: ' + err.message);
+        return;
+      }
+    }
+
     const result = await register({
       email,
       password,
@@ -347,6 +395,18 @@ export default function RegisterPage() {
         {/* ─── ADIM 2: Rol Seçimi ───────────────────────────────────── */}
         {step === 2 && (
           <div className="space-y-4">
+            {isGoogleOAuth && (
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-violet-600/20 to-pink-600/10 border border-violet-500/30 text-slate-200 text-xs flex items-center gap-3 animate-fadeIn">
+                <div className="w-8 h-8 rounded-xl bg-violet-500/30 text-violet-300 flex items-center justify-center shrink-0 text-base">
+                  🔐
+                </div>
+                <div>
+                  <p className="font-bold text-white text-xs">Google ile Doğrulandı ({email})</p>
+                  <p className="text-[11px] text-slate-300 mt-0.5">Lütfen CyberEdu LMS'e hangi rolle katılmak istediğinizi seçin.</p>
+                </div>
+              </div>
+            )}
+
             <p className="text-sm text-slate-300 font-medium text-center">
               Platforma hangi amaçla katılıyorsun?
             </p>

@@ -64,7 +64,13 @@ export function AuthProvider({ children }) {
           localStorage.removeItem('cyberedu_oauth_intent_role');
           if (newProf) prof = newProf;
         } else {
-          setNeedsRoleSelection(true);
+          // E-posta veritabanında henüz kayıtlı değilse rol seçimi için register sayfasına yönlendir
+          sessionStorage.setItem('cyberedu_google_signup_email', verifiedUser.email || '');
+          sessionStorage.setItem('cyberedu_google_signup_name', verifiedUser.user_metadata?.full_name || verifiedUser.user_metadata?.name || '');
+          if (window.location.pathname !== '/register') {
+            window.location.href = '/register?google_signup=1';
+            return;
+          }
         }
       }
 
@@ -102,7 +108,13 @@ export function AuthProvider({ children }) {
               localStorage.removeItem('cyberedu_oauth_intent_role');
               if (newProf) prof = newProf;
             } else {
-              setNeedsRoleSelection(true);
+              // Veritabanında profili olmayan yeni Google kullanıcısı -> Doğrudan Register sayfasına yönlendir
+              sessionStorage.setItem('cyberedu_google_signup_email', session.user.email || '');
+              sessionStorage.setItem('cyberedu_google_signup_name', session.user.user_metadata?.full_name || session.user.user_metadata?.name || '');
+              if (window.location.pathname !== '/register') {
+                window.location.href = '/register?google_signup=1';
+                return;
+              }
             }
           }
 

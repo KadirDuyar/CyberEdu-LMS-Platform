@@ -74,15 +74,23 @@ export default function OnboardingTour() {
 
   // Sayfa yüklendiğinde kontrol et
   useEffect(() => {
-    // Sadece onboarding'i tamamlanmış ve turu henüz görmemiş kullanıcıya göster
-    const isCompleted = localStorage.getItem(tourKey);
-    if (!isCompleted && profile?.onboarding_completed) {
+    if (!profile?.onboarding_completed) return;
+
+    const lastSeenKey = user ? `cyberedu_tour_last_seen_${user.id}` : 'cyberedu_tour_last_seen';
+    const lastSeenTime = localStorage.getItem(lastSeenKey);
+
+    // Eğer kullanıcı daha önce hiç tur görmediyse veya Admin profilini sıfırladıysa (profile.updated_at > lastSeenTime):
+    const shouldShow =
+      !lastSeenTime ||
+      (profile.updated_at && new Date(profile.updated_at).getTime() > new Date(lastSeenTime).getTime());
+
+    if (shouldShow) {
       const timer = setTimeout(() => {
         setIsOpen(true);
       }, 700);
       return () => clearTimeout(timer);
     }
-  }, [tourKey, profile?.onboarding_completed]);
+  }, [user?.id, profile?.onboarding_completed, profile?.updated_at]);
 
   // Manuel tur başlatma olayını dinle
   useEffect(() => {
@@ -94,28 +102,40 @@ export default function OnboardingTour() {
     return () => window.removeEventListener('start-cyberedu-tour', handleStartTour);
   }, []);
 
-  // Adım değiştiğinde hedefe kaydır ve koordinatı güncelle
+  // Adım değiştiğinde hedefe kaydır ve koordinatı güncelle (Raf ile 60fps akıcı takip)
   useEffect(() => {
     if (!isOpen) return;
 
     const step = TOUR_STEPS[currentStep];
     const el = document.querySelector(step?.target);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Ders devam kartı için üstten hizalayarak altına kart için geniş alan aç
+      const blockPos = step.target.includes('resume') ? 'start' : 'center';
+      el.scrollIntoView({ behavior: 'smooth', block: blockPos });
     }
 
     const timer = setTimeout(updateRect, 300);
-    window.addEventListener('resize', updateRect);
-    window.addEventListener('scroll', updateRect, true);
+
+    let rafId = null;
+    const handleScrollOrResize = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateRect);
+    };
+
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    window.addEventListener('scroll', handleScrollOrResize, { capture: true, passive: true });
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('resize', updateRect);
-      window.removeEventListener('scroll', updateRect, true);
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', handleScrollOrResize);
+      window.removeEventListener('scroll', handleScrollOrResize, { capture: true });
     };
   }, [isOpen, currentStep, updateRect]);
 
   const handleComplete = () => {
+    const lastSeenKey = user ? `cyberedu_tour_last_seen_${user.id}` : 'cyberedu_tour_last_seen';
+    localStorage.setItem(lastSeenKey, new Date().toISOString());
     localStorage.setItem(tourKey, 'true');
     localStorage.setItem('cyberedu_tour_completed', 'true');
     setIsOpen(false);
@@ -140,7 +160,7 @@ export default function OnboardingTour() {
   const step = TOUR_STEPS[currentStep];
   const Icon = step.icon;
 
-  // Popover Kart Pozisyonlama Hesabı
+  // Popover Kart Pozisyonlama Hesabı (Hedefleri asla kapatmayacak akıllı yerleşim)
   const getCardStyle = () => {
     if (!targetRect || typeof window === 'undefined') {
       return {
@@ -162,20 +182,20 @@ export default function OnboardingTour() {
       };
     }
 
-    const cardWidth = 420;
-    const cardHeight = 320;
+    const cardWidth = 430;
+    const cardHeight = 310;
 
-    // AI Widget (Sağ alt)
+    // 1. AI Widget (Sağ alt) - Butonun tam üstünde yer alacak şekilde
     if (step.target.includes('ai-widget')) {
       return {
         position: 'fixed',
-        bottom: `${Math.max(24, window.innerHeight - targetRect.top + 16)}px`,
+        bottom: `${Math.max(24, window.innerHeight - targetRect.top + 20)}px`,
         right: '24px',
         width: `${cardWidth}px`,
       };
     }
 
-    // Profil (Sağ üst)
+    // 2. Profil (Sağ üst) - Header kontrollerinin hemen altında
     if (step.target.includes('profile') || step.target.includes('notifications')) {
       return {
         position: 'fixed',
@@ -185,7 +205,7 @@ export default function OnboardingTour() {
       };
     }
 
-    // Sidebar (Sol taraf)
+    // 3. Sidebar (Sol taraf) - Sol menünün hemen sağında
     if (step.target.includes('sidebar')) {
       return {
         position: 'fixed',
@@ -195,17 +215,16 @@ export default function OnboardingTour() {
       };
     }
 
-    // Devam Et Kartı / Orta İçerik
+    // 4. Devam Et Kartı (Orta İçerik) - Kartın altına hizala, kartı ASLA örtme!
     const spaceBelow = window.innerHeight - targetRect.bottom;
-    const fitsBelow = spaceBelow >= cardHeight + 30;
-    const cardTop = fitsBelow
-      ? targetRect.bottom + 16
-      : Math.max(20, targetRect.top - cardHeight - 16);
+    const cardTop = spaceBelow >= cardHeight + 20
+      ? targetRect.bottom + 20
+      : Math.max(80, window.innerHeight - cardHeight - 24);
 
     return {
       position: 'fixed',
       top: `${cardTop}px`,
-      left: `${Math.max(24, Math.min(targetRect.left + 20, window.innerWidth - cardWidth - 24))}px`,
+      left: `${Math.max(24, Math.min(targetRect.left + 30, window.innerWidth - cardWidth - 24))}px`,
       width: `${cardWidth}px`,
     };
   };
@@ -255,17 +274,7 @@ export default function OnboardingTour() {
             // Dışında kalan tüm sayfa alanı ise 0.85 derin slate ile karartılır.
             boxShadow: '0 0 0 9999px rgba(3, 7, 18, 0.85), 0 0 35px rgba(139, 92, 246, 0.7)',
           }}
-        >
-          {/* Rozet Etiketi */}
-          <div
-            className={`absolute ${
-              spotTop < 35 ? 'top-3 right-3' : '-top-3.5 left-4'
-            } bg-gradient-to-r from-violet-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 border border-white/20 z-[152]`}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            {step.badge}
-          </div>
-        </div>
+        />
       ) : (
         /* Hedef koordinatı henüz hesaplanmamışsa veya yoksa genel arka plan karartması */
         <div

@@ -7,8 +7,10 @@ import Card from '../components/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import {
   User, Lock, Shield, Zap, CheckCircle2,
-  Calendar, Key, BookOpen, Save, Award, AlertCircle, ArrowRight, Sparkles, Trash2
+  Calendar, Key, BookOpen, Save, Award, AlertCircle, ArrowRight, Sparkles, Trash2,
+  Users, UserMinus, Trophy
 } from 'lucide-react';
+import { getFollowedUsersWithProfiles, unfollowUser } from '../services/socialService';
 
 const AVATAR_OPTIONS = ['👨‍💻', '👩‍💻', '🚀', '🛡️', '🕵️‍♂️', '🔑', '⚡', '🌐', '🥷', '🧙‍♂️', '🦾', '🦅', '👑', '🤖', '👾'];
 
@@ -28,9 +30,10 @@ export default function ProfilePage() {
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordMsg, setPasswordMsg] = useState(null);
 
-  // Tamamlanan dersler & kurslar
+  // Tamamlanan dersler & kurslar & arkadaşlar
   const [completedLessons, setCompletedLessons] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [friends, setFriends] = useState([]);
   const [statsLoading, setStatsLoading] = useState(true);
 
   // Hesap Silme (Danger Zone)
@@ -137,12 +140,25 @@ export default function ProfilePage() {
       if (enrollData) {
         setEnrolledCourses(enrollData.filter(e => e.courses));
       }
+
+      // 3. Takip edilen arkadaşlar
+      try {
+        const friendList = await getFollowedUsersWithProfiles(user.id);
+        setFriends(friendList);
+      } catch (fErr) {
+        console.warn('Arkadaşlar yüklenemedi:', fErr);
+      }
     } catch (err) {
       console.error('Profil verisi yükleme hatası:', err);
     } finally {
       setStatsLoading(false);
     }
   }
+
+  const handleUnfollowFriend = async (friendId) => {
+    setFriends((prev) => prev.filter((f) => f.id !== friendId));
+    await unfollowUser(user.id, friendId);
+  };
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -415,6 +431,75 @@ export default function ProfilePage() {
                         <Calendar size={12} /> {item.completed_at ? new Date(item.completed_at).toLocaleDateString('tr-TR') : '-'}
                       </span>
                     </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        )}
+
+        {/* Öğrenci Takip Ettiği Arkadaşlarım */}
+        {profile?.role === 'student' && (
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Users size={20} className="text-violet-400" /> Takip Ettiğim Arkadaşlarım ({friends.length})
+              </h3>
+              <button
+                type="button"
+                onClick={() => navigate('/student/leaderboard')}
+                className="text-xs font-bold text-violet-400 hover:text-violet-300 flex items-center gap-1 transition-colors"
+              >
+                Yeni Arkadaşlar Keşfet <ArrowRight size={13} />
+              </button>
+            </div>
+
+            {statsLoading ? (
+              <div className="py-8 flex justify-center"><LoadingSpinner /></div>
+            ) : friends.length === 0 ? (
+              <div className="py-10 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
+                <span className="text-3xl mb-2 block">🤝</span>
+                <p className="text-slate-300 font-semibold text-sm">Henüz kimseyi takip etmiyorsun.</p>
+                <p className="text-slate-500 text-xs mt-1 mb-4">Liderlik tablosundaki diğer siber güvenlik öğrencilerini takip ederek yarışabilirsin!</p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/student/leaderboard')}
+                  className="px-4 py-2 rounded-xl bg-violet-600/30 hover:bg-violet-600 border border-violet-500/40 text-violet-200 text-xs font-bold transition-all inline-flex items-center gap-1.5"
+                >
+                  <Trophy size={14} className="text-amber-400" /> Liderlik Tablosuna Git
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {friends.map((friend) => (
+                  <div
+                    key={friend.id}
+                    className="p-3.5 rounded-2xl glass border border-white/10 bg-slate-900/60 flex items-center justify-between gap-3 hover:border-violet-500/40 transition-all"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="text-2xl shrink-0 p-1.5 rounded-xl bg-white/5 border border-white/10">
+                        {friend.avatar_emoji || '🚀'}
+                      </span>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-sm text-white truncate">
+                          {friend.full_name || 'Öğrenci'}
+                        </h4>
+                        <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                          <span className="font-bold text-amber-400">Lv.{friend.level || 1}</span>
+                          <span>•</span>
+                          <span className="text-violet-300 font-semibold">{friend.xp || 0} XP</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleUnfollowFriend(friend.id)}
+                      className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-white/5 hover:border-rose-500/20 transition-all shrink-0"
+                      title="Takipten Çık"
+                    >
+                      <UserMinus size={15} />
+                    </button>
                   </div>
                 ))}
               </div>
