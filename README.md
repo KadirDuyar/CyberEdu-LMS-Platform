@@ -374,10 +374,9 @@ Proje veritabanı Supabase üzerinde PostgreSQL ile yapılandırılmıştır. T�
 - `activity_attempts`: Soru cevaplama ve puan denemeleri.
 - `badges` & `user_badges`: Başarı rozetleri ve kazanım kayıtları.
 
-### 🔧 Gerekli SQL Dosyaları (Çalıştırma Sırası):
-1. `supabase/migration.sql`: Temel veritabanı şeması ve RLS politikaları.
-2. `supabase/add_mandatory_elective_courses.sql`: Zorunlu/seçmeli kurs alanları ve enrollments güncellemesi.
-3. `supabase/seed_exact_courses.sql`: Farkındalık ve Teknik standart kurs müfredat verileri.
+### 🔧 Gerekli SQL Dosyaları (Supabase SQL Editor):
+1. `supabase/migration.sql`: Tüm veritabanı şeması, RLS güvenlik politikaları, sosyal etkileşim, geri bildirim ve bildirim tabloları (Tek ve ana şema dosyası).
+2. `supabase/seed_exact_courses.sql`: Farkındalık ve Teknik standart kurs müfredat verileri (Zorunlu ve Seçmeli kurs tohum verileri).
 
 ---
 

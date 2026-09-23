@@ -377,10 +377,10 @@ export default function DashboardLayout({ children }) {
 
               {notifOpen && (
                 <div
-                  className="absolute right-0 top-12 w-80 sm:w-88 glass-light border border-white/15 rounded-2xl p-4 z-50 shadow-2xl bg-slate-900/95 backdrop-blur-xl animate-scale-up"
+                  className="absolute right-0 top-12 w-80 sm:w-88 bg-slate-950 border border-slate-700/90 rounded-2xl p-4 z-[100] shadow-2xl shadow-black/95 animate-scale-up"
                   onMouseLeave={() => setNotifOpen(false)}
                 >
-                  <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/10">
+                  <div className="flex items-center justify-between pb-3 mb-2 border-b border-slate-800">
                     <div className="flex items-center gap-2">
                       <p className="font-bold text-sm text-white">Bildirimler</p>
                       {unreadCount > 0 && (
@@ -402,7 +402,7 @@ export default function DashboardLayout({ children }) {
 
                   <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
                     {notifications.length === 0 ? (
-                      <div className="py-8 text-center">
+                      <div className="py-8 text-center bg-slate-900/50 rounded-xl border border-white/5">
                         <span className="text-2xl block mb-1">🔔</span>
                         <p className="text-xs text-slate-400">Henüz yeni bir bildiriminiz yok.</p>
                       </div>
@@ -417,10 +417,10 @@ export default function DashboardLayout({ children }) {
                           <div
                             key={n.id}
                             onClick={() => handleMarkAsRead(n)}
-                            className={`flex gap-3 p-2.5 rounded-xl border transition-all cursor-pointer ${
+                            className={`flex gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
                               !n.is_read
-                                ? 'bg-violet-950/30 border-violet-500/30 hover:bg-violet-900/40'
-                                : 'bg-white/5 border-white/5 hover:bg-white/10'
+                                ? 'bg-violet-950/60 border-violet-500/50 hover:bg-violet-900/60 shadow-md'
+                                : 'bg-slate-900/90 border-slate-800 hover:bg-slate-850'
                             }`}
                           >
                             <span className="text-lg shrink-0 mt-0.5">{icon}</span>
