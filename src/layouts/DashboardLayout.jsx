@@ -344,7 +344,7 @@ export default function DashboardLayout({ children }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3">
+          <div id="tour-profile-section" className="flex items-center gap-2 md:gap-3">
             {/* SADECE ÖĞRENCİDE GÖRÜNEN LEVEL/XP KUTUSU */}
             {isStudent && (
               <div id="tour-xp" className="hidden sm:flex items-center gap-2 glass-light rounded-xl px-3 md:px-4 py-2 border border-white/10">

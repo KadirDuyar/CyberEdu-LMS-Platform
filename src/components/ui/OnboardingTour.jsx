@@ -22,7 +22,7 @@ const TOUR_STEPS = [
     tip: 'Tamamlanan her ders için otomatik XP kazanır ve liderlik tablosunda üst sıralara tırmanırsın.'
   },
   {
-    target: '#tour-profile',
+    target: '#tour-profile-section, #tour-profile',
     icon: Trophy,
     color: 'from-amber-600 to-orange-600',
     badge: '3 / 4 • Profil & Bildirimler',
@@ -57,17 +57,19 @@ export default function OnboardingTour() {
     const el = document.querySelector(step.target);
     if (el) {
       const rect = el.getBoundingClientRect();
-      setTargetRect({
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height,
-        bottom: rect.bottom,
-        right: rect.right,
-      });
-    } else {
-      setTargetRect(null);
+      if (rect.width > 0 && rect.height > 0) {
+        setTargetRect({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+          bottom: rect.bottom,
+          right: rect.right,
+        });
+        return;
+      }
     }
+    setTargetRect(null);
   }, [isOpen, currentStep]);
 
   // Sayfa yüklendiğinde kontrol et
@@ -164,7 +166,7 @@ export default function OnboardingTour() {
     const cardHeight = 320;
 
     // AI Widget (Sağ alt)
-    if (step.target === '#tour-ai-widget') {
+    if (step.target.includes('ai-widget')) {
       return {
         position: 'fixed',
         bottom: `${Math.max(24, window.innerHeight - targetRect.top + 16)}px`,
@@ -174,7 +176,7 @@ export default function OnboardingTour() {
     }
 
     // Profil (Sağ üst)
-    if (step.target === '#tour-profile' || step.target === '#tour-notifications') {
+    if (step.target.includes('profile') || step.target.includes('notifications')) {
       return {
         position: 'fixed',
         top: `${Math.max(80, targetRect.bottom + 16)}px`,
@@ -184,7 +186,7 @@ export default function OnboardingTour() {
     }
 
     // Sidebar (Sol taraf)
-    if (step.target === '#tour-sidebar') {
+    if (step.target.includes('sidebar')) {
       return {
         position: 'fixed',
         top: `${Math.max(80, Math.min(targetRect.top + 60, window.innerHeight - cardHeight - 40))}px`,
@@ -194,45 +196,87 @@ export default function OnboardingTour() {
     }
 
     // Devam Et Kartı / Orta İçerik
+    const spaceBelow = window.innerHeight - targetRect.bottom;
+    const fitsBelow = spaceBelow >= cardHeight + 30;
+    const cardTop = fitsBelow
+      ? targetRect.bottom + 16
+      : Math.max(20, targetRect.top - cardHeight - 16);
+
     return {
       position: 'fixed',
-      top: `${Math.min(targetRect.bottom + 20, window.innerHeight - cardHeight - 20)}px`,
-      left: `${Math.max(24, Math.min(targetRect.left + 40, window.innerWidth - cardWidth - 24))}px`,
+      top: `${cardTop}px`,
+      left: `${Math.max(24, Math.min(targetRect.left + 20, window.innerWidth - cardWidth - 24))}px`,
       width: `${cardWidth}px`,
     };
   };
 
+  const isSidebar = step.target.includes('sidebar');
+  const spotTop = isSidebar ? 0 : Math.max(0, targetRect ? targetRect.top - 6 : 0);
+  const spotLeft = isSidebar ? 0 : Math.max(0, targetRect ? targetRect.left - 6 : 0);
+  const spotWidth = isSidebar ? (targetRect ? targetRect.width : 0) : (targetRect ? targetRect.width + 12 : 0);
+  const spotHeight = isSidebar ? (typeof window !== 'undefined' ? window.innerHeight : 800) : (targetRect ? targetRect.height + 12 : 0);
+
+  const handleBackdropClick = (e) => {
+    if (targetRect) {
+      const { clientX, clientY } = e;
+      if (
+        clientX >= spotLeft &&
+        clientX <= spotLeft + spotWidth &&
+        clientY >= spotTop &&
+        clientY <= spotTop + spotHeight
+      ) {
+        // Hedefe tıklandığında turu kazara kapatma
+        return;
+      }
+    }
+    handleComplete();
+  };
+
   return (
-    <div className="fixed inset-0 z-[150] pointer-events-auto">
-      {/* Yarı Saydam Koyu Arka Plan */}
+    <div className="fixed inset-0 z-[150] overflow-hidden">
+      {/* Sayfa geneli dış tıklama yakalayıcı */}
       <div
-        className="fixed inset-0 bg-slate-950/75 backdrop-blur-[2px] transition-opacity duration-300"
-        onClick={handleComplete}
+        className="fixed inset-0 z-[149] pointer-events-auto"
+        onClick={handleBackdropClick}
       />
 
-      {/* 🎯 Hedef Eleman Üzerinde Parlayan Spot Çerçevesi */}
-      {targetRect && (
+      {/* 🎯 Hedef Eleman Üzerinde Parlayan Spot ve Kesim Alanı (Spotlight Cutout) */}
+      {targetRect ? (
         <div
-          className="fixed pointer-events-none transition-all duration-300 rounded-2xl ring-4 ring-violet-500/50 border-2 border-violet-400 shadow-[0_0_40px_rgba(139,92,246,0.6)] animate-pulse z-[151]"
+          className={`fixed pointer-events-none transition-all duration-300 z-[151] border-2 border-violet-400 ring-4 ring-violet-500/60 ${
+            isSidebar ? 'rounded-r-2xl' : 'rounded-2xl'
+          }`}
           style={{
-            top: targetRect.top - 6,
-            left: targetRect.left - 6,
-            width: targetRect.width + 12,
-            height: targetRect.height + 12,
+            top: spotTop,
+            left: spotLeft,
+            width: spotWidth,
+            height: spotHeight,
+            // 9999px box shadow: Hedefin içi %100 şeffaf ve kristal netliktedir (0 karartma, 0 blur)!
+            // Dışında kalan tüm sayfa alanı ise 0.85 derin slate ile karartılır.
+            boxShadow: '0 0 0 9999px rgba(3, 7, 18, 0.85), 0 0 35px rgba(139, 92, 246, 0.7)',
           }}
         >
           {/* Rozet Etiketi */}
-          <div className="absolute -top-3.5 left-4 bg-gradient-to-r from-violet-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-wider px-3 py-0.5 rounded-full shadow-lg flex items-center gap-1.5 border border-white/20">
+          <div
+            className={`absolute ${
+              spotTop < 35 ? 'top-3 right-3' : '-top-3.5 left-4'
+            } bg-gradient-to-r from-violet-600 to-pink-600 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 border border-white/20 z-[152]`}
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
             {step.badge}
           </div>
         </div>
+      ) : (
+        /* Hedef koordinatı henüz hesaplanmamışsa veya yoksa genel arka plan karartması */
+        <div
+          className="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-[151] pointer-events-none transition-opacity duration-300"
+        />
       )}
 
       {/* 💬 İnteraktif Bilgi Kartı (Popover) */}
       <div
         style={getCardStyle()}
-        className="z-[152] rounded-3xl glass border border-white/25 p-6 shadow-2xl bg-slate-900/95 overflow-hidden animate-scale-up backdrop-blur-xl"
+        className="z-[160] pointer-events-auto rounded-3xl glass border border-white/25 p-6 shadow-2xl bg-slate-900/95 overflow-hidden animate-scale-up backdrop-blur-xl"
       >
         {/* Üst Gradyan Çizgisi */}
         <div className={`absolute top-0 left-0 right-0 h-2 bg-gradient-to-r ${step.color}`} />
