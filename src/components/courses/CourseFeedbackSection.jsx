@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import { ThumbsUp, ThumbsDown, MessageSquare, Send, Trash2, EyeOff, User, CheckCircle2, AlertCircle } from 'lucide-react';
-import { getCourseFeedbacks, getUserCourseFeedback, submitCourseFeedback, deleteCourseFeedback } from '../../services/feedbackService';
+import { getCourseFeedbacks, getUserCourseFeedback, submitCourseFeedback, deleteCourseFeedback, replyToFeedback } from '../../services/feedbackService';
+import { useAuth } from '../../context/AuthContext';
 import Card from '../Card';
 import LoadingSpinner from '../ui/LoadingSpinner';
 
 export default function CourseFeedbackSection({ courseId, currentUser }) {
+  const { profile } = useAuth();
+  const isTeacher = profile?.role === 'teacher' || profile?.role === 'admin';
+
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -16,6 +20,12 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
   const [existingFeedbackId, setExistingFeedbackId] = useState(null);
   const [feedbackSuccess, setFeedbackSuccess] = useState('');
   const [feedbackError, setFeedbackError] = useState('');
+
+  // Eğitmen yanıt durumları
+  const [replyingId, setReplyingId] = useState(null);
+  const [replyText, setReplyText] = useState('');
+  const [savingReply, setSavingReply] = useState(false);
+  const [replyError, setReplyError] = useState('');
 
   useEffect(() => {
     if (!courseId) return;
@@ -91,6 +101,33 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
     }
   };
 
+  const handleSaveReply = async (feedbackId, studentId) => {
+    if (!replyText.trim()) return;
+    setSavingReply(true);
+    setReplyError('');
+
+    const { error } = await replyToFeedback({
+      feedbackId,
+      reply: replyText.trim(),
+      studentId,
+      courseId
+    });
+
+    setSavingReply(false);
+
+    if (error) {
+      setReplyError('Yanıt kaydedilemedi: ' + error.message);
+    } else {
+      setFeedbacks((prev) => prev.map((f) => f.id === feedbackId ? {
+        ...f,
+        teacher_reply: replyText.trim(),
+        replied_at: new Date().toISOString()
+      } : f));
+      setReplyingId(null);
+      setReplyText('');
+    }
+  };
+
   // İstatistikler
   const likesCount = feedbacks.filter((f) => f.rating === 'like').length;
   const dislikesCount = feedbacks.filter((f) => f.rating === 'dislike').length;
@@ -105,7 +142,9 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
             <MessageSquare size={20} className="text-violet-400" /> Kurs Değerlendirmeleri & Geri Bildirim
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            Bu kurs hakkındaki görüşlerinizi paylaşarak eğitmenimize ve diğer öğrencilere katkı sağlayın.
+            {isTeacher 
+              ? 'Öğrencilerinizin bu kurs hakkındaki yorumlarını inceleyin ve yanıtlayın.'
+              : 'Bu kurs hakkındaki görüşlerinizi paylaşarak eğitmenimize ve diğer öğrencilere katkı sağlayın.'}
           </p>
         </div>
 
@@ -127,8 +166,20 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
         </div>
       </div>
 
-      {/* Geri Bildirim Formu (Sadece Öğrenciye / Giriş Yapmış Kullanıcıya) */}
-      {currentUser && (
+      {/* Geri Bildirim Formu (Öğrenciye) veya Bilgi Kutusu (Öğretmene) */}
+      {currentUser && isTeacher ? (
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-violet-950/40 via-purple-950/30 to-slate-900 border border-violet-500/20 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-violet-500/20 text-violet-400 flex items-center justify-center shrink-0">
+            <MessageSquare size={18} />
+          </div>
+          <div>
+            <p className="text-xs font-bold text-white">Eğitmen Değerlendirme & Yanıt Masası</p>
+            <p className="text-[11px] text-slate-400">
+              Öğrencilerinizin kurs hakkındaki değerlendirmelerini aşağıda görebilir ve doğrudan "Cevap Yaz" butonunu kullanarak yanıt verebilirsiniz.
+            </p>
+          </div>
+        </div>
+      ) : currentUser ? (
         <form onSubmit={handleSubmit} className="p-4 rounded-2xl bg-slate-900/60 border border-white/10 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <label className="text-xs font-bold text-slate-300">
@@ -286,6 +337,80 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
                     <p className="text-xs text-slate-300 mt-2.5 pl-9 leading-relaxed break-words">
                       "{fb.comment}"
                     </p>
+                  )}
+
+                  {/* Eğitmen Yanıtı */}
+                  {fb.teacher_reply && (
+                    <div className="mt-3 ml-7 p-3 rounded-xl bg-violet-950/40 border border-violet-500/25">
+                      <div className="flex items-center gap-1.5 text-violet-300 font-bold text-[11px] mb-1">
+                        <MessageSquare size={13} className="text-violet-400" />
+                        <span>Eğitmen Yanıtı</span>
+                        {fb.replied_at && (
+                          <span className="text-[10px] text-slate-500 font-normal">
+                            • {new Date(fb.replied_at).toLocaleDateString('tr-TR')}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-200 leading-relaxed pl-4">
+                        {fb.teacher_reply}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Öğretmen Yanıtlama Alanı */}
+                  {isTeacher && (
+                    <div className="mt-2.5 ml-7">
+                      {replyingId === fb.id ? (
+                        <div className="p-3 rounded-xl bg-slate-950/90 border border-violet-500/40 space-y-2.5">
+                          <label className="text-[11px] font-bold text-violet-300 flex items-center gap-1.5">
+                            <MessageSquare size={13} />
+                            Öğrenci Yorumuna Yanıtınız:
+                          </label>
+                          <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder="Öğrenciye geri bildirimini yanıtlayan açıklayıcı bir mesaj yazın..."
+                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 resize-none"
+                            rows={3}
+                            autoFocus
+                          />
+                          {replyError && (
+                            <p className="text-[11px] text-rose-400">{replyError}</p>
+                          )}
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => { setReplyingId(null); setReplyText(''); setReplyError(''); }}
+                              className="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white transition-colors"
+                            >
+                              İptal
+                            </button>
+                            <button
+                              type="button"
+                              disabled={savingReply || !replyText.trim()}
+                              onClick={() => handleSaveReply(fb.id, fb.user_id)}
+                              className="px-4 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition-all shadow-md shadow-violet-600/30 flex items-center gap-1.5 disabled:opacity-50"
+                            >
+                              {savingReply ? <LoadingSpinner size="xs" /> : <Send size={12} />}
+                              {fb.teacher_reply ? 'Yanıtı Güncelle' : 'Yanıtı Gönder'}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReplyingId(fb.id);
+                            setReplyText(fb.teacher_reply || '');
+                            setReplyError('');
+                          }}
+                          className="text-[11px] font-bold text-violet-400 hover:text-violet-300 transition-colors inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20"
+                        >
+                          <MessageSquare size={12} />
+                          {fb.teacher_reply ? 'Yanıtı Düzenle' : 'Cevap Yaz'}
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               );

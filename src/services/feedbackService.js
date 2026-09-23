@@ -16,6 +16,8 @@ export async function getCourseFeedbacks(courseId) {
         comment,
         is_anonymous,
         created_at,
+        teacher_reply,
+        replied_at,
         profiles (
           full_name,
           avatar_emoji
@@ -163,5 +165,70 @@ export async function deleteCourseFeedback(feedbackId) {
     return { error };
   } catch (err) {
     return { error: err };
+  }
+}
+
+/**
+ * Eğitmenin bir öğrenci yorumuna yanıt vermesi (ve öğrenciye bildirim göndermesi)
+ */
+export async function replyToFeedback({ feedbackId, reply, studentId, courseId }) {
+  if (!feedbackId || !reply?.trim()) {
+    return { error: new Error('Yanıt metni boş olamaz.') };
+  }
+
+  try {
+    // 1. Önce güvenli RPC fonksiyonunu dene
+    const { error: rpcError } = await supabase.rpc('reply_course_feedback', {
+      p_feedback_id: feedbackId,
+      p_reply: reply.trim()
+    });
+
+    if (!rpcError) {
+      return { success: true, error: null };
+    }
+
+    // 2. Eğer RPC henüz çalıştırılmadıysa doğrudan update yap
+    const { error: updateError } = await supabase
+      .from('course_feedbacks')
+      .update({
+        teacher_reply: reply.trim(),
+        replied_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', feedbackId);
+
+    if (updateError) {
+      console.error('Yoruma yanıt verilemedi:', updateError.message);
+      return { success: false, error: updateError };
+    }
+
+    // Öğrenciye bildirim gönder
+    if (studentId && courseId) {
+      try {
+        const { data: cData } = await supabase
+          .from('courses')
+          .select('title')
+          .eq('id', courseId)
+          .single();
+
+        const { data: userData } = await supabase.auth.getUser();
+
+        await createNotification({
+          userId: studentId,
+          actorId: userData?.user?.id,
+          type: 'course_feedback',
+          title: 'Eğitmen Yorumunuzu Yanıtladı 💬',
+          message: `Eğitmeniniz, "${cData?.title || 'Kurs'}" hakkındaki yorumunuza yanıt verdi.`,
+          data: { courseId, feedbackId }
+        });
+      } catch (nErr) {
+        console.warn('Öğrenci bildirimi gönderilemedi:', nErr);
+      }
+    }
+
+    return { success: true, error: null };
+  } catch (err) {
+    console.error('replyToFeedback beklenmeyen hata:', err);
+    return { success: false, error: err };
   }
 }

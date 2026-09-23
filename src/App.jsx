@@ -93,7 +93,7 @@ export default function App() {
           <Route
             path="/student/courses/:courseId"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
                 <CoursePage />
               </ProtectedRoute>
             }
@@ -101,7 +101,7 @@ export default function App() {
           <Route
             path="/student/lessons/:lessonId"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
                 <LessonPage />
               </ProtectedRoute>
             }
