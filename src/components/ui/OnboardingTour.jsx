@@ -171,25 +171,52 @@ export default function OnboardingTour() {
     return () => window.removeEventListener('start-cyberedu-tour', handleStartTour);
   }, [goToStep]);
 
-  // Sayfa kaydırma ve yeniden boyutlandırmayı 60fps dinle
+  // Sayfa kaydırma ve yeniden boyutlandırmayı 60fps akıcı takip et
   useEffect(() => {
     if (!isOpen) return;
 
     let rafId = null;
-    const handleScrollOrResize = () => {
+    let scrollTimeout = null;
+
+    const handleScroll = () => {
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
-        updateStepTarget(currentStep);
+        if (spotlightRef.current) {
+          const rect = getStepTargetRect(currentStep);
+          if (rect) {
+            const step = TOUR_STEPS[currentStep];
+            const isSidebar = step?.target.includes('sidebar');
+            const spotTop = isSidebar ? 0 : Math.max(0, rect.top - 6);
+            const spotLeft = isSidebar ? 0 : Math.max(0, rect.left - 6);
+            const spotWidth = isSidebar ? rect.width : rect.width + 12;
+            const spotHeight = isSidebar ? window.innerHeight : rect.height + 12;
+
+            spotlightRef.current.style.top = `${spotTop}px`;
+            spotlightRef.current.style.left = `${spotLeft}px`;
+            spotlightRef.current.style.width = `${spotWidth}px`;
+            spotlightRef.current.style.height = `${spotHeight}px`;
+          }
+        }
       });
+
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        updateStepTarget(currentStep);
+      }, 100);
     };
 
-    window.addEventListener('resize', handleScrollOrResize, { passive: true });
-    window.addEventListener('scroll', handleScrollOrResize, { capture: true, passive: true });
+    const handleResize = () => {
+      updateStepTarget(currentStep);
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
+    window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', handleScrollOrResize);
-      window.removeEventListener('scroll', handleScrollOrResize, { capture: true });
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll, { capture: true });
     };
   }, [isOpen, currentStep, updateStepTarget]);
 

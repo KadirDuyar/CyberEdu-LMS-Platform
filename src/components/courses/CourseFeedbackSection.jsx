@@ -271,7 +271,7 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
             </div>
           )}
         </form>
-      )}
+      ) : null}
 
       {/* Yorum Listesi */}
       <div className="space-y-3">
