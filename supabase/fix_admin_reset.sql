@@ -86,6 +86,7 @@ CREATE POLICY "notifications_delete_actor" ON public.notifications
   FOR DELETE USING (auth.uid() = actor_id);
 
 -- 3. ADMIN RESET RPC FUNCTION (SECURITY DEFINER ile atomik ve RLS baypaslı)
+DROP FUNCTION IF EXISTS public.admin_reset_student(UUID);
 CREATE OR REPLACE FUNCTION public.admin_reset_student(target_user_id UUID)
 RETURNS JSONB
 LANGUAGE plpgsql
