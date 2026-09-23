@@ -390,6 +390,7 @@ export default function AiChatWidget() {
       {/* Tetikleyici Buton */}
       {!isOpen && (
         <button
+          id="tour-ai-widget"
           onClick={() => setIsOpen(true)}
           className="group relative flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-violet-600 via-purple-600 to-pink-500 text-white shadow-xl shadow-violet-600/40 hover:shadow-violet-600/60 hover:scale-105 active:scale-95 transition-all"
         >

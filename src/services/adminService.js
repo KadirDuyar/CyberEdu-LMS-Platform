@@ -9,6 +9,12 @@ export async function getAllProfiles() {
 }
 
 export async function resetStudentProgress(userId) {
+  // Tanıtım turu durumunu sıfırla ki kullanıcı tekrar giriş yapıp navigatörü tamamladığında tur açılsın
+  try {
+    localStorage.removeItem(`cyberedu_tour_completed_${userId}`);
+    localStorage.removeItem('cyberedu_tour_completed');
+  } catch (e) {}
+
   // 1. RPC fonksiyonunu çağır
   const { data: rpcResult, error: rpcError } = await supabase.rpc('admin_reset_student', { target_user_id: userId });
   

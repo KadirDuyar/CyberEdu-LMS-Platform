@@ -295,6 +295,7 @@ export default function DashboardLayout({ children }) {
 
       {/* Desktop Sidebar */}
       <aside
+        id="tour-sidebar"
         className={[
           'relative hidden md:flex flex-col h-full glass border-r border-white/10 transition-all duration-300 z-20 shrink-0',
           collapsed ? 'w-[72px]' : 'w-64',
@@ -340,7 +341,7 @@ export default function DashboardLayout({ children }) {
           <div className="flex items-center gap-2 md:gap-3">
             {/* SADECE ÖĞRENCİDE GÖRÜNEN LEVEL/XP KUTUSU */}
             {isStudent && (
-              <div className="hidden sm:flex items-center gap-2 glass-light rounded-xl px-3 md:px-4 py-2 border border-white/10">
+              <div id="tour-xp" className="hidden sm:flex items-center gap-2 glass-light rounded-xl px-3 md:px-4 py-2 border border-white/10">
                 <Star size={15} className="text-amber-400" />
                 <span className="text-sm font-bold text-white">Lv.{level}</span>
                 <span className="w-px h-4 bg-white/20" />
@@ -361,7 +362,7 @@ export default function DashboardLayout({ children }) {
             </button>
 
             {/* Bildirim */}
-            <div className="relative">
+            <div id="tour-notifications" className="relative">
               <button
                 onClick={() => setNotifOpen((n) => !n)}
                 className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-white/10 hover:border-violet-500/50 transition-colors relative"
@@ -451,6 +452,7 @@ export default function DashboardLayout({ children }) {
 
             {/* Avatar Kutusu (Tıklanabilir Profil) */}
             <button
+              id="tour-profile"
               onClick={() => navigate(role === 'teacher' ? '/teacher/profile' : role === 'admin' ? '/admin/profile' : '/student/profile')}
               className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-white/10 text-lg hover:border-violet-500/60 hover:scale-105 transition-all cursor-pointer"
               title="Profil Sayfam"

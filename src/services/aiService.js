@@ -5,10 +5,10 @@
 const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
 const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
 const configuredGeminiModel = import.meta.env.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
-const groqModel = import.meta.env.VITE_GROQ_MODEL || 'llama-3.1-8b-instant';
+const configuredGroqModel = import.meta.env.VITE_GROQ_MODEL;
 
 /**
- * Groq Cloud REST API Çağrısı (Llama 3.1 - Ultra Düşük Gecikme)
+ * Groq Cloud REST API Çağrısı (Llama 3.3 / Llama 3 - Ultra Düşük Gecikme)
  */
 async function callGroq({ prompt, systemInstruction = '', history = [], signal }) {
   if (!groqApiKey) {
@@ -32,40 +32,56 @@ async function callGroq({ prompt, systemInstruction = '', history = [], signal }
 
   messages.push({ role: 'user', content: prompt });
 
-  const startTime = performance.now();
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    signal,
-    headers: {
-      'Authorization': `Bearer ${groqApiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: groqModel,
-      messages,
-      temperature: 0.7
-    })
-  });
+  // Aktif Groq model adayları (llama-3.1-8b-instant groq tarafından kaldırıldığı için güncellendi)
+  const candidateModels = [
+    configuredGroqModel,
+    'llama-3.3-70b-versatile',
+    'llama3-8b-8192',
+    'gemma2-9b-it'
+  ].filter(Boolean);
 
-  const duration = Math.round(performance.now() - startTime);
+  let lastError = null;
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.warn(`❌ [Groq API Hatası (${groqModel})]: HTTP ${res.status} - ${errorText}`);
-    throw new Error(`[Groq Hatası]: ${res.status} - ${errorText}`);
+  for (const model of candidateModels) {
+    const startTime = performance.now();
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        signal,
+        headers: {
+          'Authorization': `Bearer ${groqApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature: 0.7
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const text = data?.choices?.[0]?.message?.content;
+        if (text) {
+          const duration = Math.round(performance.now() - startTime);
+          return { provider: `Groq (${model})`, text, duration };
+        }
+      } else {
+        const errorText = await res.text();
+        console.warn(`⚠️ [Groq Modeli Başarısız (${model})]: HTTP ${res.status} - ${errorText}`);
+        lastError = new Error(`[Groq Hatası (${model})]: ${res.status} - ${errorText}`);
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') throw err;
+      lastError = err;
+    }
   }
 
-  const data = await res.json();
-  const text = data?.choices?.[0]?.message?.content;
-  if (!text) {
-    throw new Error('[Groq Hatası]: Boş yanıt döndü.');
-  }
-
-  return { provider: 'Groq (Llama 3.1)', text, duration };
+  throw lastError || new Error('[Groq Hatası]: Tüm Groq modelleri başarısız oldu.');
 }
 
 /**
- * Google Gemini REST API Çağrısı
+ * Google Gemini REST API Çağrısı (v1 ve v1beta Fallback Destekli)
  */
 async function callGemini({ prompt, systemInstruction = '', history = [], signal }) {
   if (!geminiApiKey) {
@@ -91,31 +107,42 @@ async function callGemini({ prompt, systemInstruction = '', history = [], signal
     payload.system_instruction = { parts: [{ text: systemInstruction }] };
   }
 
-  const startTime = performance.now();
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${configuredGeminiModel}:generateContent?key=${geminiApiKey}`;
+  const endpoints = [
+    `https://generativelanguage.googleapis.com/v1/models/${configuredGeminiModel}:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${configuredGeminiModel}:generateContent?key=${geminiApiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`
+  ];
 
-  const res = await fetch(url, {
-    method: 'POST',
-    signal,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
+  let lastError = null;
 
-  const duration = Math.round(performance.now() - startTime);
+  for (const url of endpoints) {
+    const startTime = performance.now();
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        signal,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.warn(`❌ [Google Gemini API Hatası (${configuredGeminiModel})]: HTTP ${res.status} - ${errorText}`);
-    throw new Error(`[Gemini Hatası]: ${res.status} - ${errorText}`);
+      if (res.ok) {
+        const data = await res.json();
+        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          const duration = Math.round(performance.now() - startTime);
+          return { provider: 'Google Gemini Flash', text, duration };
+        }
+      } else {
+        const errorText = await res.text();
+        lastError = new Error(`[Gemini Hatası]: ${res.status} - ${errorText}`);
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') throw err;
+      lastError = err;
+    }
   }
 
-  const data = await res.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) {
-    throw new Error('[Gemini Hatası]: Boş yanıt döndü.');
-  }
-
-  return { provider: 'Google Gemini Flash', text, duration };
+  throw lastError || new Error('[Gemini Hatası]: İstek başarısız.');
 }
 
 /**

@@ -269,106 +269,108 @@ export default function StudentDashboard() {
       <div className="space-y-6 max-w-5xl mx-auto pb-12">
 
         {/* ── Banner: Kurs Tamamlandı vs Yeni Öğrenci vs Devam Et ──────────────────────── */}
-        {isCourseFinished ? (
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/90 via-teal-950/70 to-slate-900 border border-emerald-500/40 p-6 md:p-8 shadow-2xl">
-            <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs font-black uppercase tracking-wider text-emerald-300 bg-emerald-900/50 border border-emerald-500/30 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
-                  <Trophy size={14} className="text-amber-400" /> Kurs Başarıyla Tamamlandı!
-                </span>
-                <span className="text-xs font-bold text-slate-300 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
-                  {profile?.learning_area === 'technical' ? '💻 Teknik Parkur' : '🛡️ Farkındalık Parkuru'}
-                </span>
-              </div>
+        <div id="tour-resume-card">
+          {isCourseFinished ? (
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/90 via-teal-950/70 to-slate-900 border border-emerald-500/40 p-6 md:p-8 shadow-2xl">
+              <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs font-black uppercase tracking-wider text-emerald-300 bg-emerald-900/50 border border-emerald-500/30 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+                    <Trophy size={14} className="text-amber-400" /> Kurs Başarıyla Tamamlandı!
+                  </span>
+                  <span className="text-xs font-bold text-slate-300 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
+                    {profile?.learning_area === 'technical' ? '💻 Teknik Parkur' : '🛡️ Farkındalık Parkuru'}
+                  </span>
+                </div>
 
-              <h2 className="font-display font-black text-2xl md:text-3xl text-white">
-                Tebrikler, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'Öğrenci'}!</span> 🎉
-              </h2>
+                <h2 className="font-display font-black text-2xl md:text-3xl text-white">
+                  Tebrikler, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'Öğrenci'}!</span> 🎉
+                </h2>
 
-              <p className="text-slate-300 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
-                <strong className="text-emerald-300 font-bold">{activeCourse?.title}</strong> kursundaki tüm dersleri başarıyla bitirdin! Yeni yetenekler kazanmak ve siber güvenlikte uzmanlaşmak için sıradaki kurslara katılabilirsin.
-              </p>
+                <p className="text-slate-300 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
+                  <strong className="text-emerald-300 font-bold">{activeCourse?.title}</strong> kursundaki tüm dersleri başarıyla bitirdin! Yeni yetenekler kazanmak ve siber güvenlikte uzmanlaşmak için sıradaki kurslara katılabilirsin.
+                </p>
 
-              <div className="mt-5 flex flex-wrap items-center gap-3">
-                <button
-                  onClick={() => navigate('/student/courses')}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition-all shadow-lg shadow-emerald-500/25 hover:scale-105"
-                >
-                  <BookOpen size={18} /> Başka Kurslara Göz At
-                </button>
-                <button
-                  onClick={() => navigate('/student/learning-path')}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-sm font-bold transition-all"
-                >
-                  <Map size={18} /> Öğrenme Yolculuğum
-                </button>
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={() => navigate('/student/courses')}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition-all shadow-lg shadow-emerald-500/25 hover:scale-105"
+                  >
+                    <BookOpen size={18} /> Başka Kurslara Göz At
+                  </button>
+                  <button
+                    onClick={() => navigate('/student/learning-path')}
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-sm font-bold transition-all"
+                  >
+                    <Map size={18} /> Öğrenme Yolculuğum
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ) : isNewStudent ? (
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-950/90 via-blue-950/70 to-slate-900 border border-cyan-500/40 p-6 md:p-8 shadow-2xl">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xs font-black uppercase tracking-wider text-cyan-300 bg-cyan-900/50 border border-cyan-500/40 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
-                  🎯 İlk Kursun Hazır!
-                </span>
-                <span className="text-xs font-bold text-slate-300 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
+          ) : isNewStudent ? (
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-950/90 via-blue-950/70 to-slate-900 border border-cyan-500/40 p-6 md:p-8 shadow-2xl">
+              <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs font-black uppercase tracking-wider text-cyan-300 bg-cyan-900/50 border border-cyan-500/40 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+                    🎯 İlk Kursun Hazır!
+                  </span>
+                  <span className="text-xs font-bold text-slate-300 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
+                    {profile?.learning_area === 'technical' ? '💻 Teknik Siber Güvenlik Parkuru' : '🛡️ Siber Farkındalık Parkuru'}
+                  </span>
+                </div>
+
+                <h2 className="font-display font-black text-2xl md:text-3xl text-white">
+                  Aramıza Hoş Geldin, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'Öğrenci'}!</span> 🚀
+                </h2>
+
+                <p className="text-slate-300 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
+                  Siber güvenlik yolculuğuna <strong className="text-cyan-300 font-bold">{activeCourse?.title || 'Temel Güvenlik Kursu'}</strong> ile başlamaya hazırsın. Hemen ilk dersine gir ve maceraya başla!
+                </p>
+
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  {activeLesson && (
+                    <button
+                      onClick={() => navigate(`/student/lessons/${activeLesson.id}`)}
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold transition-all shadow-lg shadow-cyan-500/25 hover:scale-105"
+                    >
+                      İlk Kursuna Başla 🚀 <ArrowRight size={18} />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => navigate('/student/learning-path')}
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-sm font-bold transition-all"
+                  >
+                    <Map size={18} /> Yol Haritasını Gör
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-950/80 via-purple-950/60 to-slate-900 border border-violet-500/30 p-6 md:p-8 shadow-2xl">
+              <div className="relative z-10">
+                <span className="text-xs font-black uppercase tracking-wider text-violet-300 bg-violet-900/40 border border-violet-700/40 px-3 py-1 rounded-full inline-block mb-3">
                   {profile?.learning_area === 'technical' ? '💻 Teknik Siber Güvenlik Parkuru' : '🛡️ Siber Farkındalık Parkuru'}
                 </span>
-              </div>
-
-              <h2 className="font-display font-black text-2xl md:text-3xl text-white">
-                Aramıza Hoş Geldin, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'Öğrenci'}!</span> 🚀
-              </h2>
-
-              <p className="text-slate-300 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
-                Siber güvenlik yolculuğuna <strong className="text-cyan-300 font-bold">{activeCourse?.title || 'Temel Güvenlik Kursu'}</strong> ile başlamaya hazırsın. Hemen ilk dersine gir ve maceraya başla!
-              </p>
-
-              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <h2 className="font-display font-black text-2xl md:text-3xl text-white">
+                  Kaldığın yerden devam et, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'Öğrenci'}!</span>
+                </h2>
+                <p className="text-slate-300 text-sm mt-2 max-w-xl">
+                  Şu an <span className="text-violet-300 font-bold underline decoration-violet-500">{activeCourse?.title || 'Eğitim Kursu'}</span> modülünde{' '}
+                  <strong className="text-white">"{activeLesson?.title || 'Eğitim Dersi'}"</strong> üzerindesin.
+                </p>
                 {activeLesson && (
                   <button
                     onClick={() => navigate(`/student/lessons/${activeLesson.id}`)}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold transition-all shadow-lg shadow-cyan-500/25 hover:scale-105"
+                    className="mt-5 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold transition-all shadow-lg shadow-violet-500/25 hover:scale-105"
                   >
-                    İlk Kursuna Başla 🚀 <ArrowRight size={18} />
+                    Derse Devam Et <ArrowRight size={18} />
                   </button>
                 )}
-                <button
-                  onClick={() => navigate('/student/learning-path')}
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-sm font-bold transition-all"
-                >
-                  <Map size={18} /> Yol Haritasını Gör
-                </button>
               </div>
             </div>
-          </div>
-        ) : (
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-950/80 via-purple-950/60 to-slate-900 border border-violet-500/30 p-6 md:p-8 shadow-2xl">
-            <div className="relative z-10">
-              <span className="text-xs font-black uppercase tracking-wider text-violet-300 bg-violet-900/40 border border-violet-700/40 px-3 py-1 rounded-full inline-block mb-3">
-                {profile?.learning_area === 'technical' ? '💻 Teknik Siber Güvenlik Parkuru' : '🛡️ Siber Farkındalık Parkuru'}
-              </span>
-              <h2 className="font-display font-black text-2xl md:text-3xl text-white">
-                Kaldığın yerden devam et, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'Öğrenci'}!</span>
-              </h2>
-              <p className="text-slate-300 text-sm mt-2 max-w-xl">
-                Şu an <span className="text-violet-300 font-bold underline decoration-violet-500">{activeCourse?.title || 'Eğitim Kursu'}</span> modülünde{' '}
-                <strong className="text-white">"{activeLesson?.title || 'Eğitim Dersi'}"</strong> üzerindesin.
-              </p>
-              {activeLesson && (
-                <button
-                  onClick={() => navigate(`/student/lessons/${activeLesson.id}`)}
-                  className="mt-5 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold transition-all shadow-lg shadow-violet-500/25 hover:scale-105"
-                >
-                  Derse Devam Et <ArrowRight size={18} />
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* ── Dinamik İstatistik Metrikleri ────────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -527,7 +529,7 @@ export default function StudentDashboard() {
           </div>
 
           {/* Sağ Kolon: Liderlik Tablosu & Hızlı Aksiyon */}
-          <div className="space-y-4">
+          <div id="tour-leaderboard" className="space-y-4">
             <h3 className="font-bold text-lg text-white flex items-center gap-2">
               <Trophy size={18} className="text-amber-400" /> Canlı Liderlik Tablosu
             </h3>
