@@ -8,21 +8,7 @@ export async function getCourseFeedbacks(courseId) {
   try {
     const { data, error } = await supabase
       .from('course_feedbacks')
-      .select(`
-        id,
-        course_id,
-        user_id,
-        rating,
-        comment,
-        is_anonymous,
-        created_at,
-        teacher_reply,
-        replied_at,
-        profiles (
-          full_name,
-          avatar_emoji
-        )
-      `)
+      .select('*, profiles:user_id(id, full_name, avatar_emoji)')
       .eq('course_id', courseId)
       .order('created_at', { ascending: false });
 
