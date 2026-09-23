@@ -15,6 +15,7 @@ import CoursePage       from './pages/student/CoursePage';
 import LessonPage       from './pages/student/LessonPage';
 import AiMentor         from './pages/student/AiMentor';
 import Achievements     from './pages/student/Achievements';
+import LeaderboardPage  from './pages/student/LeaderboardPage';
 
 // ─── Teacher Pages ────────────────────────────────────────────────────────────
 import TeacherDashboard from './pages/TeacherDashboard';
@@ -121,10 +122,34 @@ export default function App() {
             }
           />
           <Route
+            path="/student/leaderboard"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <LeaderboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/leaderboard/:studentId"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <LeaderboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/student/profile"
             element={
               <ProtectedRoute allowedRoles={['student']}>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/profile/:studentId"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <LeaderboardPage />
               </ProtectedRoute>
             }
           />

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, LogOut, ChevronLeft, ChevronRight,
-  Star, Zap, Bell, Map, Trophy, Bot, BookOpen,
+  Star, Zap, Bell, Map, Trophy, Award, Bot, BookOpen,
   BarChart3, Settings, Users, Shield, PlusCircle, Menu, X, Sun, Moon, User, Check
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -36,8 +36,14 @@ const NAV_ITEMS = [
     roles: ['student'],
   },
   {
-    label: 'Başarılar',
+    label: 'Liderlik Tablosu',
     icon: Trophy,
+    href: '/student/leaderboard',
+    roles: ['student'],
+  },
+  {
+    label: 'Başarılar',
+    icon: Award,
     href: '/student/achievements',
     roles: ['student'],
   },

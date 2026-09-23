@@ -10,24 +10,33 @@ export default function RoleSelectModal({ user, onRoleSelected }) {
   const [error, setError] = useState('');
 
   const handleConfirmRole = async () => {
-    if (!user) return;
     setLoading(true);
     setError('');
 
     try {
-      const fullName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Kullanıcı';
+      // 1. Sunucudan kullanıcının auth.users tablosunda geçerli olduğunu doğrula
+      const { data: authData, error: authErr } = await supabase.auth.getUser();
+      const currentAuthUser = authData?.user || user;
+
+      if (authErr || !currentAuthUser) {
+        await supabase.auth.signOut();
+        throw new Error('Oturumunuzun süresi dolmuş veya hesap bulunamadı. Lütfen tekrar giriş yapın.');
+      }
+
+      const fullName = currentAuthUser.user_metadata?.full_name || currentAuthUser.email?.split('@')[0] || 'Kullanıcı';
       const avatarEmoji = selectedRole === 'teacher' ? '🎓' : '🚀';
 
       const { data, error: upsertErr } = await supabase
         .from('profiles')
         .upsert({
-          id: user.id,
+          id: currentAuthUser.id,
           full_name: fullName,
           role: selectedRole,
           avatar_emoji: avatarEmoji,
           xp: 0,
           level: 1,
           onboarding_completed: selectedRole === 'teacher', // Öğretmen navigator'a girmesin
+          updated_at: new Date().toISOString()
         })
         .select()
         .single();

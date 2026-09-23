@@ -31,34 +31,44 @@ export function AuthProvider({ children }) {
 
   // ── Oturum başlatma / değişim dinleyicisi ─────────────────────────────────────
   useEffect(() => {
-    // İlk yükleme: mevcut oturumu kontrol et
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user);
-        let prof = await fetchProfile(session.user.id);
-
-        if (!prof || !prof.role) {
-          const intentRole = localStorage.getItem('cyberedu_oauth_intent_role');
-          if (intentRole) {
-            const fullName = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Kullanıcı';
-            const { data: newProf } = await supabase.from('profiles').upsert({
-              id: session.user.id,
-              full_name: fullName,
-              role: intentRole,
-              avatar_emoji: intentRole === 'teacher' ? '🎓' : '🚀',
-              xp: 0,
-              level: 1,
-              onboarding_completed: intentRole === 'teacher'
-            }).select().single();
-            localStorage.removeItem('cyberedu_oauth_intent_role');
-            if (newProf) prof = newProf;
-          } else {
-            setNeedsRoleSelection(true);
-          }
+    // İlk yükleme: mevcut oturumu sunucudan doğrula
+    supabase.auth.getUser().then(async ({ data: { user: verifiedUser }, error: userErr }) => {
+      if (userErr || !verifiedUser) {
+        // Oturum geçersiz veya kullanıcı DB'de bulunmuyorsa temizle
+        if (userErr && !userErr.message?.includes('Auth session missing')) {
+          await supabase.auth.signOut();
         }
-
-        setProfile(prof);
+        setUser(null);
+        setProfile(null);
+        setNeedsRoleSelection(false);
+        setLoading(false);
+        return;
       }
+
+      setUser(verifiedUser);
+      let prof = await fetchProfile(verifiedUser.id);
+
+      if (!prof || !prof.role) {
+        const intentRole = localStorage.getItem('cyberedu_oauth_intent_role');
+        if (intentRole) {
+          const fullName = verifiedUser.user_metadata?.full_name || verifiedUser.email?.split('@')[0] || 'Kullanıcı';
+          const { data: newProf } = await supabase.from('profiles').upsert({
+            id: verifiedUser.id,
+            full_name: fullName,
+            role: intentRole,
+            avatar_emoji: intentRole === 'teacher' ? '🎓' : '🚀',
+            xp: 0,
+            level: 1,
+            onboarding_completed: intentRole === 'teacher'
+          }).select().single();
+          localStorage.removeItem('cyberedu_oauth_intent_role');
+          if (newProf) prof = newProf;
+        } else {
+          setNeedsRoleSelection(true);
+        }
+      }
+
+      setProfile(prof);
       setLoading(false);
     });
 
@@ -297,6 +307,7 @@ export function AuthProvider({ children }) {
     loading,
     error,
     isAuthenticated: !!user,
+    needsRoleSelection,
     // Kolaylık için profile'dan role'ü doğrudan aç
     role: profile?.role ?? null,
     login,

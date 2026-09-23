@@ -89,7 +89,7 @@ export async function submitCourseFeedback({ courseId, userId, rating, comment =
       return { data: null, error };
     }
 
-    // 2. Kursun sahibini (eğitmeni) bulup bildirim gönder
+    // 2. Kursun sahibini (eğitmeni) veya genel eğitmenleri bulup bildirim gönder
     try {
       const { data: courseData } = await supabase
         .from('courses')
@@ -97,7 +97,23 @@ export async function submitCourseFeedback({ courseId, userId, rating, comment =
         .eq('id', courseId)
         .single();
 
+      let targetTeacherIds = [];
+
       if (courseData?.created_by && courseData.created_by !== userId) {
+        targetTeacherIds.push(courseData.created_by);
+      } else {
+        // Eğer kurs created_by içermiyorsa (örneğin tohum/seed kurslar), sistemdeki eğitmenlere bildir
+        const { data: teachers } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('role', 'teacher');
+        
+        if (teachers && teachers.length > 0) {
+          targetTeacherIds = teachers.map((t) => t.id).filter((tId) => tId !== userId);
+        }
+      }
+
+      if (targetTeacherIds.length > 0) {
         // Öğrencinin adını al (anonim değilse)
         let senderName = 'Bir öğrenci';
         if (!isAnonymous) {
@@ -110,14 +126,18 @@ export async function submitCourseFeedback({ courseId, userId, rating, comment =
         }
 
         const icon = rating === 'like' ? '👍' : '👎';
-        await createNotification({
-          userId: courseData.created_by,
-          actorId: isAnonymous ? null : userId,
-          type: 'course_feedback',
-          title: `${icon} Yeni Kurs Değerlendirmesi`,
-          message: `${senderName}, "${courseData.title}" kursunuza ${rating === 'like' ? 'olumlu' : 'olumsuz'} geri bildirim bıraktı.${comment ? ` Yorum: "${comment.slice(0, 80)}..."` : ''}`,
-          data: { courseId, rating, isAnonymous }
-        });
+        const courseTitle = courseData?.title || 'Kurs';
+
+        for (const teacherId of targetTeacherIds) {
+          await createNotification({
+            userId: teacherId,
+            actorId: isAnonymous ? null : userId,
+            type: 'course_feedback',
+            title: `${icon} Yeni Kurs Değerlendirmesi`,
+            message: `${senderName}, "${courseTitle}" kursuna ${rating === 'like' ? 'olumlu' : 'olumsuz'} geri bildirim bıraktı.${comment ? ` Yorum: "${comment.slice(0, 80)}..."` : ''}`,
+            data: { courseId, rating, isAnonymous }
+          });
+        }
       }
     } catch (notifErr) {
       console.warn('Eğitmene bildirim iletilemedi:', notifErr);

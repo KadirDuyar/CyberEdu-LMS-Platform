@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle, Shield } from 'lucide-react';
 import AuthLayout from '../layouts/AuthLayout';
@@ -44,7 +44,7 @@ function getRoleRedirect(role, from) {
 export default function LoginPage() {
   const navigate        = useNavigate();
   const location        = useLocation();
-  const { login, loading, error, role: currentRole } = useAuth();
+  const { login, loading, error, role: currentRole, user, profile, needsRoleSelection } = useAuth();
 
   const [email, setEmail]               = useState('');
   const [password, setPassword]         = useState('');
@@ -54,6 +54,13 @@ export default function LoginPage() {
   const [showGoogleNotice, setShowGoogleNotice] = useState(false);
 
   const from = location.state?.from?.pathname || null;
+
+  // Kullanıcı zaten oturum açmışsa doğrudan paneline yönlendir
+  useEffect(() => {
+    if (user && profile?.role && !needsRoleSelection) {
+      navigate(getRoleRedirect(profile.role, from), { replace: true });
+    }
+  }, [user, profile?.role, needsRoleSelection, from, navigate]);
 
   const handleGoogleLogin = async () => {
     setOauthLoading(true);

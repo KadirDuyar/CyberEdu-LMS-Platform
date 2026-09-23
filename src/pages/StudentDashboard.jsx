@@ -530,16 +530,26 @@ export default function StudentDashboard() {
 
           {/* Sağ Kolon: Liderlik Tablosu & Hızlı Aksiyon */}
           <div id="tour-leaderboard" className="space-y-4">
-            <h3 className="font-bold text-lg text-white flex items-center gap-2">
-              <Trophy size={18} className="text-amber-400" /> Canlı Liderlik Tablosu
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-lg text-white flex items-center gap-2">
+                <Trophy size={18} className="text-amber-400" /> Canlı Liderlik
+              </h3>
+              <button
+                onClick={() => navigate('/student/leaderboard')}
+                className="text-xs font-bold text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1"
+              >
+                Tümünü Gör <ArrowRight size={13} />
+              </button>
+            </div>
+
             <div className="glass rounded-2xl border border-white/10 p-4 space-y-2.5">
               {leaderboard.map((st, i) => {
                 const isMe = st.id === profile?.id;
                 return (
                   <div
                     key={st.id}
-                    className={`flex items-center gap-3 p-2.5 rounded-xl transition-all ${
+                    onClick={() => navigate(`/student/leaderboard/${st.id}`)}
+                    className={`flex items-center gap-3 p-2.5 rounded-xl transition-all cursor-pointer ${
                       isMe ? 'bg-violet-600/30 border border-violet-500/50 shadow-md' : 'hover:bg-white/5'
                     }`}
                   >
@@ -589,6 +599,13 @@ export default function StudentDashboard() {
                   </div>
                 );
               })}
+
+              <button
+                onClick={() => navigate('/student/leaderboard')}
+                className="w-full mt-2 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-violet-300 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1 border border-white/5"
+              >
+                🏆 Liderlik Tablosu Sayfası <ArrowRight size={13} />
+              </button>
             </div>
 
             {/* Kurs Keşfet Kartı */}

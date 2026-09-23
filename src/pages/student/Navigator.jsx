@@ -149,6 +149,8 @@ export default function Navigator() {
       }
     } catch (e) {
       console.warn('İlk kurs kaydı hatası:', e);
+    }
+
     // Turu sıfırla ki Dashboard'a gidildiğinde tanıtım rehberi açılsın (Admin sıfırlasa dahi navigator bitince 1 kez gösterilir)
     try {
       localStorage.removeItem(`cyberedu_tour_completed_${user?.id}`);

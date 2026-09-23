@@ -212,6 +212,10 @@ CREATE POLICY "profiles_select_own" ON public.profiles
 CREATE POLICY "profiles_update_own" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
+-- Kullanıcı kendi profilini oluşturabilir
+CREATE POLICY "profiles_insert_own" ON public.profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
 -- Admin tüm profilleri görebilir
 CREATE POLICY "profiles_admin_select" ON public.profiles
   FOR SELECT USING (public.get_my_role() = 'admin');
@@ -455,6 +459,36 @@ CREATE INDEX IF NOT EXISTS idx_feedbacks_course_id ON public.course_feedbacks(co
 CREATE INDEX IF NOT EXISTS idx_follows_follower ON public.user_follows(follower_id);
 CREATE INDEX IF NOT EXISTS idx_follows_following ON public.user_follows(following_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications(user_id, is_read);
+
+-- ============================================================
+-- 12. ADMIN İLERLEME VE VERİ SIFIRLAMA RPC
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.admin_reset_student(target_user_id UUID)
+RETURNS JSONB AS $$
+BEGIN
+  -- Öğrencinin öğrenme ve etkileşim verilerini tamamen temizle (şifre ve e-posta korunur)
+  DELETE FROM public.activity_attempts WHERE user_id = target_user_id;
+  DELETE FROM public.lesson_progress WHERE user_id = target_user_id;
+  DELETE FROM public.enrollments WHERE user_id = target_user_id;
+  DELETE FROM public.course_feedbacks WHERE user_id = target_user_id;
+  DELETE FROM public.user_follows WHERE follower_id = target_user_id OR following_id = target_user_id;
+  DELETE FROM public.notifications WHERE user_id = target_user_id OR actor_id = target_user_id;
+  DELETE FROM public.user_badges WHERE user_id = target_user_id;
+
+  -- Profili ilk kayıt durumuna getir
+  UPDATE public.profiles
+  SET xp = 0,
+      level = 1,
+      learning_area = NULL,
+      skill_level = NULL,
+      onboarding_completed = FALSE,
+      avatar_emoji = '🚀',
+      updated_at = NOW()
+  WHERE id = target_user_id;
+
+  RETURN jsonb_build_object('success', true, 'message', 'Öğrencinin tüm verileri başarıyla sıfırlandı.');
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================
 -- SEED DATA — Demo içerikler
