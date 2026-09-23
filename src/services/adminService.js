@@ -1,10 +1,10 @@
 import { supabase } from '../lib/supabase';
 
 export async function getAllProfiles() {
-  const { data: rpcData, error: rpcError } = await supabase.rpc('get_masked_users');
-  if (rpcData && !rpcError) return { data: rpcData, error: null };
-
-  const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
   return { data, error };
 }
 
@@ -13,15 +13,20 @@ export async function resetStudentProgress(userId) {
   try {
     localStorage.removeItem(`cyberedu_tour_completed_${userId}`);
     localStorage.removeItem('cyberedu_tour_completed');
+    localStorage.removeItem(`cyberedu_tour_last_seen_${userId}`);
+    localStorage.removeItem('cyberedu_tour_last_seen');
     localStorage.removeItem(`cyberedu_last_active_course_${userId}`);
     localStorage.removeItem('cyberedu_last_active_course');
   } catch (e) {}
 
   // 1. RPC fonksiyonunu çağır (SECURITY DEFINER ile tüm RLS'leri aşarak tek seferde siler)
-  const { data: rpcResult, error: rpcError } = await supabase.rpc('admin_reset_student', { target_user_id: userId });
-  
-  if (!rpcError && rpcResult?.success) {
-    return { data: rpcResult, error: null };
+  try {
+    const { data: rpcResult, error: rpcError } = await supabase.rpc('admin_reset_student', { target_user_id: userId });
+    if (!rpcError && rpcResult?.success) {
+      return { data: rpcResult, error: null };
+    }
+  } catch (rpcErr) {
+    console.warn('RPC admin_reset_student başarısız, doğrudan silme deneniyor:', rpcErr);
   }
 
   // 2. Client-side alternatif / garanti silme (RPC henüz oluşturulmamış veya hata vermişse)
@@ -46,7 +51,6 @@ export async function resetStudentProgress(userId) {
       xp: 0,
       level: 1,
       avatar_emoji: '🛡️',
-      bio: null,
       updated_at: new Date().toISOString()
     };
 
@@ -57,7 +61,11 @@ export async function resetStudentProgress(userId) {
     }).eq('id', userId);
 
     if (profError) {
-      await supabase.from('profiles').update(basePayload).eq('id', userId);
+      // tour_completed sütunu veritabanında henüz eklenmemişse sadece basePayload ile güncelle
+      const { error: baseError } = await supabase.from('profiles').update(basePayload).eq('id', userId);
+      if (baseError) {
+        return { data: null, error: baseError };
+      }
     }
 
     return { data: { success: true, message: 'Öğrenci verileri başarıyla sıfırlandı.' }, error: null };

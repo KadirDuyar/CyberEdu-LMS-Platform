@@ -125,7 +125,6 @@ BEGIN
       onboarding_completed = FALSE,
       tour_completed = FALSE,
       avatar_emoji = '🛡️',
-      bio = NULL,
       updated_at = NOW()
   WHERE id = target_user_id;
 
