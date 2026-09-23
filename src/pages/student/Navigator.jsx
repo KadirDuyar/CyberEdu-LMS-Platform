@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 
 // ─── Adım tanımları ────────────────────────────────────────────────────────────
+// CyberEdu LMS v1.0.1
 const STEPS = ['Hoş Geldin', 'Öğrenci Tipi', 'Seviye', 'Önerilen Yol'];
 
 // ─── Öğrenci tipi seçenekleri ─────────────────────────────────────────────────
