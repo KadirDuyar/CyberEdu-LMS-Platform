@@ -1,36 +1,77 @@
-// ─── CyberEdu LMS: Gelişmiş Gemini Yapay Zeka Servisi ────────────────────────
-// Desteklenen modeller sırasıyla denenir (fallback).
-// .env.local üzerinden VITE_GEMINI_MODEL ile varsayılan model ezilebilir.
+// ─── CyberEdu LMS: Çoklu Sağlayıcı Hedge Request (Yarışçı) AI Motoru ────────
+// Groq (Llama 3.1) ve Google Gemini aynı anda çağrılır.
+// İlk başarılı dönen yanıt kullanılır, diğeri AbortController ile iptal edilir.
 
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-const configuredModel = import.meta.env.VITE_GEMINI_MODEL;
-
-// Model fallback zinciri (gemini-3.8-flash, 3.7, 3.6, 3.5, 2.5, 1.5)
-const FALLBACK_MODELS = [
-  ...(configuredModel ? [configuredModel] : []),
-  'gemini-3.8-flash',
-  'gemini-3.7-flash',
-  'gemini-3.6-flash',
-  'gemini-3.5-flash',
-  'gemini-2.5-flash',
-  'gemini-1.5-flash'
-];
-
-// Tekrar eden modelleri temizle
-const MODELS_TO_TRY = [...new Set(FALLBACK_MODELS)];
+const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
+const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
+const configuredGeminiModel = import.meta.env.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
+const groqModel = import.meta.env.VITE_GROQ_MODEL || 'llama-3.1-8b-instant';
 
 /**
- * Gemini REST API çağrısı. Kapalı/bulunamayan modelleri otomatik atlayıp fallback zincirini izler.
- * Not: Temmuz 2026 sonrası temperature, top_p, top_k kaldırıldığı için gönderilmez.
+ * Groq Cloud REST API Çağrısı (Llama 3.1 - Ultra Düşük Gecikme)
  */
-export async function fetchGemini(prompt, systemInstruction = '', history = []) {
-  if (!apiKey) {
-    throw new Error("Gemini API Anahtarı eksik! .env.local dosyasındaki VITE_GEMINI_API_KEY değişkenini kontrol edin.");
+async function callGroq({ prompt, systemInstruction = '', history = [], signal }) {
+  if (!groqApiKey) {
+    throw new Error('[Groq Hatası]: API anahtarı tanımlı değil (VITE_GROQ_API_KEY).');
   }
 
-  let lastError = null;
+  const messages = [];
 
-  // Format historical contents if any
+  if (systemInstruction) {
+    messages.push({ role: 'system', content: systemInstruction });
+  }
+
+  if (Array.isArray(history) && history.length > 0) {
+    for (const msg of history) {
+      messages.push({
+        role: msg.role === 'model' || msg.role === 'assistant' ? 'assistant' : 'user',
+        content: msg.content || msg.text || ''
+      });
+    }
+  }
+
+  messages.push({ role: 'user', content: prompt });
+
+  const startTime = performance.now();
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    signal,
+    headers: {
+      'Authorization': `Bearer ${groqApiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: groqModel,
+      messages,
+      temperature: 0.7
+    })
+  });
+
+  const duration = Math.round(performance.now() - startTime);
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.warn(`❌ [Groq API Hatası (${groqModel})]: HTTP ${res.status} - ${errorText}`);
+    throw new Error(`[Groq Hatası]: ${res.status} - ${errorText}`);
+  }
+
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) {
+    throw new Error('[Groq Hatası]: Boş yanıt döndü.');
+  }
+
+  return { provider: 'Groq (Llama 3.1)', text, duration };
+}
+
+/**
+ * Google Gemini REST API Çağrısı
+ */
+async function callGemini({ prompt, systemInstruction = '', history = [], signal }) {
+  if (!geminiApiKey) {
+    throw new Error('[Gemini Hatası]: API anahtarı tanımlı değil (VITE_GEMINI_API_KEY).');
+  }
+
   const contents = [];
   if (Array.isArray(history) && history.length > 0) {
     for (const msg of history) {
@@ -45,45 +86,82 @@ export async function fetchGemini(prompt, systemInstruction = '', history = []) 
     parts: [{ text: prompt }]
   });
 
-  for (const model of MODELS_TO_TRY) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const payload = {
-        contents
-      };
-
-      if (systemInstruction) {
-        payload.system_instruction = {
-          parts: [{ text: systemInstruction }]
-        };
-      }
-
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.warn(`Gemini API çağrısı başarısız (${model}): ${res.status} - ${errorText}`);
-        lastError = new Error(`Model ${model} hatası: ${res.status}`);
-        continue; // Bir sonraki modele geç
-      }
-
-      const data = await res.json();
-      const answer = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (answer) {
-        return answer;
-      }
-    } catch (err) {
-      console.warn(`Gemini (${model}) bağlantı hatası:`, err.message);
-      lastError = err;
-    }
+  const payload = { contents };
+  if (systemInstruction) {
+    payload.system_instruction = { parts: [{ text: systemInstruction }] };
   }
 
-  throw lastError || new Error("Yapay Zeka modellerine erişilemedi. Lütfen internet bağlantınızı veya API anahtarınızı kontrol edin.");
+  const startTime = performance.now();
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${configuredGeminiModel}:generateContent?key=${geminiApiKey}`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    signal,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  const duration = Math.round(performance.now() - startTime);
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.warn(`❌ [Google Gemini API Hatası (${configuredGeminiModel})]: HTTP ${res.status} - ${errorText}`);
+    throw new Error(`[Gemini Hatası]: ${res.status} - ${errorText}`);
+  }
+
+  const data = await res.json();
+  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) {
+    throw new Error('[Gemini Hatası]: Boş yanıt döndü.');
+  }
+
+  return { provider: 'Google Gemini Flash', text, duration };
 }
+
+/**
+ * ⚡ Hedge Request / Fast-Race Motoru (Promise.any)
+ * Groq ve Gemini'ye aynı anda istek atar, ilk yanıt veren kazanır, diğeri anında iptal edilir.
+ */
+export async function fetchFastestAI(prompt, systemInstruction = '', history = []) {
+  const controller = new AbortController();
+  const { signal } = controller;
+
+  const tasks = [];
+
+  // Groq tanımlıysa yarışa dahil et
+  if (groqApiKey) {
+    tasks.push(callGroq({ prompt, systemInstruction, history, signal }));
+  }
+
+  // Gemini tanımlıysa yarışa dahil et
+  if (geminiApiKey) {
+    tasks.push(callGemini({ prompt, systemInstruction, history, signal }));
+  }
+
+  if (tasks.length === 0) {
+    throw new Error('Hiçbir AI API anahtarı yapılandırılmamış! .env dosyasında VITE_GROQ_API_KEY veya VITE_GEMINI_API_KEY tanımlayın.');
+  }
+
+  try {
+    // Hangisi önce başarılı dönerse onu al
+    const fastest = await Promise.any(tasks);
+
+    // Kazanan belli oldu, arkada devam eden diğer isteği anında iptal et
+    controller.abort();
+
+    console.info(`⚡ [Hedge Request Kazananı]: ${fastest.provider} (${fastest.duration} ms)`);
+    return fastest.text;
+  } catch (aggErr) {
+    // Tüm sağlayıcılar başarısız olduysa
+    console.error('💥 [Tüm AI Sağlayıcıları Başarısız]:', aggErr);
+    const detailList = aggErr?.errors?.map((e) => e?.message || e).join(' | ') || aggErr.message;
+    throw new Error(`Tüm Yapay Zeka servisleri başarısız oldu: ${detailList}`);
+  }
+}
+
+// Geriye dönük uyumluluk için alias
+export const fetchGemini = fetchFastestAI;
+
 
 /**
  * Öğretmen için: Her etkinlik türüne uygun tam teşekküllü JSON soru üretici
