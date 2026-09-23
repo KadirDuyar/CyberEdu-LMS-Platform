@@ -313,24 +313,24 @@ export default function StudentDashboard() {
               </div>
             </div>
           ) : isNewStudent ? (
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-950/90 via-blue-950/70 to-slate-900 border border-cyan-500/40 p-6 md:p-8 shadow-2xl">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-100 via-blue-50 to-white dark:from-cyan-950/90 dark:via-blue-950/70 dark:to-slate-900 border border-cyan-500/40 p-6 md:p-8 shadow-2xl">
               <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs font-black uppercase tracking-wider text-cyan-300 bg-cyan-900/50 border border-cyan-500/40 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+                  <span className="text-xs font-black uppercase tracking-wider text-cyan-700 dark:text-cyan-300 bg-cyan-200/50 dark:bg-cyan-900/50 border border-cyan-500/40 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
                     🎯 İlk Kursun Hazır!
                   </span>
-                  <span className="text-xs font-bold text-slate-300 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-black/5 dark:bg-white/10 px-2.5 py-1 rounded-full border border-black/10 dark:border-white/10">
                     {profile?.learning_area === 'technical' ? '💻 Teknik Siber Güvenlik Parkuru' : '🛡️ Siber Farkındalık Parkuru'}
                   </span>
                 </div>
 
-                <h2 className="font-display font-black text-2xl md:text-3xl text-white">
+                <h2 className="font-display font-black text-2xl md:text-3xl text-slate-900 dark:text-white">
                   Aramıza Hoş Geldin, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'Öğrenci'}!</span> 🚀
                 </h2>
 
-                <p className="text-slate-300 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
-                  Siber güvenlik yolculuğuna <strong className="text-cyan-300 font-bold">{activeCourse?.title || 'Temel Güvenlik Kursu'}</strong> ile başlamaya hazırsın. Hemen ilk dersine gir ve maceraya başla!
+                <p className="text-slate-700 dark:text-slate-300 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
+                  Siber güvenlik yolculuğuna <strong className="text-cyan-700 dark:text-cyan-300 font-bold">{activeCourse?.title || 'Temel Güvenlik Kursu'}</strong> ile başlamaya hazırsın. Hemen ilk dersine gir ve maceraya başla!
                 </p>
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -344,7 +344,7 @@ export default function StudentDashboard() {
                   )}
                   <button
                     onClick={() => navigate('/student/learning-path')}
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-sm font-bold transition-all"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-slate-800 dark:text-slate-200 text-sm font-bold transition-all"
                   >
                     <Map size={18} /> Yol Haritasını Gör
                   </button>
@@ -352,17 +352,17 @@ export default function StudentDashboard() {
               </div>
             </div>
           ) : (
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-950/80 via-purple-950/60 to-slate-900 border border-violet-500/30 p-6 md:p-8 shadow-2xl">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-100 via-purple-50 to-white dark:from-violet-950/80 dark:via-purple-950/60 dark:to-slate-900 border border-violet-500/30 p-6 md:p-8 shadow-2xl">
               <div className="relative z-10">
-                <span className="text-xs font-black uppercase tracking-wider text-violet-300 bg-violet-900/40 border border-violet-700/40 px-3 py-1 rounded-full inline-block mb-3">
+                <span className="text-xs font-black uppercase tracking-wider text-violet-700 dark:text-violet-300 bg-violet-200/50 dark:bg-violet-900/40 border border-violet-500/40 dark:border-violet-700/40 px-3 py-1 rounded-full inline-block mb-3">
                   {profile?.learning_area === 'technical' ? '💻 Teknik Siber Güvenlik Parkuru' : '🛡️ Siber Farkındalık Parkuru'}
                 </span>
-                <h2 className="font-display font-black text-2xl md:text-3xl text-white">
+                <h2 className="font-display font-black text-2xl md:text-3xl text-slate-900 dark:text-white">
                   Kaldığın yerden devam et, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'Öğrenci'}!</span>
                 </h2>
-                <p className="text-slate-300 text-sm mt-2 max-w-xl">
-                  Şu an <span className="text-violet-300 font-bold underline decoration-violet-500">{activeCourse?.title || 'Eğitim Kursu'}</span> modülünde{' '}
-                  <strong className="text-white">"{activeLesson?.title || 'Eğitim Dersi'}"</strong> üzerindesin.
+                <p className="text-slate-700 dark:text-slate-300 text-sm mt-2 max-w-xl">
+                  Şu an <span className="text-violet-700 dark:text-violet-300 font-bold underline decoration-violet-500">{activeCourse?.title || 'Eğitim Kursu'}</span> modülünde{' '}
+                  <strong className="text-slate-900 dark:text-white">"{activeLesson?.title || 'Eğitim Dersi'}"</strong> üzerindesin.
                 </p>
                 {activeLesson && (
                   <button

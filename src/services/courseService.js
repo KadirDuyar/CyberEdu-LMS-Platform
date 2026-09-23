@@ -32,13 +32,22 @@ export async function getCourseWithLessons(courseId) {
   return { data, error };
 }
 
-// Kursa kayıt olma
 export async function enrollInCourse(userId, courseId) {
   const { data, error } = await supabase
     .from('enrollments')
     .upsert([{ user_id: userId, course_id: courseId, enrolled_at: new Date().toISOString() }], { onConflict: 'user_id,course_id' })
     .select()
     .single();
+  return { data, error };
+}
+
+// Kurstan ayrılma
+export async function dropCourse(userId, courseId) {
+  const { data, error } = await supabase
+    .from('enrollments')
+    .delete()
+    .eq('user_id', userId)
+    .eq('course_id', courseId);
   return { data, error };
 }
 

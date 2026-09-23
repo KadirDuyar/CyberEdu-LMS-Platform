@@ -137,10 +137,6 @@ export default function CourseList() {
     if (user) {
       localStorage.setItem(`cyberedu_last_active_course_${user.id}`, course.id);
     }
-    if (!isEnrolled && user) {
-      await enrollInCourse(user.id, course.id);
-      setEnrolledMap((prev) => ({ ...prev, [course.id]: true }));
-    }
     navigate(`/student/courses/${course.id}`);
   };
 

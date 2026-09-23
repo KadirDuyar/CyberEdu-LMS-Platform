@@ -6,7 +6,7 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import EmptyState from '../../components/ui/EmptyState';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import Card from '../../components/Card';
-import { Plus, BookOpen, Edit, Eye, Shield, Code2, Trash2, Wand2, AlertCircle } from 'lucide-react';
+import { Plus, BookOpen, Edit, Eye, Shield, Code2, Trash2, Wand2, AlertCircle, Users } from 'lucide-react';
 
 export default function TeacherCourses() {
   const { user } = useAuth();
@@ -137,18 +137,24 @@ export default function TeacherCourses() {
                       </span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 divide-x divide-white/10 border-t border-white/10 bg-white/5">
+                  <div className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-white/5">
                     <button
                       onClick={() => navigate(`/teacher/courses/${course.id}/edit`)}
-                      className="py-3 text-sm text-slate-300 font-medium hover:text-white hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+                      className="py-3 text-xs text-slate-300 font-medium hover:text-white hover:bg-white/5 transition-colors flex items-center justify-center gap-1.5"
                     >
-                      <Edit size={16} /> Düzenle
+                      <Edit size={14} /> Düzenle
+                    </button>
+                    <button
+                      onClick={() => navigate(`/teacher/courses/${course.id}/details`)}
+                      className="py-3 text-xs text-cyan-400 font-medium hover:text-cyan-300 hover:bg-white/5 transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <Users size={14} /> Detaylar
                     </button>
                     <button
                       onClick={() => navigate(`/student/courses/${course.id}`)}
-                      className="py-3 text-sm text-violet-400 font-medium hover:text-violet-300 hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
+                      className="py-3 text-xs text-violet-400 font-medium hover:text-violet-300 hover:bg-white/5 transition-colors flex items-center justify-center gap-1.5"
                     >
-                      <Eye size={16} /> Önizle
+                      <Eye size={14} /> Önizle
                     </button>
                   </div>
                 </Card>

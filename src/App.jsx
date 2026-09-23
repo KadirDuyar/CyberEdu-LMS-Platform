@@ -21,6 +21,7 @@ import LeaderboardPage  from './pages/student/LeaderboardPage';
 import TeacherDashboard from './pages/TeacherDashboard';
 import TeacherCourses   from './pages/teacher/TeacherCourses';
 import CourseEditor     from './pages/teacher/CourseEditor';
+import TeacherCourseDetails from './pages/teacher/TeacherCourseDetails';
 import LessonBuilder    from './pages/teacher/LessonBuilder';
 import TeacherStats     from './pages/teacher/TeacherStats';
 
@@ -184,6 +185,14 @@ export default function App() {
             element={
               <ProtectedRoute allowedRoles={['teacher']}>
                 <CourseEditor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/courses/:courseId/details"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <TeacherCourseDetails />
               </ProtectedRoute>
             }
           />

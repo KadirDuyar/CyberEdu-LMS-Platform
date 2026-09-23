@@ -22,10 +22,12 @@ const LEVEL_LABELS = {
 export default function CoursePage() {
   const { courseId } = useParams();
   const navigate     = useNavigate();
-  const { user, addXP } = useAuth();
+  const { user, profile, addXP } = useAuth();
+  const isTeacher    = profile?.role === 'teacher' || profile?.role === 'admin';
+
   const {
-    course, enrolled, progress, loading, enrolling, error,
-    enroll, completedCount, totalCount, progressPct,
+    course, enrolled, progress, loading, enrolling, dropping, error,
+    enroll, drop, completedCount, totalCount, progressPct,
   } = useCourse(courseId);
 
   const [courseLockInfo, setCourseLockInfo] = useState({ isLocked: false, prevCourse: null });
@@ -42,7 +44,8 @@ export default function CoursePage() {
 
   useEffect(() => {
     async function checkCourseLock() {
-      if (!course || !user) {
+      if (!course || !user || isTeacher) {
+        setCourseLockInfo({ isLocked: false, prevCourse: null });
         setLockChecking(false);
         return;
       }
@@ -96,7 +99,7 @@ export default function CoursePage() {
     }
 
     checkCourseLock();
-  }, [course, user]);
+  }, [course, user, isTeacher]);
 
   if (loading) {
     return (
@@ -112,8 +115,8 @@ export default function CoursePage() {
         <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
           <div className="text-5xl">⚠️</div>
           <p className="text-slate-400">{error || 'Kurs bulunamadı.'}</p>
-          <button onClick={() => navigate('/student/courses')} className="text-violet-400 text-sm underline">
-            Kurslara dön
+          <button onClick={() => navigate(isTeacher ? '/teacher/courses' : '/student/courses')} className="text-violet-400 text-sm underline">
+            {isTeacher ? 'Eğitmen paneline dön' : 'Kurslara dön'}
           </button>
         </div>
       </DashboardLayout>
@@ -125,8 +128,9 @@ export default function CoursePage() {
     (a, b) => a.order_index - b.order_index
   );
 
-  // Bir ders açık mı? (sıralı kilit: önceki tamamlanmadan bir sonraki kilitli)
+  // Bir ders açık mı? (Öğretmen için tüm dersler açık, sıralı kilit sadece öğrenciye)
   const isLessonUnlocked = (idx) => {
+    if (isTeacher) return true;
     if (!enrolled) return false;
     if (idx === 0) return true;
     return progress[sortedLessons[idx - 1]?.id] === 'completed';
@@ -142,14 +146,14 @@ export default function CoursePage() {
 
         {/* Geri */}
         <button
-          onClick={() => navigate('/student/courses')}
+          onClick={() => navigate(isTeacher ? '/teacher/courses' : '/student/courses')}
           className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm"
         >
-          <ArrowLeft size={16} /> Kurslara Dön
+          <ArrowLeft size={16} /> {isTeacher ? 'Eğitmen Kurslarıma Dön' : 'Kurslara Dön'}
         </button>
 
-        {/* Kurs Kilitli Uyarısı */}
-        {courseLockInfo.isLocked ? (
+        {/* Kurs Kilitli Uyarısı (Öğretmene asla kilit uygulanmaz) */}
+        {!isTeacher && courseLockInfo.isLocked ? (
           <Card className="border border-amber-500/30 bg-amber-950/20 text-center py-12 px-6 space-y-4">
             <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/20 flex items-center justify-center text-3xl border border-amber-500/40">
               🔒
@@ -208,19 +212,63 @@ export default function CoursePage() {
 
           {/* İlerleme (kayıtlıysa) */}
           {enrolled && totalCount > 0 && (
-            <div className="relative mt-5">
+            <div className="relative mt-5 space-y-3">
               <ProgressBar
                 value={progressPct}
                 showPercent
                 color="violet"
                 label={`${completedCount}/${totalCount} ders tamamlandı`}
               />
+              {!isTeacher && (course.is_mandatory === false || course.course_type === 'elective') && (
+                <div className="flex justify-end mt-2">
+                  <button
+                    onClick={drop}
+                    disabled={dropping}
+                    className="text-xs text-rose-400 hover:text-rose-300 transition-colors font-semibold flex items-center gap-1 disabled:opacity-50"
+                  >
+                    {dropping ? 'Bırakılıyor...' : 'Kursu Bırak'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
 
-        {/* Kayıt kartı (kayıtlı değilse) */}
-        {!enrolled && (
+        {/* Kayıt kartı (öğretmene önizleme çubuğu, öğrenciye kayıt kartı) */}
+        {isTeacher ? (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-violet-950/60 to-purple-950/40 border border-violet-500/30 shadow-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-violet-500/20 text-violet-400 flex items-center justify-center font-bold text-lg shrink-0">
+                👨‍🏫
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white flex items-center gap-2">
+                  Eğitmen Önizleme Modu
+                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                    Öğrenci Görünümü
+                  </span>
+                </p>
+                <p className="text-xs text-slate-400">
+                  Kursunuzu, ders içeriklerini ve öğrenci yorumlarını aynen öğrencinin deneyimlediği arayüzde inceliyorsunuz.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => navigate(`/teacher/courses/${courseId}/edit`)}
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all"
+              >
+                Kursu Düzenle
+              </button>
+              <button
+                onClick={() => navigate(`/teacher/courses/${courseId}/details`)}
+                className="px-3.5 py-2 rounded-xl bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition-all"
+              >
+                Kayıtlı Öğrenciler
+              </button>
+            </div>
+          </div>
+        ) : !enrolled ? (
           <Card className="border border-violet-500/30 bg-violet-500/5 text-center space-y-3">
             <p className="text-white font-semibold">Bu kursa kayıt ol ve öğrenmeye başla!</p>
             <p className="text-xs text-slate-400">Dersleri görmek ve ilerlemeyi takip etmek için kayıt gerekiyor.</p>
@@ -244,7 +292,7 @@ export default function CoursePage() {
               )}
             </button>
           </Card>
-        )}
+        ) : null}
 
         {/* Ders Listesi */}
         <div>
@@ -292,17 +340,23 @@ export default function CoursePage() {
                       {lesson.title}
                     </p>
                     <div className="flex items-center gap-3 mt-0.5">
-                      {isDone && (
-                        <span className="text-[10px] font-bold text-emerald-400">✓ Tamamlandı</span>
-                      )}
-                      {isActive && (
-                        <span className="text-[10px] font-bold text-violet-400">▶ Devam ediyor</span>
-                      )}
-                      {!isDone && !isActive && unlocked && (
-                        <span className="text-[10px] text-slate-500">Başlanmadı</span>
-                      )}
-                      {!unlocked && (
-                        <span className="text-[10px] text-slate-600">Önceki dersi tamamla</span>
+                      {isTeacher ? (
+                        <span className="text-[10px] font-semibold text-cyan-400">İçeriği görmek için tıkla</span>
+                      ) : (
+                        <>
+                          {isDone && (
+                            <span className="text-[10px] font-bold text-emerald-400">✓ Tamamlandı</span>
+                          )}
+                          {isActive && (
+                            <span className="text-[10px] font-bold text-violet-400">▶ Devam ediyor</span>
+                          )}
+                          {!isDone && !isActive && unlocked && (
+                            <span className="text-[10px] text-slate-500">Başlanmadı</span>
+                          )}
+                          {!unlocked && (
+                            <span className="text-[10px] text-slate-600">Önceki dersi tamamla</span>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>

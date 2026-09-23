@@ -99,6 +99,24 @@ export function useCourse(courseId) {
     setEnrolling(false);
   }, [user, courseId, enrolling]);
 
+  const [dropping, setDropping] = useState(false);
+  const drop = useCallback(async () => {
+    if (!user || dropping || !enrolled) return;
+    setDropping(true);
+    const { dropCourse } = await import('../services/courseService');
+    const { error: err } = await dropCourse(user.id, courseId);
+    if (!err) {
+      setEnrolled(false);
+      // Optional: Clear active course if it was this one
+      const lastActive = localStorage.getItem(`cyberedu_last_active_course_${user.id}`);
+      if (lastActive === courseId) {
+        localStorage.removeItem(`cyberedu_last_active_course_${user.id}`);
+        localStorage.removeItem('cyberedu_last_active_course');
+      }
+    }
+    setDropping(false);
+  }, [user, courseId, dropping, enrolled]);
+
   // Tamamlanan ders sayısı
   const completedCount = Object.values(progress).filter((s) => s === 'completed').length;
   const totalCount     = course?.lessons?.length ?? 0;
@@ -110,8 +128,10 @@ export function useCourse(courseId) {
     progress,
     loading,
     enrolling,
+    dropping,
     error,
     enroll,
+    drop,
     completedCount,
     totalCount,
     progressPct,

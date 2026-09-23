@@ -449,6 +449,7 @@ export default function ProfilePage() {
           </Card>
         )}
 
+
         {/* Öğrenci Takip Ettiği Arkadaşlarım */}
         {profile?.role === 'student' && (
           <Card className="p-6">

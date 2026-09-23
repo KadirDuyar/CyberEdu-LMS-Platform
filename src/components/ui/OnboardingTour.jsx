@@ -41,53 +41,101 @@ const TOUR_STEPS = [
   }
 ];
 
-export default function OnboardingTour() {
-  const { user, profile } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [targetRect, setTargetRect] = useState(null);
-  const tourKey = user ? `cyberedu_tour_completed_${user.id}` : 'cyberedu_tour_completed';
-
-  // Hedef elemanın koordinatlarını hesapla
-  const updateRect = useCallback(() => {
-    if (!isOpen) return;
-    const step = TOUR_STEPS[currentStep];
-    if (!step) return;
-
-    const el = document.querySelector(step.target);
+// Yardımcı: Hedef elemanın koordinatlarını anında DOM'dan ölç
+const getStepTargetRect = (stepIndex) => {
+  if (typeof document === 'undefined') return null;
+  const step = TOUR_STEPS[stepIndex];
+  if (!step) return null;
+  const selectors = step.target.split(',').map((s) => s.trim());
+  for (const sel of selectors) {
+    const el = document.querySelector(sel);
     if (el) {
       const rect = el.getBoundingClientRect();
       if (rect.width > 0 && rect.height > 0) {
-        setTargetRect({
+        return {
           top: rect.top,
           left: rect.left,
           width: rect.width,
           height: rect.height,
           bottom: rect.bottom,
           right: rect.right,
-        });
-        return;
+        };
       }
     }
-    setTargetRect(null);
+  }
+  return null;
+};
+
+export default function OnboardingTour() {
+  const { user, profile } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [targetRect, setTargetRect] = useState(null);
+  const spotlightRef = useRef(null);
+  const tourKey = user ? `cyberedu_tour_completed_${user.id}` : 'cyberedu_tour_completed';
+
+  // Hedef elemanın koordinatlarını senkron ve anında güncelle
+  const updateRect = useCallback(() => {
+    if (!isOpen) return;
+    const rect = getStepTargetRect(currentStep);
+    if (rect) {
+      setTargetRect(rect);
+
+      if (spotlightRef.current) {
+        const step = TOUR_STEPS[currentStep];
+        const isSidebar = step?.target.includes('sidebar');
+        const spotTop = isSidebar ? 0 : Math.max(0, rect.top - 6);
+        const spotLeft = isSidebar ? 0 : Math.max(0, rect.left - 6);
+        const spotWidth = isSidebar ? rect.width : rect.width + 12;
+        const spotHeight = isSidebar ? window.innerHeight : rect.height + 12;
+
+        spotlightRef.current.style.top = `${spotTop}px`;
+        spotlightRef.current.style.left = `${spotLeft}px`;
+        spotlightRef.current.style.width = `${spotWidth}px`;
+        spotlightRef.current.style.height = `${spotHeight}px`;
+      }
+    }
   }, [isOpen, currentStep]);
 
-  // Sayfa yüklendiğinde kontrol et
+  // Sadece kaydırma sırasında doğrudan DOM güncelleyerek 60fps akıcılık sağla
+  const updateSpotlightOnScroll = useCallback(() => {
+    if (!isOpen || !spotlightRef.current) return;
+    const rect = getStepTargetRect(currentStep);
+    if (rect) {
+      const step = TOUR_STEPS[currentStep];
+      const isSidebar = step?.target.includes('sidebar');
+      const spotTop = isSidebar ? 0 : Math.max(0, rect.top - 6);
+      const spotLeft = isSidebar ? 0 : Math.max(0, rect.left - 6);
+      const spotWidth = isSidebar ? rect.width : rect.width + 12;
+      const spotHeight = isSidebar ? window.innerHeight : rect.height + 12;
+
+      spotlightRef.current.style.top = `${spotTop}px`;
+      spotlightRef.current.style.left = `${spotLeft}px`;
+      spotlightRef.current.style.width = `${spotWidth}px`;
+      spotlightRef.current.style.height = `${spotHeight}px`;
+    }
+  }, [isOpen, currentStep]);
+
+  // Sayfa yüklendiğinde kontrol et ve turu başlatmadan önce koordinatı ölç
   useEffect(() => {
     if (!profile?.onboarding_completed) return;
 
     const lastSeenKey = user ? `cyberedu_tour_last_seen_${user.id}` : 'cyberedu_tour_last_seen';
     const lastSeenTime = localStorage.getItem(lastSeenKey);
 
-    // Eğer kullanıcı daha önce hiç tur görmediyse veya Admin profilini sıfırladıysa (profile.updated_at > lastSeenTime):
     const shouldShow =
       !lastSeenTime ||
       (profile.updated_at && new Date(profile.updated_at).getTime() > new Date(lastSeenTime).getTime());
 
     if (shouldShow) {
       const timer = setTimeout(() => {
+        // Tur açılmadan ÖNCE ilk hedef koordinatını al (Böylece ortaya gelip sola kayma yaşanmaz)
+        const initialRect = getStepTargetRect(0);
+        if (initialRect) {
+          setTargetRect(initialRect);
+        }
         setIsOpen(true);
-      }, 700);
+      }, 600);
       return () => clearTimeout(timer);
     }
   }, [user?.id, profile?.onboarding_completed, profile?.updated_at]);
@@ -96,42 +144,42 @@ export default function OnboardingTour() {
   useEffect(() => {
     const handleStartTour = () => {
       setCurrentStep(0);
+      const initialRect = getStepTargetRect(0);
+      if (initialRect) {
+        setTargetRect(initialRect);
+      }
       setIsOpen(true);
     };
     window.addEventListener('start-cyberedu-tour', handleStartTour);
     return () => window.removeEventListener('start-cyberedu-tour', handleStartTour);
   }, []);
 
-  // Adım değiştiğinde hedefe kaydır ve koordinatı güncelle (Raf ile 60fps akıcı takip)
+  // Adım değiştiğinde veya yeniden boyutlandırmada takip
   useEffect(() => {
     if (!isOpen) return;
 
-    const step = TOUR_STEPS[currentStep];
-    const el = document.querySelector(step?.target);
-    if (el) {
-      // Ders devam kartı için üstten hizalayarak altına kart için geniş alan aç
-      const blockPos = step.target.includes('resume') ? 'start' : 'center';
-      el.scrollIntoView({ behavior: 'smooth', block: blockPos });
-    }
-
-    const timer = setTimeout(updateRect, 300);
+    // İlk anda anında güncelle
+    updateRect();
 
     let rafId = null;
-    const handleScrollOrResize = () => {
+    const handleScroll = () => {
       if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(updateRect);
+      rafId = requestAnimationFrame(updateSpotlightOnScroll);
     };
 
-    window.addEventListener('resize', handleScrollOrResize, { passive: true });
-    window.addEventListener('scroll', handleScrollOrResize, { capture: true, passive: true });
+    const handleResize = () => {
+      updateRect();
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
+    window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
 
     return () => {
-      clearTimeout(timer);
       if (rafId) cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', handleScrollOrResize);
-      window.removeEventListener('scroll', handleScrollOrResize, { capture: true });
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll, { capture: true });
     };
-  }, [isOpen, currentStep, updateRect]);
+  }, [isOpen, currentStep, updateRect, updateSpotlightOnScroll]);
 
   const handleComplete = () => {
     const lastSeenKey = user ? `cyberedu_tour_last_seen_${user.id}` : 'cyberedu_tour_last_seen';
@@ -143,7 +191,23 @@ export default function OnboardingTour() {
 
   const handleNext = () => {
     if (currentStep < TOUR_STEPS.length - 1) {
-      setCurrentStep((c) => c + 1);
+      const next = currentStep + 1;
+      const step = TOUR_STEPS[next];
+      const el = document.querySelector(step?.target);
+      if (el) {
+        const blockPos = step.target.includes('resume') ? 'start' : 'center';
+        el.scrollIntoView({ behavior: 'smooth', block: blockPos });
+      }
+
+      // Koordinatı hemen al ve adıma geç (Bekletmeden pürüzsüz akış)
+      const nextRect = getStepTargetRect(next);
+      if (nextRect) {
+        setTargetRect(nextRect);
+      }
+      setCurrentStep(next);
+
+      // Kaydırma bitince milimetrik tekrar ayarla
+      setTimeout(updateRect, 320);
     } else {
       handleComplete();
     }
@@ -151,7 +215,21 @@ export default function OnboardingTour() {
 
   const handlePrev = () => {
     if (currentStep > 0) {
-      setCurrentStep((c) => c - 1);
+      const prev = currentStep - 1;
+      const step = TOUR_STEPS[prev];
+      const el = document.querySelector(step?.target);
+      if (el) {
+        const blockPos = step.target.includes('resume') ? 'start' : 'center';
+        el.scrollIntoView({ behavior: 'smooth', block: blockPos });
+      }
+
+      const prevRect = getStepTargetRect(prev);
+      if (prevRect) {
+        setTargetRect(prevRect);
+      }
+      setCurrentStep(prev);
+
+      setTimeout(updateRect, 320);
     }
   };
 
@@ -160,62 +238,71 @@ export default function OnboardingTour() {
   const step = TOUR_STEPS[currentStep];
   const Icon = step.icon;
 
-  // Popover Kart Pozisyonlama Hesabı (Hedefleri asla kapatmayacak akıllı yerleşim)
+  // Popover Kart Pozisyonlama Hesabı (Pürüzsüz ve asla ortaya sıçramayan hesaplama)
   const getCardStyle = () => {
     if (!targetRect || typeof window === 'undefined') {
+      // Eğer hedef ölçülemediyse kartı ortada flaşlamak yerine görünmez tut
       return {
         position: 'fixed',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
+        opacity: 0,
+        pointerEvents: 'none',
       };
     }
 
     const isMobile = window.innerWidth < 768;
+    const cardWidth = isMobile ? window.innerWidth - 32 : 430;
+    const cardHeight = 310;
+
+    // Mobil yerleşim: Hedefin durumuna göre üste veya alta yerleşir
     if (isMobile) {
+      const isTargetAtBottom = targetRect.bottom > window.innerHeight / 2;
       return {
         position: 'fixed',
         left: '16px',
         right: '16px',
-        bottom: '24px',
+        ...(isTargetAtBottom ? { top: '80px' } : { bottom: '24px' }),
         maxWidth: 'calc(100vw - 32px)',
+        opacity: 1,
       };
     }
 
-    const cardWidth = 430;
-    const cardHeight = 310;
-
-    // 1. AI Widget (Sağ alt) - Butonun tam üstünde yer alacak şekilde
+    // 1. Masaüstü: AI Mentor Widget
     if (step.target.includes('ai-widget')) {
       return {
         position: 'fixed',
         bottom: `${Math.max(24, window.innerHeight - targetRect.top + 20)}px`,
         right: '24px',
         width: `${cardWidth}px`,
+        opacity: 1,
       };
     }
 
-    // 2. Profil (Sağ üst) - Header kontrollerinin hemen altında
+    // 2. Masaüstü: Profil & Bildirimler
     if (step.target.includes('profile') || step.target.includes('notifications')) {
       return {
         position: 'fixed',
         top: `${Math.max(80, targetRect.bottom + 16)}px`,
         right: '24px',
         width: `${cardWidth}px`,
+        opacity: 1,
       };
     }
 
-    // 3. Sidebar (Sol taraf) - Sol menünün hemen sağında
+    // 3. Masaüstü: Sol Sidebar
     if (step.target.includes('sidebar')) {
       return {
         position: 'fixed',
         top: `${Math.max(80, Math.min(targetRect.top + 60, window.innerHeight - cardHeight - 40))}px`,
         left: `${Math.min(targetRect.right + 24, window.innerWidth - cardWidth - 24)}px`,
         width: `${cardWidth}px`,
+        opacity: 1,
       };
     }
 
-    // 4. Devam Et Kartı (Orta İçerik) - Kartın altına hizala, kartı ASLA örtme!
+    // 4. Masaüstü: Devam Et Kartı
     const spaceBelow = window.innerHeight - targetRect.bottom;
     const cardTop = spaceBelow >= cardHeight + 20
       ? targetRect.bottom + 20
@@ -226,25 +313,27 @@ export default function OnboardingTour() {
       top: `${cardTop}px`,
       left: `${Math.max(24, Math.min(targetRect.left + 30, window.innerWidth - cardWidth - 24))}px`,
       width: `${cardWidth}px`,
+      opacity: 1,
     };
   };
 
   const isSidebar = step.target.includes('sidebar');
-  const spotTop = isSidebar ? 0 : Math.max(0, targetRect ? targetRect.top - 6 : 0);
-  const spotLeft = isSidebar ? 0 : Math.max(0, targetRect ? targetRect.left - 6 : 0);
-  const spotWidth = isSidebar ? (targetRect ? targetRect.width : 0) : (targetRect ? targetRect.width + 12 : 0);
-  const spotHeight = isSidebar ? (typeof window !== 'undefined' ? window.innerHeight : 800) : (targetRect ? targetRect.height + 12 : 0);
+  
+  const initialSpotTop = isSidebar ? 0 : Math.max(0, targetRect ? targetRect.top - 6 : 0);
+  const initialSpotLeft = isSidebar ? 0 : Math.max(0, targetRect ? targetRect.left - 6 : 0);
+  const initialSpotWidth = isSidebar ? (targetRect ? targetRect.width : 0) : (targetRect ? targetRect.width + 12 : 0);
+  const initialSpotHeight = isSidebar ? (typeof window !== 'undefined' ? window.innerHeight : 800) : (targetRect ? targetRect.height + 12 : 0);
 
   const handleBackdropClick = (e) => {
-    if (targetRect) {
+    if (targetRect && spotlightRef.current) {
       const { clientX, clientY } = e;
+      const rect = spotlightRef.current.getBoundingClientRect();
       if (
-        clientX >= spotLeft &&
-        clientX <= spotLeft + spotWidth &&
-        clientY >= spotTop &&
-        clientY <= spotTop + spotHeight
+        clientX >= rect.left &&
+        clientX <= rect.right &&
+        clientY >= rect.top &&
+        clientY <= rect.bottom
       ) {
-        // Hedefe tıklandığında turu kazara kapatma
         return;
       }
     }
@@ -262,14 +351,15 @@ export default function OnboardingTour() {
       {/* 🎯 Hedef Eleman Üzerinde Parlayan Spot ve Kesim Alanı (Spotlight Cutout) */}
       {targetRect ? (
         <div
-          className={`fixed pointer-events-none transition-all duration-300 z-[151] border-2 border-violet-400 ring-4 ring-violet-500/60 ${
+          ref={spotlightRef}
+          className={`fixed pointer-events-none transition-all duration-300 ease-out z-[151] border-2 border-violet-400 ring-4 ring-violet-500/60 ${
             isSidebar ? 'rounded-r-2xl' : 'rounded-2xl'
           }`}
           style={{
-            top: spotTop,
-            left: spotLeft,
-            width: spotWidth,
-            height: spotHeight,
+            top: initialSpotTop,
+            left: initialSpotLeft,
+            width: initialSpotWidth,
+            height: initialSpotHeight,
             // 9999px box shadow: Hedefin içi %100 şeffaf ve kristal netliktedir (0 karartma, 0 blur)!
             // Dışında kalan tüm sayfa alanı ise 0.85 derin slate ile karartılır.
             boxShadow: '0 0 0 9999px rgba(3, 7, 18, 0.85), 0 0 35px rgba(139, 92, 246, 0.7)',
@@ -285,7 +375,7 @@ export default function OnboardingTour() {
       {/* 💬 İnteraktif Bilgi Kartı (Popover) */}
       <div
         style={getCardStyle()}
-        className="z-[160] pointer-events-auto rounded-3xl glass border border-white/25 p-6 shadow-2xl bg-slate-900/95 overflow-hidden animate-scale-up backdrop-blur-xl"
+        className="z-[160] pointer-events-auto rounded-3xl glass border border-white/25 p-6 shadow-2xl bg-slate-900/95 overflow-hidden backdrop-blur-xl transition-[top,left,bottom,right,opacity] duration-300 ease-out"
       >
         {/* Üst Gradyan Çizgisi */}
         <div className={`absolute top-0 left-0 right-0 h-2 bg-gradient-to-r ${step.color}`} />
