@@ -2,41 +2,51 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, X, Compass, Map, Trophy, Bot } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
+// ─── Kusursuz ve Mantıksal Sıralı Tur Adımları (1'den 5'e) ───────────────────
 const TOUR_STEPS = [
+  {
+    target: '#tour-resume-card',
+    icon: Sparkles,
+    color: 'from-violet-600 to-indigo-600',
+    badge: '1 / 5 • Hoş Geldin & Ders Takibi',
+    title: '🚀 CyberEdu\'ya Hoş Geldin!',
+    description: 'Kontrol panelinin merkezindeki bu alan, senin ana çalışma merkezindir. Seviyene uygun başlangıç dersi veya üzerinde çalıştığın en son ders daima burada seni bekler.',
+    tip: 'Tamamlanan her ders için otomatik XP kazanır ve liderlik sıralamasında tırmanırsın.'
+  },
   {
     target: '#tour-sidebar',
     icon: Map,
-    color: 'from-violet-600 to-indigo-600',
-    badge: '1 / 4 • Öğrenme Rotaları',
+    color: 'from-cyan-600 to-blue-600',
+    badge: '2 / 5 • Öğrenme Rotaları & Menü',
     title: '🗺️ Navigasyon & Öğrenme Menüsü',
-    description: 'Sol menüden Öğrenme Yolculuğum (zorunlu sarmal müfredat), seçmeli Kurslar Kataloğu ve Başarılar odasına dilediğin an ulaşabilirsin.',
-    tip: 'Menüyü daraltıp genişletmek için yanındaki ok simgesini kullanabilirsin.'
+    description: 'Sol menüden zorunlu sarmal müfredata (Öğrenme Yolculuğum), seçmeli Kurslar Kataloğuna ve Başarılar odasına dilediğin an kolayca ulaşabilirsin.',
+    tip: 'Menüyü daraltıp genişletmek için kenarındaki ok simgesini kullanabilirsin.'
   },
   {
-    target: '#tour-resume-card',
-    icon: Compass,
-    color: 'from-cyan-600 to-blue-600',
-    badge: '2 / 4 • Ders Takibi',
-    title: '🎯 Kaldığın Yerden Asla Kopma',
-    description: 'Kontrol panelinin merkezindeki bu kart, üzerinde çalıştığın en son dersi daima hatırlar. "Derse Devam Et" butonuyla tek tıkla eğitime dönebilirsin.',
-    tip: 'Tamamlanan her ders için otomatik XP kazanır ve liderlik tablosunda üst sıralara tırmanırsın.'
+    target: '#tour-leaderboard',
+    icon: Trophy,
+    color: 'from-amber-600 to-orange-600',
+    badge: '3 / 5 • Canlı Liderlik & Rekabet',
+    title: '🏆 Canlı Liderlik & Sosyal Rekabet',
+    description: 'Burada haftalık sıralamada en çok puan toplayan öğrencileri görebilir, profillerine tıklayarak arkadaşlarını takip edebilirsin.',
+    tip: 'Takip ettiğin bir arkadaşın kurs bitirdiğinde sağ üstteki zil simgesine anında tebrik bildirimi düşer!'
   },
   {
     target: '#tour-profile-section, #tour-profile',
-    icon: Trophy,
-    color: 'from-amber-600 to-orange-600',
-    badge: '3 / 4 • Profil & Bildirimler',
-    title: '👤 Profil, Rozetler & Bildirimler',
-    description: 'Sağ üstten seviyeni ve toplam XP durumunu izleyebilir, profilini yönetebilir ve arkadaş etkileşimlerini zil simgesinden anlık takip edebilirsin.',
-    tip: 'Arkadaşların bir kursu bitirdiğinde veya eğitmen geri bildirim verdiğinde buraya bildirim düşer.'
+    icon: Compass,
+    color: 'from-emerald-600 to-teal-600',
+    badge: '4 / 5 • Profil, Seviye & Bildirimler',
+    title: '👤 Profilin, Rozetlerin & Bildirimler',
+    description: 'Sağ üst alandan anlık seviyeni ve XP durumunu izleyebilir, temayı açık/koyu olarak değiştirebilir ve gelen bildirimleri anlık takip edebilirsin.',
+    tip: '13 farklı siber kahraman rozetinin kilidini açmak için dersleri tamamlamaya devam et!'
   },
   {
     target: '#tour-ai-widget',
     icon: Bot,
     color: 'from-fuchsia-600 to-pink-600',
-    badge: '4 / 4 • Yapay Zeka Mentor',
+    badge: '5 / 5 • 7/24 Akıllı Siber Mentor YZ',
     title: '🤖 7/24 Akıllı Siber Mentor YZ',
-    description: 'Sağ alttaki bu butona tıklayarak dilediğin an yapay zekadan yardım alabilirsin. O an bulunduğun sayfayı ve çalıştığın dersi otomatik olarak anlayıp sana özel Sokratik ipuçları sunar.',
+    description: 'Sağ alttaki butona tıklayarak takıldığın her an yapay zekadan yardım alabilirsin. O an bulunduğun sayfayı ve çalıştığın dersi otomatik olarak anlayıp sana özel Sokratik ipuçları üretir.',
     tip: 'Cevabı doğrudan söylemek yerine düşünmeni sağlayacak akılcı yönlendirmeler yapar!'
   }
 ];
@@ -74,16 +84,17 @@ export default function OnboardingTour() {
   const spotlightRef = useRef(null);
   const tourKey = user ? `cyberedu_tour_completed_${user.id}` : 'cyberedu_tour_completed';
 
-  // Hedef elemanın koordinatlarını senkron ve anında güncelle
-  const updateRect = useCallback(() => {
-    if (!isOpen) return;
-    const rect = getStepTargetRect(currentStep);
+  // Belirli bir adımın hedefini hesapla ve spotlight ref'ini doğrudan güncelle
+  const updateStepTarget = useCallback((stepIdx) => {
+    const step = TOUR_STEPS[stepIdx];
+    if (!step) return;
+
+    const rect = getStepTargetRect(stepIdx);
     if (rect) {
       setTargetRect(rect);
 
       if (spotlightRef.current) {
-        const step = TOUR_STEPS[currentStep];
-        const isSidebar = step?.target.includes('sidebar');
+        const isSidebar = step.target.includes('sidebar');
         const spotTop = isSidebar ? 0 : Math.max(0, rect.top - 6);
         const spotLeft = isSidebar ? 0 : Math.max(0, rect.left - 6);
         const spotWidth = isSidebar ? rect.width : rect.width + 12;
@@ -94,29 +105,38 @@ export default function OnboardingTour() {
         spotlightRef.current.style.width = `${spotWidth}px`;
         spotlightRef.current.style.height = `${spotHeight}px`;
       }
+    } else {
+      setTargetRect(null);
     }
-  }, [isOpen, currentStep]);
+  }, []);
 
-  // Sadece kaydırma sırasında doğrudan DOM güncelleyerek 60fps akıcılık sağla
-  const updateSpotlightOnScroll = useCallback(() => {
-    if (!isOpen || !spotlightRef.current) return;
-    const rect = getStepTargetRect(currentStep);
-    if (rect) {
-      const step = TOUR_STEPS[currentStep];
-      const isSidebar = step?.target.includes('sidebar');
-      const spotTop = isSidebar ? 0 : Math.max(0, rect.top - 6);
-      const spotLeft = isSidebar ? 0 : Math.max(0, rect.left - 6);
-      const spotWidth = isSidebar ? rect.width : rect.width + 12;
-      const spotHeight = isSidebar ? window.innerHeight : rect.height + 12;
+  // Merkezi Adım Değiştirme Fonksiyonu (Stale closure hatasını ve sıralama kaymasını önler)
+  const goToStep = useCallback((targetIndex) => {
+    if (targetIndex < 0 || targetIndex >= TOUR_STEPS.length) return;
 
-      spotlightRef.current.style.top = `${spotTop}px`;
-      spotlightRef.current.style.left = `${spotLeft}px`;
-      spotlightRef.current.style.width = `${spotWidth}px`;
-      spotlightRef.current.style.height = `${spotHeight}px`;
+    setCurrentStep(targetIndex);
+
+    const step = TOUR_STEPS[targetIndex];
+    const el = document.querySelector(step?.target);
+
+    // Sabit öğeler (sidebar, header, ai-widget) haricindekileri görünüme kaydır
+    if (el) {
+      const isFixed = step.target.includes('sidebar') || step.target.includes('profile') || step.target.includes('ai-widget');
+      if (!isFixed) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
-  }, [isOpen, currentStep]);
 
-  // Sayfa yüklendiğinde kontrol et ve turu başlatmadan önce koordinatı ölç
+    // İlk ölçümü anında yap
+    updateStepTarget(targetIndex);
+
+    // Kaydırma bittiğinde bir kez daha tam yerini doğrula
+    setTimeout(() => {
+      updateStepTarget(targetIndex);
+    }, 280);
+  }, [updateStepTarget]);
+
+  // Sayfa yüklendiğinde kontrol et
   useEffect(() => {
     if (!profile?.onboarding_completed) return;
 
@@ -129,57 +149,49 @@ export default function OnboardingTour() {
 
     if (shouldShow) {
       const timer = setTimeout(() => {
-        // Tur açılmadan ÖNCE ilk hedef koordinatını al (Böylece ortaya gelip sola kayma yaşanmaz)
+        // İlk adım (Hoş Geldin & Ders Takibi) koordinatını alıp aç
         const initialRect = getStepTargetRect(0);
         if (initialRect) {
           setTargetRect(initialRect);
         }
+        setCurrentStep(0);
         setIsOpen(true);
-      }, 600);
+      }, 700);
       return () => clearTimeout(timer);
     }
   }, [user?.id, profile?.onboarding_completed, profile?.updated_at]);
 
-  // Manuel tur başlatma olayını dinle
+  // Manuel tur başlatma olayı (Profil sayfasından veya butondan tetiklendiğinde)
   useEffect(() => {
     const handleStartTour = () => {
-      setCurrentStep(0);
-      const initialRect = getStepTargetRect(0);
-      if (initialRect) {
-        setTargetRect(initialRect);
-      }
+      goToStep(0);
       setIsOpen(true);
     };
     window.addEventListener('start-cyberedu-tour', handleStartTour);
     return () => window.removeEventListener('start-cyberedu-tour', handleStartTour);
-  }, []);
+  }, [goToStep]);
 
-  // Adım değiştiğinde veya yeniden boyutlandırmada takip
+  // Sayfa kaydırma ve yeniden boyutlandırmayı 60fps dinle
   useEffect(() => {
     if (!isOpen) return;
 
-    // İlk anda anında güncelle
-    updateRect();
-
     let rafId = null;
-    const handleScroll = () => {
+    const handleScrollOrResize = () => {
       if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(updateSpotlightOnScroll);
+      rafId = requestAnimationFrame(() => {
+        updateStepTarget(currentStep);
+      });
     };
 
-    const handleResize = () => {
-      updateRect();
-    };
-
-    window.addEventListener('resize', handleResize, { passive: true });
-    window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    window.addEventListener('scroll', handleScrollOrResize, { capture: true, passive: true });
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleScroll, { capture: true });
+      window.removeEventListener('resize', handleScrollOrResize);
+      window.removeEventListener('scroll', handleScrollOrResize, { capture: true });
     };
-  }, [isOpen, currentStep, updateRect, updateSpotlightOnScroll]);
+  }, [isOpen, currentStep, updateStepTarget]);
 
   const handleComplete = () => {
     const lastSeenKey = user ? `cyberedu_tour_last_seen_${user.id}` : 'cyberedu_tour_last_seen';
@@ -191,23 +203,7 @@ export default function OnboardingTour() {
 
   const handleNext = () => {
     if (currentStep < TOUR_STEPS.length - 1) {
-      const next = currentStep + 1;
-      const step = TOUR_STEPS[next];
-      const el = document.querySelector(step?.target);
-      if (el) {
-        const blockPos = step.target.includes('resume') ? 'start' : 'center';
-        el.scrollIntoView({ behavior: 'smooth', block: blockPos });
-      }
-
-      // Koordinatı hemen al ve adıma geç (Bekletmeden pürüzsüz akış)
-      const nextRect = getStepTargetRect(next);
-      if (nextRect) {
-        setTargetRect(nextRect);
-      }
-      setCurrentStep(next);
-
-      // Kaydırma bitince milimetrik tekrar ayarla
-      setTimeout(updateRect, 320);
+      goToStep(currentStep + 1);
     } else {
       handleComplete();
     }
@@ -215,48 +211,34 @@ export default function OnboardingTour() {
 
   const handlePrev = () => {
     if (currentStep > 0) {
-      const prev = currentStep - 1;
-      const step = TOUR_STEPS[prev];
-      const el = document.querySelector(step?.target);
-      if (el) {
-        const blockPos = step.target.includes('resume') ? 'start' : 'center';
-        el.scrollIntoView({ behavior: 'smooth', block: blockPos });
-      }
-
-      const prevRect = getStepTargetRect(prev);
-      if (prevRect) {
-        setTargetRect(prevRect);
-      }
-      setCurrentStep(prev);
-
-      setTimeout(updateRect, 320);
+      goToStep(currentStep - 1);
     }
   };
 
   if (!isOpen) return null;
 
-  const step = TOUR_STEPS[currentStep];
+  const step = TOUR_STEPS[currentStep] || TOUR_STEPS[0];
   const Icon = step.icon;
 
-  // Popover Kart Pozisyonlama Hesabı (Pürüzsüz ve asla ortaya sıçramayan hesaplama)
+  // Popover Kart Pozisyonlama Hesabı (Öğelerin Üstüne Asla Binmez)
   const getCardStyle = () => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const cardWidth = isMobile ? (typeof window !== 'undefined' ? window.innerWidth - 32 : 360) : 420;
+    const cardHeight = 310;
+
+    // Hedef bulunamadıysa temiz ortala
     if (!targetRect || typeof window === 'undefined') {
-      // Eğer hedef ölçülemediyse kartı ortada flaşlamak yerine görünmez tut
       return {
         position: 'fixed',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
-        opacity: 0,
-        pointerEvents: 'none',
+        width: `${cardWidth}px`,
+        maxWidth: 'calc(100vw - 32px)',
       };
     }
 
-    const isMobile = window.innerWidth < 768;
-    const cardWidth = isMobile ? window.innerWidth - 32 : 430;
-    const cardHeight = 310;
-
-    // Mobil yerleşim: Hedefin durumuna göre üste veya alta yerleşir
+    // Mobil Yerleşim: Hedef ekranın altındaysa kutu üste, üstündeyse kutu alta yerleşir
     if (isMobile) {
       const isTargetAtBottom = targetRect.bottom > window.innerHeight / 2;
       return {
@@ -265,64 +247,72 @@ export default function OnboardingTour() {
         right: '16px',
         ...(isTargetAtBottom ? { top: '80px' } : { bottom: '24px' }),
         maxWidth: 'calc(100vw - 32px)',
-        opacity: 1,
       };
     }
 
-    // 1. Masaüstü: AI Mentor Widget
+    // 1. Masaüstü: AI Widget (Sağ alt) -> KUTU HEDEF BUTONUN ÜSTÜNDE OLUR
     if (step.target.includes('ai-widget')) {
       return {
         position: 'fixed',
         bottom: `${Math.max(24, window.innerHeight - targetRect.top + 20)}px`,
         right: '24px',
         width: `${cardWidth}px`,
-        opacity: 1,
       };
     }
 
-    // 2. Masaüstü: Profil & Bildirimler
-    if (step.target.includes('profile') || step.target.includes('notifications')) {
+    // 2. Masaüstü: Profil & Bildirimler (Sağ üst) -> KUTU HEDEFİN ALTINDA OLUR
+    if (step.target.includes('profile')) {
       return {
         position: 'fixed',
         top: `${Math.max(80, targetRect.bottom + 16)}px`,
         right: '24px',
         width: `${cardWidth}px`,
-        opacity: 1,
       };
     }
 
-    // 3. Masaüstü: Sol Sidebar
+    // 3. Masaüstü: Sol Sidebar -> KUTU MENÜNÜN SAĞINDA OLUR
     if (step.target.includes('sidebar')) {
       return {
         position: 'fixed',
         top: `${Math.max(80, Math.min(targetRect.top + 60, window.innerHeight - cardHeight - 40))}px`,
         left: `${Math.min(targetRect.right + 24, window.innerWidth - cardWidth - 24)}px`,
         width: `${cardWidth}px`,
-        opacity: 1,
       };
     }
 
-    // 4. Masaüstü: Devam Et Kartı
+    // 4. Masaüstü: Liderlik Tablosu -> KUTU TABLONUN SOLUNDA YERLEŞİR
+    if (step.target.includes('leaderboard')) {
+      const canFitLeft = targetRect.left >= cardWidth + 30;
+      if (canFitLeft) {
+        return {
+          position: 'fixed',
+          top: `${Math.max(80, Math.min(targetRect.top + 20, window.innerHeight - cardHeight - 30))}px`,
+          left: `${targetRect.left - cardWidth - 20}px`,
+          width: `${cardWidth}px`,
+        };
+      }
+    }
+
+    // 5. Masaüstü: Ders Takip Kartı / Genel İçerik -> KUTU KARTIN ALTINDA YERLEŞİR
     const spaceBelow = window.innerHeight - targetRect.bottom;
     const cardTop = spaceBelow >= cardHeight + 20
       ? targetRect.bottom + 20
-      : Math.max(80, window.innerHeight - cardHeight - 24);
+      : Math.max(80, targetRect.top - cardHeight - 20);
 
     return {
       position: 'fixed',
       top: `${cardTop}px`,
       left: `${Math.max(24, Math.min(targetRect.left + 30, window.innerWidth - cardWidth - 24))}px`,
       width: `${cardWidth}px`,
-      opacity: 1,
     };
   };
 
   const isSidebar = step.target.includes('sidebar');
-  
-  const initialSpotTop = isSidebar ? 0 : Math.max(0, targetRect ? targetRect.top - 6 : 0);
-  const initialSpotLeft = isSidebar ? 0 : Math.max(0, targetRect ? targetRect.left - 6 : 0);
-  const initialSpotWidth = isSidebar ? (targetRect ? targetRect.width : 0) : (targetRect ? targetRect.width + 12 : 0);
-  const initialSpotHeight = isSidebar ? (typeof window !== 'undefined' ? window.innerHeight : 800) : (targetRect ? targetRect.height + 12 : 0);
+
+  const spotTop = isSidebar ? 0 : Math.max(0, targetRect ? targetRect.top - 6 : 0);
+  const spotLeft = isSidebar ? 0 : Math.max(0, targetRect ? targetRect.left - 6 : 0);
+  const spotWidth = isSidebar ? (targetRect ? targetRect.width : 0) : (targetRect ? targetRect.width + 12 : 0);
+  const spotHeight = isSidebar ? (typeof window !== 'undefined' ? window.innerHeight : 800) : (targetRect ? targetRect.height + 12 : 0);
 
   const handleBackdropClick = (e) => {
     if (targetRect && spotlightRef.current) {
@@ -356,12 +346,11 @@ export default function OnboardingTour() {
             isSidebar ? 'rounded-r-2xl' : 'rounded-2xl'
           }`}
           style={{
-            top: initialSpotTop,
-            left: initialSpotLeft,
-            width: initialSpotWidth,
-            height: initialSpotHeight,
-            // 9999px box shadow: Hedefin içi %100 şeffaf ve kristal netliktedir (0 karartma, 0 blur)!
-            // Dışında kalan tüm sayfa alanı ise 0.85 derin slate ile karartılır.
+            top: spotTop,
+            left: spotLeft,
+            width: spotWidth,
+            height: spotHeight,
+            // 9999px box shadow: Hedef alanı %100 kristal berrak, dışı derin karartma
             boxShadow: '0 0 0 9999px rgba(3, 7, 18, 0.85), 0 0 35px rgba(139, 92, 246, 0.7)',
           }}
         />
@@ -375,7 +364,7 @@ export default function OnboardingTour() {
       {/* 💬 İnteraktif Bilgi Kartı (Popover) */}
       <div
         style={getCardStyle()}
-        className="z-[160] pointer-events-auto rounded-3xl glass border border-white/25 p-6 shadow-2xl bg-slate-900/95 overflow-hidden backdrop-blur-xl transition-[top,left,bottom,right,opacity] duration-300 ease-out"
+        className="z-[160] pointer-events-auto rounded-3xl glass border border-white/25 p-6 shadow-2xl bg-slate-900/95 overflow-hidden backdrop-blur-xl transition-all duration-300 ease-out"
       >
         {/* Üst Gradyan Çizgisi */}
         <div className={`absolute top-0 left-0 right-0 h-2 bg-gradient-to-r ${step.color}`} />
@@ -395,7 +384,7 @@ export default function OnboardingTour() {
             <Icon size={22} />
           </div>
           <div>
-            <h3 className="font-display font-black text-lg text-white leading-snug">
+            <h3 className="font-display font-black text-lg text-white leading-tight">
               {step.title}
             </h3>
             <span className="text-[10px] font-bold text-violet-300 uppercase tracking-wider">
@@ -425,13 +414,13 @@ export default function OnboardingTour() {
               <button
                 key={idx}
                 type="button"
-                onClick={() => setCurrentStep(idx)}
-                className={`h-2 rounded-full transition-all duration-300 ${
+                onClick={() => goToStep(idx)}
+                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
                   idx === currentStep
                     ? 'w-6 bg-violet-400'
                     : idx < currentStep
-                      ? 'w-2 bg-violet-600/60'
-                      : 'w-2 bg-white/20'
+                      ? 'w-2 bg-violet-600/60 hover:bg-violet-500'
+                      : 'w-2 bg-white/20 hover:bg-white/40'
                 }`}
                 title={`Adım ${idx + 1}`}
               />
@@ -444,7 +433,7 @@ export default function OnboardingTour() {
               <button
                 type="button"
                 onClick={handlePrev}
-                className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 text-xs font-semibold transition-all flex items-center gap-1"
+                className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
               >
                 <ArrowLeft size={13} /> Geri
               </button>
@@ -453,7 +442,7 @@ export default function OnboardingTour() {
             <button
               type="button"
               onClick={handleNext}
-              className={`px-4 py-2 rounded-xl font-bold text-xs text-white transition-all shadow-lg flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-xl font-bold text-xs text-white transition-all shadow-lg flex items-center gap-1.5 cursor-pointer ${
                 currentStep === TOUR_STEPS.length - 1
                   ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/30'
                   : 'bg-violet-600 hover:bg-violet-500 shadow-violet-600/30'
@@ -461,7 +450,7 @@ export default function OnboardingTour() {
             >
               {currentStep === TOUR_STEPS.length - 1 ? (
                 <>
-                  <CheckCircle2 size={14} /> Anladım, Başla!
+                  <CheckCircle2 size={14} /> Tamamla
                 </>
               ) : (
                 <>
