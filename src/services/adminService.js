@@ -39,7 +39,7 @@ export async function resetStudentProgress(userId) {
     ]);
 
     // Profili sıfırla (Ad soyad, rol ve e-posta korunur)
-    const { error: profError } = await supabase.from('profiles').update({
+    const basePayload = {
       learning_area: null,
       skill_level: null,
       onboarding_completed: false,
@@ -48,10 +48,16 @@ export async function resetStudentProgress(userId) {
       avatar_emoji: '🛡️',
       bio: null,
       updated_at: new Date().toISOString()
+    };
+
+    // tour_completed sütunuyla birlikte sıfırla
+    const { error: profError } = await supabase.from('profiles').update({
+      ...basePayload,
+      tour_completed: false
     }).eq('id', userId);
 
     if (profError) {
-      return { data: null, error: profError };
+      await supabase.from('profiles').update(basePayload).eq('id', userId);
     }
 
     return { data: { success: true, message: 'Öğrenci verileri başarıyla sıfırlandı.' }, error: null };

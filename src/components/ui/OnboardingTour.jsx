@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, X, Compass, Map, Trophy, Bot } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
 
 // ─── Kusursuz ve Mantıksal Sıralı Tur Adımları (1'den 5'e) ───────────────────
 const TOUR_STEPS = [
@@ -77,7 +78,7 @@ const getStepTargetRect = (stepIndex) => {
 };
 
 export default function OnboardingTour() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [targetRect, setTargetRect] = useState(null);
@@ -136,30 +137,36 @@ export default function OnboardingTour() {
     }, 280);
   }, [updateStepTarget]);
 
-  // Sayfa yüklendiğinde kontrol et
+  // Sayfa yüklendiğinde kontrol et (Farklı tarayıcılar dahil tek seferlik çalışır)
   useEffect(() => {
+    // 1. Öğrenci henüz navigator seçimini yapmadıysa tur başlatılmaz
     if (!profile?.onboarding_completed) return;
 
-    const lastSeenKey = user ? `cyberedu_tour_last_seen_${user.id}` : 'cyberedu_tour_last_seen';
-    const lastSeenTime = localStorage.getItem(lastSeenKey);
+    // 2. Veritabanı kontrolü: Eğer profilde tour_completed true ise ASLA tekrar açma
+    if (profile?.tour_completed === true) return;
 
-    const shouldShow =
-      !lastSeenTime ||
-      (profile.updated_at && new Date(profile.updated_at).getTime() > new Date(lastSeenTime).getTime());
+    // 3. LocalStorage kontrolü (veritabanı sütun geçişi ve anlık önbellek güvencesi)
+    const localCompleted =
+      localStorage.getItem(tourKey) === 'true' ||
+      localStorage.getItem('cyberedu_tour_completed') === 'true';
 
-    if (shouldShow) {
-      const timer = setTimeout(() => {
-        // İlk adım (Hoş Geldin & Ders Takibi) koordinatını alıp aç
-        const initialRect = getStepTargetRect(0);
-        if (initialRect) {
-          setTargetRect(initialRect);
-        }
-        setCurrentStep(0);
-        setIsOpen(true);
-      }, 700);
-      return () => clearTimeout(timer);
+    // Eğer veritabanında tour_completed açıkça false değilse ve local'de tamamlanmışsa gösterme
+    if (profile?.tour_completed !== false && localCompleted) {
+      return;
     }
-  }, [user?.id, profile?.onboarding_completed, profile?.updated_at]);
+
+    const timer = setTimeout(() => {
+      // İlk adım (Hoş Geldin & Ders Takibi) koordinatını alıp aç
+      const initialRect = getStepTargetRect(0);
+      if (initialRect) {
+        setTargetRect(initialRect);
+      }
+      setCurrentStep(0);
+      setIsOpen(true);
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, [user?.id, profile?.onboarding_completed, profile?.tour_completed, tourKey]);
 
   // Manuel tur başlatma olayı (Profil sayfasından veya butondan tetiklendiğinde)
   useEffect(() => {
@@ -220,12 +227,35 @@ export default function OnboardingTour() {
     };
   }, [isOpen, currentStep, updateStepTarget]);
 
-  const handleComplete = () => {
-    const lastSeenKey = user ? `cyberedu_tour_last_seen_${user.id}` : 'cyberedu_tour_last_seen';
-    localStorage.setItem(lastSeenKey, new Date().toISOString());
+  const handleComplete = async () => {
+    // 1. Arayüzü anında kapat
+    setIsOpen(false);
+
+    // 2. LocalStorage'a kaydet
+    if (user?.id) {
+      localStorage.setItem(`cyberedu_tour_completed_${user.id}`, 'true');
+    }
     localStorage.setItem(tourKey, 'true');
     localStorage.setItem('cyberedu_tour_completed', 'true');
-    setIsOpen(false);
+
+    // 3. Veritabanına (profiles) kalıcı kaydet -> Farklı tarayıcı veya cihazlarda ASLA tekrar çıkmasın
+    if (user?.id) {
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            tour_completed: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+
+        if (!error && refreshProfile) {
+          await refreshProfile();
+        }
+      } catch (err) {
+        console.warn('tour_completed veritabanına yazılamadı:', err);
+      }
+    }
   };
 
   const handleNext = () => {

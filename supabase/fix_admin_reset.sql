@@ -5,6 +5,10 @@
 -- bildirimler, takip ilişkileri, rozetler) kalıcı olarak sıfırlanır ve silinir.
 -- ============================================================
 
+-- 0. Profiles Tablosuna tour_completed Sütununu Ekle (Tek Seferlik Yönerge Takibi)
+ALTER TABLE public.profiles 
+ADD COLUMN IF NOT EXISTS tour_completed BOOLEAN NOT NULL DEFAULT false;
+
 -- 1. Helper: public.get_my_role()
 CREATE OR REPLACE FUNCTION public.get_my_role()
 RETURNS TEXT AS $$
@@ -111,13 +115,14 @@ BEGIN
   DELETE FROM public.user_badges WHERE user_id = target_user_id;
 
   -- 8. Profili sıfırla: E-posta ve şifre auth tablosunda korunur; full_name ve role korunur.
-  -- Geri kalan tüm alanlar başlangıç durumuna döndürülür.
+  -- Geri kalan tüm alanlar ve yönerge turu başlangıç durumuna döndürülür.
   UPDATE public.profiles
   SET xp = 0,
       level = 1,
       learning_area = NULL,
       skill_level = NULL,
       onboarding_completed = FALSE,
+      tour_completed = FALSE,
       avatar_emoji = '🛡️',
       bio = NULL,
       updated_at = NOW()
