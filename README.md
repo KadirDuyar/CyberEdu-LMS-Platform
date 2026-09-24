@@ -268,7 +268,7 @@ Yanlışlıkla veri silinmesini önlemek amacıyla çift aşamalı onay (Modal D
 - **Boşluk Doldurma:** Metin tabanlı etkileşimler.
 - **Eşleştirme (Matching):** Kavram ve tanımları eşleştiren interaktif kartlar.
 - **Gelişmiş Video Eğitimi:** Özel video ilerleme çubuğu (slider), dakika:saniye sayacı, -10 sn geri sarma, +10 sn ileri sarma, baştan başlatma ve tam ekran izleme.
-- **Başarı Eşiği:** Dersin tamamlanabilmesi için interaktif sorulardan en az %80 başarı elde edilmesi gerekir.
+- **Başarı Eşiği:** Dersin tamamlanabilmesi için interaktif sorulardan en az %50 başarı elde edilmesi gerekir.
 
 ---
 

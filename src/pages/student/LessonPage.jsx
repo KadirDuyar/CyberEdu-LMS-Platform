@@ -13,7 +13,7 @@ import {
 import { findNewUnlockedReward } from '../../data/achievementsData';
 import { notifyFollowersCourseCompleted } from '../../services/socialService';
 
-const PASS_PERCENT = 80;
+const PASS_PERCENT = 50;
 
 function SafeMarkdown({ content }) {
   if (!content) return null;
@@ -275,7 +275,7 @@ export default function LessonPage() {
     if (totalQuestions > 0) {
       const percentage = (correctCount / totalQuestions) * 100;
       if (percentage < PASS_PERCENT) {
-        setFailedMessage(`Soruların en az %${PASS_PERCENT}'ini doğru cevaplamalısın. (Senin başarın: %${Math.round(percentage)})`);
+        setFailedMessage(`Soruların en az %${PASS_PERCENT}'sini doğru cevaplamalısın. (Senin başarın: %${Math.round(percentage)})`);
         setCompleting(false);
         return;
       }
