@@ -231,24 +231,24 @@ export default function ProfilePage() {
       <div className="max-w-4xl mx-auto space-y-8 pb-16">
 
         {/* Profil Başlık Kartı */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-950/80 via-slate-900 to-indigo-950/80 border border-violet-500/30 p-6 md:p-8 shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-100 via-purple-50 to-white dark:from-violet-950/80 dark:via-slate-900 dark:to-indigo-950/80 border border-violet-200 dark:border-violet-500/30 p-6 md:p-8 shadow-2xl">
           <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
-            <div className="w-24 h-24 rounded-3xl bg-violet-600/30 border-2 border-violet-400 flex items-center justify-center text-5xl shadow-xl shrink-0">
+            <div className="w-24 h-24 rounded-3xl bg-violet-100 dark:bg-violet-600/30 border-2 border-violet-300 dark:border-violet-400 flex items-center justify-center text-5xl shadow-xl shrink-0">
               {avatar}
             </div>
             <div className="text-center md:text-left flex-1">
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-2">
-                <span className="text-xs font-black uppercase px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                <span className="text-xs font-black uppercase px-3 py-1 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-500/30">
                   {profile?.role === 'teacher' ? '👨‍🏫 Eğitmen' : profile?.role === 'admin' ? '⚡ Yönetici' : '🎓 Öğrenci'}
                 </span>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30 flex items-center gap-1">
                   <Zap size={14} /> Seviye {profile?.level || 1} • {profile?.xp || 0} XP
                 </span>
               </div>
-              <h1 className="font-display font-black text-2xl md:text-3xl text-white">
+              <h1 className="font-display font-black text-2xl md:text-3xl text-slate-900 dark:text-white">
                 {profile?.full_name || 'Kullanıcı'}
               </h1>
-              <p className="text-slate-400 text-sm mt-1">{user?.email}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{user?.email}</p>
             </div>
           </div>
         </div>
@@ -256,13 +256,13 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Genel Bilgileri Düzenleme */}
           <Card className="p-6">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
-              <User size={20} className="text-violet-400" /> Profil Bilgilerini Güncelle
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+              <User size={20} className="text-violet-600 dark:text-violet-400" /> Profil Bilgilerini Güncelle
             </h3>
 
             {profileMsg && (
               <div className={`p-3.5 rounded-xl text-xs font-medium mb-4 flex items-center gap-2 ${
-                profileMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+                profileMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/30'
               }`}>
                 {profileMsg.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                 {profileMsg.text}
@@ -271,15 +271,15 @@ export default function ProfilePage() {
 
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">Avatar Emojisi</label>
-                <div className="flex flex-wrap gap-2 p-2 bg-slate-900/60 rounded-xl border border-white/10">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Avatar Emojisi</label>
+                <div className="flex flex-wrap gap-2 p-2 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-white/10">
                   {AVATAR_OPTIONS.map((em) => (
                     <button
                       key={em}
                       type="button"
                       onClick={() => setAvatar(em)}
-                      className={`w-9 h-9 rounded-lg flex items-center justify-center text-xl transition-transform ${
-                        avatar === em ? 'bg-violet-600 ring-2 ring-violet-400 scale-110' : 'hover:bg-white/10'
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center text-xl transition-transform cursor-pointer ${
+                        avatar === em ? 'bg-violet-600 ring-2 ring-violet-400 scale-110' : 'hover:bg-slate-200 dark:hover:bg-white/10'
                       }`}
                     >
                       {em}
@@ -290,43 +290,43 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => navigate('/student/achievements')}
-                    className="mt-2 text-xs font-bold text-violet-400 hover:text-violet-300 flex items-center gap-1.5 transition-colors"
+                    className="mt-2 text-xs font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <Sparkles size={13} className="text-amber-400" />
+                    <Sparkles size={13} className="text-amber-500 dark:text-amber-400" />
                     Karakter Koleksiyonu & Başarılar Odası <ArrowRight size={12} />
                   </button>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">Ad Soyad</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Ad Soyad</label>
                 <input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-violet-500 text-sm shadow-sm"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1.5">E-posta Adresi</label>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">E-posta Adresi</label>
                 <input
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-800/50 border border-white/5 text-slate-400 text-sm cursor-not-allowed"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 text-sm cursor-not-allowed"
                 />
                 <span className="text-[10px] text-slate-500 mt-1 block">E-posta hesabı değiştirilemez.</span>
               </div>
 
               {profile?.role === 'student' && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Öğrenme Parkuru</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Öğrenme Parkuru</label>
                   <select
                     value={learningArea}
                     onChange={(e) => setLearningArea(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/80 border border-white/10 text-white focus:outline-none focus:border-violet-500 text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white focus:outline-none focus:border-violet-500 text-sm shadow-sm"
                   >
                     <option value="awareness">🛡️ Siber Farkındalık Parkuru</option>
                     <option value="technical">💻 Teknik Siber Güvenlik Parkuru</option>
@@ -337,7 +337,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={profileSaving}
-                className="w-full mt-2 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-sm transition-all shadow-lg shadow-violet-500/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full mt-2 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-sm transition-all shadow-lg shadow-violet-500/20 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {profileSaving ? <LoadingSpinner size="sm" /> : <Save size={16} />} Değişiklikleri Kaydet
               </button>
@@ -347,13 +347,13 @@ export default function ProfilePage() {
           {/* Şifre Değiştirme */}
           <Card className="p-6 flex flex-col justify-between">
             <div>
-              <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4">
-                <Lock size={20} className="text-cyan-400" /> Şifre Değiştir
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+                <Lock size={20} className="text-cyan-600 dark:text-cyan-400" /> Şifre Değiştir
               </h3>
 
               {passwordMsg && (
                 <div className={`p-3.5 rounded-xl text-xs font-medium mb-4 flex items-center gap-2 ${
-                  passwordMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+                  passwordMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/30'
                 }`}>
                   {passwordMsg.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                   {passwordMsg.text}
@@ -362,25 +362,25 @@ export default function ProfilePage() {
 
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Yeni Şifre</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Yeni Şifre</label>
                   <input
                     type="password"
                     placeholder="En az 6 karakter"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 text-sm shadow-sm"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 mb-1.5">Yeni Şifre Tekrar</label>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Yeni Şifre Tekrar</label>
                   <input
                     type="password"
                     placeholder="Şifreyi tekrar yazın"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900/80 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-cyan-500 text-sm shadow-sm"
                     required
                   />
                 </div>
@@ -388,15 +388,15 @@ export default function ProfilePage() {
                 <button
                   type="submit"
                   disabled={passwordLoading}
-                  className="w-full mt-2 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm transition-all shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full mt-2 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm transition-all shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                 >
                   {passwordLoading ? <LoadingSpinner size="sm" /> : <Key size={16} />} Şifreyi Güncelle
                 </button>
               </form>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/10 text-xs text-slate-400">
-              <p>Hesap Oluşturulma: <span className="text-white font-semibold">{user?.created_at ? new Date(user.created_at).toLocaleDateString('tr-TR') : '-'}</span></p>
+            <div className="mt-6 pt-4 border-t border-slate-200 dark:border-white/10 text-xs text-slate-500 dark:text-slate-400">
+              <p>Hesap Oluşturulma: <span className="text-slate-900 dark:text-white font-semibold">{user?.created_at ? new Date(user.created_at).toLocaleDateString('tr-TR') : '-'}</span></p>
             </div>
           </Card>
         </div>
@@ -405,40 +405,40 @@ export default function ProfilePage() {
         {profile?.role === 'student' && (
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Award size={20} className="text-amber-400" /> Tamamlanan Dersler ({completedLessons.length})
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Award size={20} className="text-amber-500 dark:text-amber-400" /> Tamamlanan Dersler ({completedLessons.length})
               </h3>
             </div>
 
             {statsLoading ? (
               <div className="py-8 flex justify-center"><LoadingSpinner /></div>
             ) : completedLessons.length === 0 ? (
-              <div className="py-10 text-center border border-dashed border-white/10 rounded-2xl">
-                <p className="text-slate-400 text-sm">Henüz tamamlanan bir dersiniz bulunmuyor.</p>
-                <p className="text-slate-500 text-xs mt-1">Öğrenme yolculuğuna başlayarak ilk başarına imza at!</p>
+              <div className="py-10 text-center border border-dashed border-slate-300 dark:border-white/10 rounded-2xl">
+                <p className="text-slate-500 dark:text-slate-400 text-sm">Henüz tamamlanan bir dersiniz bulunmuyor.</p>
+                <p className="text-slate-400 dark:text-slate-500 text-xs mt-1">Öğrenme yolculuğuna başlayarak ilk başarına imza at!</p>
               </div>
             ) : (
               <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
                 {completedLessons.map((item, idx) => (
                   <div
                     key={item.lesson_id || idx}
-                    className="p-3.5 rounded-xl glass border border-emerald-500/20 bg-emerald-950/10 flex items-center justify-between"
+                    className="p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-50/80 dark:bg-emerald-950/20 flex items-center justify-between shadow-sm"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                         <CheckCircle2 size={18} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-sm text-white">{item.lessons?.title}</h4>
-                        <span className="text-xs text-slate-400">
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white">{item.lessons?.title}</h4>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
                           {item.lessons?.courses?.title || 'Siber Güvenlik'}
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3 text-right">
-                      <span className="text-xs font-black text-amber-400">+{item.lessons?.xp_reward || 100} XP</span>
-                      <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                      <span className="text-xs font-black text-amber-600 dark:text-amber-400">+{item.lessons?.xp_reward || 100} XP</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
                         <Calendar size={12} /> {item.completed_at ? new Date(item.completed_at).toLocaleDateString('tr-TR') : '-'}
                       </span>
                     </div>

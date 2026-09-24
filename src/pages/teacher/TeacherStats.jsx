@@ -188,25 +188,25 @@ export default function TeacherStats() {
       <div className="space-y-8 max-w-6xl mx-auto pb-16">
 
         {/* ── Üst Başlık Banner ────────────────────────────── */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-950/80 via-blue-950/60 to-slate-900 border border-cyan-500/30 p-6 md:p-8 shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-100 via-blue-50 to-white dark:from-cyan-950/80 dark:via-blue-950/60 dark:to-slate-900 border border-cyan-200 dark:border-cyan-500/30 p-6 md:p-8 shadow-2xl">
           <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-2 text-center md:text-left">
-              <span className="text-xs font-black uppercase tracking-wider text-cyan-300 bg-cyan-950/70 border border-cyan-500/40 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5">
-                <Users size={14} className="text-cyan-400" /> Eğitmen Öğrenci Takip Merkezi
+              <span className="text-xs font-black uppercase tracking-wider text-cyan-800 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-950/70 border border-cyan-300 dark:border-cyan-500/40 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5">
+                <Users size={14} className="text-cyan-600 dark:text-cyan-400" /> Eğitmen Öğrenci Takip Merkezi
               </span>
-              <h1 className="font-display font-black text-2xl md:text-3xl text-white">
+              <h1 className="font-display font-black text-2xl md:text-3xl text-slate-900 dark:text-white">
                 Öğrenci İlerleme & <span className="text-gradient-cyan">Ders İstatistikleri</span>
               </h1>
-              <p className="text-slate-300 text-sm max-w-2xl leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 text-sm max-w-2xl leading-relaxed">
                 Öğrencilerinin gerçek zamanlı tamamladığı dersleri, en son aktivitelerini, puan durumlarını ve parkur başarılarını buradan detaylıca takip edebilirsin.
               </p>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-center shrink-0">
-                <p className="text-xs text-slate-400 font-bold">Aktif Katılım</p>
-                <p className="text-2xl font-black text-emerald-400">
+              <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-center shrink-0 shadow-sm">
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Aktif Katılım</p>
+                <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
                   {totalStudents > 0 ? Math.round((activeStudentsCount / totalStudents) * 100) : 0}%
                 </p>
               </div>

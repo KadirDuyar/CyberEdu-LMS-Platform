@@ -237,33 +237,33 @@ export default function AiChatWidget() {
       {/* Sohbet Penceresi */}
       {isOpen && (
         <div
-          className={`glass-panel border border-violet-500/30 rounded-3xl shadow-2xl flex flex-col transition-all duration-200 overflow-hidden mb-3 ${
+          className={`border border-violet-200 dark:border-violet-500/30 rounded-3xl shadow-2xl flex flex-col transition-all duration-200 overflow-hidden mb-3 ${
             isMinimized
-              ? 'w-72 h-14 bg-slate-900/95'
-              : 'w-[90vw] sm:w-[400px] md:w-[440px] h-[500px] max-h-[calc(100vh-6.5rem)] bg-slate-900/95 backdrop-blur-xl'
+              ? 'w-72 h-14 bg-white dark:bg-slate-900/95'
+              : 'w-[90vw] sm:w-[400px] md:w-[440px] h-[500px] max-h-[calc(100vh-6.5rem)] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl'
           }`}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-violet-900/60 to-slate-900/80 border-b border-white/10 shrink-0">
+          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-violet-100 to-purple-50 dark:from-violet-900/60 dark:to-slate-900/80 border-b border-slate-200 dark:border-white/10 shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-violet-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-violet-600/30">
                 <Bot size={18} />
               </div>
               <div>
-                <h3 className="font-bold text-sm text-white flex items-center gap-1.5">
+                <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
                   CyberEdu AI
-                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 </h3>
-                <p className="text-[10px] text-violet-300 font-medium">Siber Güvenlik Asistanı</p>
+                <p className="text-[10px] text-violet-700 dark:text-violet-300 font-medium">Siber Güvenlik Asistanı</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1 text-slate-400">
+            <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
               {!isMinimized && (
                 <button
                   onClick={clearChat}
                   title="Sohbeti Temizle"
-                  className="p-1.5 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-1.5 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
                 >
                   <Trash2 size={15} />
                 </button>
@@ -271,14 +271,14 @@ export default function AiChatWidget() {
               <button
                 onClick={() => setIsMinimized(!isMinimized)}
                 title={isMinimized ? 'Genişlet' : 'Küçült'}
-                className="p-1.5 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                className="p-1.5 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
               >
                 {isMinimized ? <Maximize2 size={15} /> : <Minimize2 size={15} />}
               </button>
               <button
                 onClick={() => setIsOpen(false)}
                 title="Kapat"
-                className="p-1.5 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                className="p-1.5 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -292,12 +292,12 @@ export default function AiChatWidget() {
               {(() => {
                 const ctx = extractCurrentContext();
                 return (
-                  <div className="px-4 py-1.5 bg-violet-950/40 border-b border-violet-800/30 flex items-center justify-between gap-2 text-[10px] text-violet-300">
+                  <div className="px-4 py-1.5 bg-violet-50 dark:bg-violet-950/40 border-b border-violet-200 dark:border-violet-800/30 flex items-center justify-between gap-2 text-[10px] text-violet-700 dark:text-violet-300">
                     <span className="truncate flex items-center gap-1">
-                      <span className="text-amber-400 font-bold shrink-0">📍 {ctx.pageName}:</span>
-                      <span className="truncate text-slate-300">{ctx.lessonTitle || ctx.courseTitle || 'Genel Konular'}</span>
+                      <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0">📍 {ctx.pageName}:</span>
+                      <span className="truncate text-slate-700 dark:text-slate-300">{ctx.lessonTitle || ctx.courseTitle || 'Genel Konular'}</span>
                     </span>
-                    <span className="shrink-0 font-bold text-violet-400 bg-violet-500/10 px-1.5 py-0.5 rounded border border-violet-500/20">
+                    <span className="shrink-0 font-bold text-violet-700 dark:text-violet-400 bg-violet-100 dark:bg-violet-500/10 px-1.5 py-0.5 rounded border border-violet-300 dark:border-violet-500/20">
                       Bağlamsal
                     </span>
                   </div>
@@ -312,7 +312,7 @@ export default function AiChatWidget() {
                       className={`flex gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}
                     >
                       {!isUser && (
-                        <div className="w-7 h-7 rounded-lg bg-violet-600/30 border border-violet-500/40 flex items-center justify-center text-violet-300 shrink-0 mt-0.5">
+                        <div className="w-7 h-7 rounded-lg bg-violet-100 dark:bg-violet-600/30 border border-violet-300 dark:border-violet-500/40 flex items-center justify-center text-violet-700 dark:text-violet-300 shrink-0 mt-0.5">
                           <Bot size={15} />
                         </div>
                       )}
@@ -321,7 +321,7 @@ export default function AiChatWidget() {
                         className={`max-w-[82%] px-4 py-2.5 rounded-2xl ${
                           isUser
                             ? 'bg-violet-600 text-white rounded-br-sm shadow-md'
-                            : 'bg-slate-800/90 text-slate-200 border border-white/10 rounded-bl-sm'
+                            : 'bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/10 rounded-bl-sm shadow-sm'
                         }`}
                       >
                         <FormattedMessage text={msg.content} />
@@ -333,13 +333,13 @@ export default function AiChatWidget() {
                 {/* Yükleniyor Durumu */}
                 {loading && (
                   <div className="flex gap-2.5 justify-start">
-                    <div className="w-7 h-7 rounded-lg bg-violet-600/30 border border-violet-500/40 flex items-center justify-center text-violet-300 shrink-0 mt-0.5">
-                      <Sparkles size={15} className="animate-spin text-violet-400" />
+                    <div className="w-7 h-7 rounded-lg bg-violet-100 dark:bg-violet-600/30 border border-violet-300 dark:border-violet-500/40 flex items-center justify-center text-violet-700 dark:text-violet-300 shrink-0 mt-0.5">
+                      <Sparkles size={15} className="animate-spin text-violet-600 dark:text-violet-400" />
                     </div>
-                    <div className="bg-slate-800/90 px-4 py-3 rounded-2xl rounded-bl-sm border border-white/10 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-2 h-2 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-2 h-2 rounded-full bg-violet-300 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div className="bg-slate-100 dark:bg-slate-800/90 px-4 py-3 rounded-2xl rounded-bl-sm border border-slate-200 dark:border-white/10 flex items-center gap-1.5 shadow-sm">
+                      <span className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 rounded-full bg-pink-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 )}
@@ -349,12 +349,12 @@ export default function AiChatWidget() {
 
               {/* Hızlı Öneri Butonları */}
               {messages.length <= 3 && !loading && (
-                <div className="px-3 py-2 bg-slate-950/40 border-t border-white/5 flex gap-1.5 overflow-x-auto no-scrollbar">
+                <div className="px-3 py-2 bg-slate-50 dark:bg-slate-950/40 border-t border-slate-200 dark:border-white/5 flex gap-1.5 overflow-x-auto no-scrollbar">
                   {chips.map((chip, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSend(chip)}
-                      className="px-2.5 py-1 rounded-full text-[11px] font-medium whitespace-nowrap bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/30 transition-all text-left"
+                      className="px-2.5 py-1 rounded-full text-[11px] font-medium whitespace-nowrap bg-violet-50 hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/20 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-500/30 transition-all text-left cursor-pointer shadow-sm"
                     >
                       {chip}
                     </button>
@@ -363,7 +363,7 @@ export default function AiChatWidget() {
               )}
 
               {/* Input Alanı */}
-              <div className="p-3 bg-slate-950/95 border-t border-white/10 flex items-center gap-2 shrink-0 sticky bottom-0 z-10">
+              <div className="p-3 bg-white dark:bg-slate-950/95 border-t border-slate-200 dark:border-white/10 flex items-center gap-2 shrink-0 sticky bottom-0 z-10">
                 <input
                   ref={inputRef}
                   type="text"
@@ -372,12 +372,12 @@ export default function AiChatWidget() {
                   onKeyDown={handleKeyDown}
                   placeholder="Bir soru sorun veya konu belirtin..."
                   disabled={loading}
-                  className="flex-1 bg-slate-800/80 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-violet-500 disabled:opacity-50"
+                  className="flex-1 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-violet-500 disabled:opacity-50 shadow-sm"
                 />
                 <button
                   onClick={() => handleSend()}
                   disabled={!input.trim() || loading}
-                  className="w-9 h-9 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:hover:bg-violet-600 text-white flex items-center justify-center transition-all shadow-md shadow-violet-600/30 shrink-0"
+                  className="w-9 h-9 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:hover:bg-violet-600 text-white flex items-center justify-center transition-all shadow-md shadow-violet-600/30 shrink-0 cursor-pointer"
                 >
                   <Send size={15} />
                 </button>

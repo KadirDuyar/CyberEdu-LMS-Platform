@@ -168,9 +168,13 @@ export default function DashboardLayout({ children }) {
 
   useEffect(() => {
     if (isLightMode) {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
       document.body.classList.add('light-mode');
       localStorage.setItem('cyberedu_theme', 'light');
     } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
       document.body.classList.remove('light-mode');
       localStorage.setItem('cyberedu_theme', 'dark');
     }
@@ -237,10 +241,10 @@ export default function DashboardLayout({ children }) {
             <div className="flex items-center gap-2">
               <span className="text-2xl">{profile?.avatar_emoji || (isStudent ? '🚀' : '🎓')}</span>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-sm text-white truncate">
+                <p className="font-bold text-sm text-slate-900 dark:text-white truncate">
                   {profile?.full_name || 'Kullanıcı'}
                 </p>
-                <p className="text-[11px] font-semibold text-slate-400">
+                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                   {ROLE_LABELS[role] || role}
                 </p>
               </div>
@@ -249,11 +253,11 @@ export default function DashboardLayout({ children }) {
             {/* SADECE ÖĞRENCİYE XP VE SEVİYE ÇUBUĞU */}
             {isStudent && (
               <div>
-                <div className="flex justify-between text-xs text-slate-400 mb-1 font-medium">
+                <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1 font-medium">
                   <span>Seviye {level}</span>
                   <span>{xpInLevel}/500 XP</span>
                 </div>
-                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full bg-gradient-to-r ${levelColor} progress-bar`}
                     style={{ width: `${xpPercent}%` }}
@@ -331,14 +335,14 @@ export default function DashboardLayout({ children }) {
               {mobileOpen ? <X size={18} className="text-slate-300" /> : <Menu size={18} className="text-slate-300" />}
             </button>
             <div>
-              <h1 className="font-display font-black text-lg md:text-xl text-white">
+              <h1 className="font-display font-black text-lg md:text-xl text-slate-900 dark:text-white">
                 Merhaba,{' '}
                 <span className="text-gradient">
                   {profile?.full_name?.split(' ')[0] || 'Kullanıcı'}{' '}
                   {profile?.avatar_emoji || (isStudent ? '🚀' : '🎓')}
                 </span>
               </h1>
-              <p className="text-xs md:text-sm text-slate-400 hidden sm:block">
+              <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 hidden sm:block">
                 {new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' })}
               </p>
             </div>
@@ -347,12 +351,12 @@ export default function DashboardLayout({ children }) {
           <div id="tour-profile-section" className="flex items-center gap-2 md:gap-3">
             {/* SADECE ÖĞRENCİDE GÖRÜNEN LEVEL/XP KUTUSU */}
             {isStudent && (
-              <div id="tour-xp" className="hidden sm:flex items-center gap-2 glass-light rounded-xl px-3 md:px-4 py-2 border border-white/10">
-                <Star size={15} className="text-amber-400" />
-                <span className="text-sm font-bold text-white">Lv.{level}</span>
-                <span className="w-px h-4 bg-white/20" />
-                <Zap size={15} className="text-violet-400" />
-                <span className="text-sm font-bold text-violet-300">
+              <div id="tour-xp" className="hidden sm:flex items-center gap-2 glass-light rounded-xl px-3 md:px-4 py-2 border border-slate-200 dark:border-white/10">
+                <Star size={15} className="text-amber-500 dark:text-amber-400" />
+                <span className="text-sm font-bold text-slate-900 dark:text-white">Lv.{level}</span>
+                <span className="w-px h-4 bg-slate-300 dark:bg-white/20" />
+                <Zap size={15} className="text-violet-500 dark:text-violet-400" />
+                <span className="text-sm font-bold text-violet-600 dark:text-violet-300">
                   {xp.toLocaleString('tr-TR')} XP
                 </span>
               </div>
@@ -361,20 +365,20 @@ export default function DashboardLayout({ children }) {
             {/* Tema Butonu */}
             <button
               onClick={() => setIsLightMode(!isLightMode)}
-              className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-white/10 hover:border-violet-500/50 transition-colors"
+              className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-slate-200 dark:border-white/10 hover:border-violet-500/50 transition-colors"
               title={isLightMode ? 'Koyu Tema' : 'Açık Tema'}
             >
-              {isLightMode ? <Moon size={17} className="text-slate-500" /> : <Sun size={17} className="text-amber-300" />}
+              {isLightMode ? <Moon size={17} className="text-slate-600" /> : <Sun size={17} className="text-amber-300" />}
             </button>
 
             {/* Bildirim */}
             <div id="tour-notifications" className="relative">
               <button
                 onClick={() => setNotifOpen((n) => !n)}
-                className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-white/10 hover:border-violet-500/50 transition-colors relative"
+                className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-slate-200 dark:border-white/10 hover:border-violet-500/50 transition-colors relative"
                 title="Bildirimler"
               >
-                <Bell size={17} className="text-slate-300" />
+                <Bell size={17} className="text-slate-600 dark:text-slate-300" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white rounded-full text-[10px] font-black flex items-center justify-center animate-pulse shadow-md shadow-rose-500/50">
                     {unreadCount > 9 ? '9+' : unreadCount}
@@ -384,14 +388,14 @@ export default function DashboardLayout({ children }) {
 
               {notifOpen && (
                 <div
-                  className="absolute right-0 top-12 w-80 sm:w-88 bg-slate-950 border border-slate-700/90 rounded-2xl p-4 z-[100] shadow-2xl shadow-black/95 animate-scale-up"
+                  className="absolute right-0 top-12 w-80 sm:w-88 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700/90 rounded-2xl p-4 z-[100] shadow-2xl dark:shadow-black/95 animate-scale-up"
                   onMouseLeave={() => setNotifOpen(false)}
                 >
-                  <div className="flex items-center justify-between pb-3 mb-2 border-b border-slate-800">
+                  <div className="flex items-center justify-between pb-3 mb-2 border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center gap-2">
-                      <p className="font-bold text-sm text-white">Bildirimler</p>
+                      <p className="font-bold text-sm text-slate-900 dark:text-white">Bildirimler</p>
                       {unreadCount > 0 && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30">
                           {unreadCount} yeni
                         </span>
                       )}
@@ -400,7 +404,7 @@ export default function DashboardLayout({ children }) {
                       <button
                         type="button"
                         onClick={handleMarkAllRead}
-                        className="text-[11px] text-violet-400 hover:text-violet-300 font-bold transition-colors flex items-center gap-1"
+                        className="text-[11px] text-violet-600 dark:text-violet-400 hover:text-violet-500 dark:hover:text-violet-300 font-bold transition-colors flex items-center gap-1"
                       >
                         <Check size={12} /> Tümünü Oku
                       </button>
@@ -409,9 +413,9 @@ export default function DashboardLayout({ children }) {
 
                   <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
                     {notifications.length === 0 ? (
-                      <div className="py-8 text-center bg-slate-900/50 rounded-xl border border-white/5">
+                      <div className="py-8 text-center bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-white/5">
                         <span className="text-2xl block mb-1">🔔</span>
-                        <p className="text-xs text-slate-400">Henüz yeni bir bildiriminiz yok.</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Henüz yeni bir bildiriminiz yok.</p>
                       </div>
                     ) : (
                       notifications.map((n) => {
@@ -426,24 +430,24 @@ export default function DashboardLayout({ children }) {
                             onClick={() => handleMarkAsRead(n)}
                             className={`flex gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
                               !n.is_read
-                                ? 'bg-violet-950/60 border-violet-500/50 hover:bg-violet-900/60 shadow-md'
-                                : 'bg-slate-900/90 border-slate-800 hover:bg-slate-850'
+                                ? 'bg-violet-50 dark:bg-violet-950/60 border-violet-200 dark:border-violet-500/50 hover:bg-violet-100/60 dark:hover:bg-violet-900/60 shadow-md'
+                                : 'bg-slate-50 dark:bg-slate-900/90 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-850'
                             }`}
                           >
                             <span className="text-lg shrink-0 mt-0.5">{icon}</span>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between gap-1">
-                                <p className={`text-xs truncate ${!n.is_read ? 'font-bold text-white' : 'font-medium text-slate-300'}`}>
+                                <p className={`text-xs truncate ${!n.is_read ? 'font-bold text-slate-900 dark:text-white' : 'font-medium text-slate-700 dark:text-slate-300'}`}>
                                   {n.title}
                                 </p>
                                 {!n.is_read && (
-                                  <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
+                                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500 dark:bg-violet-400 shrink-0" />
                                 )}
                               </div>
-                              <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
+                              <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
                                 {n.message}
                               </p>
-                              <p className="text-[9px] text-slate-500 mt-1">
+                              <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-1">
                                 {new Date(n.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                               </p>
                             </div>

@@ -140,73 +140,96 @@ input.form-input.has-icon-right {
 }
 
 /* ☀️ Light Mode Overrides (Theme Feature) ☀️ */
+html.light,
 body.light-mode {
   background-color: #F8FAFC !important;
   color: #0F172A !important;
 }
 
+html.light .bg-\[\#0f172a\],
 body.light-mode .bg-\[\#0f172a\] {
   background-color: #F1F5F9 !important;
 }
 
-body.light-mode .text-white {
-  color: #0F172A !important;
-}
-
-body.light-mode .text-slate-400,
-body.light-mode .text-slate-300 {
-  color: #475569 !important;
-}
-
-body.light-mode .bg-white\/5,
-body.light-mode .bg-white\/10 {
-  background-color: rgba(0,0,0,0.03) !important;
-}
-
-body.light-mode .border-white\/10,
-body.light-mode .border-white\/15,
-body.light-mode .border-white\/5 {
-  border-color: #cbd5e1 !important;
-}
-
-body.light-mode .glass,
-body.light-mode .glass-light {
-  background: #ffffff !important;
-  border: 1px solid #cbd5e1 !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-}
-
-body.light-mode input,
-body.light-mode textarea,
-body.light-mode .form-input {
-  background: #ffffff !important;
-  color: #0F172A !important;
-  border: 1px solid #cbd5e1 !important;
-}
-
-body.light-mode input::placeholder,
-body.light-mode textarea::placeholder,
-body.light-mode .form-input::placeholder {
-  color: #94a3b8 !important;
-}
-
+html.light .animated-bg,
 body.light-mode .animated-bg,
+html.light .login-bg,
 body.light-mode .login-bg {
   background: #F8FAFC !important;
 }
 
+/* Glass & Card Styling for Light Mode */
+html.light .glass,
+body.light-mode .glass {
+  background: #ffffff !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.06) !important;
+}
+
+html.light .glass-light,
+body.light-mode .glass-light {
+  background: #FFFFFF !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 2px 8px -1px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Form Inputs in Light Mode */
+html.light input,
+html.light textarea,
+html.light .form-input,
+body.light-mode input,
+body.light-mode textarea,
+body.light-mode .form-input {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder,
+html.light .form-input::placeholder,
+body.light-mode input::placeholder,
+body.light-mode textarea::placeholder,
+body.light-mode .form-input::placeholder {
+  color: #94A3B8 !important;
+}
+
+html.light .form-input:focus,
+body.light-mode .form-input:focus {
+  border-color: #7C3AED !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
+}
+
+/* Sidebar in Light Mode */
+html.light .sidebar-link,
 body.light-mode .sidebar-link {
   color: #475569;
 }
+html.light .sidebar-link:hover,
 body.light-mode .sidebar-link:hover {
-  background: rgba(0,0,0,0.05);
+  background: rgba(124, 58, 237, 0.06);
   color: #0F172A;
 }
+html.light .sidebar-link.active,
 body.light-mode .sidebar-link.active {
-  background: linear-gradient(to right, rgba(124, 58, 237, 0.1), rgba(236, 72, 153, 0.05));
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(236, 72, 153, 0.08) 100%) !important;
+  border: 1px solid rgba(124, 58, 237, 0.25) !important;
   color: #7C3AED !important;
-  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.1);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.12) !important;
+}
+
+/* Scrollbars in Light Mode */
+html.light ::-webkit-scrollbar-track,
+body.light-mode ::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+html.light ::-webkit-scrollbar-thumb,
+body.light-mode ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+}
+html.light ::-webkit-scrollbar-thumb:hover,
+body.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
 }
 body {
   cursor: default;

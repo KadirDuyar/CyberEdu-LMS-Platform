@@ -236,19 +236,19 @@ export default function CoursePage() {
 
         {/* Kayıt kartı (öğretmene önizleme çubuğu, öğrenciye kayıt kartı) */}
         {isTeacher ? (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-violet-950/60 to-purple-950/40 border border-violet-500/30 shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-violet-100 via-purple-50 to-white dark:from-violet-950/60 dark:to-purple-950/40 border border-violet-200 dark:border-violet-500/30 shadow-md">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-violet-500/20 text-violet-400 flex items-center justify-center font-bold text-lg shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold text-lg shrink-0">
                 👨‍🏫
               </div>
               <div>
-                <p className="text-sm font-bold text-white flex items-center gap-2">
+                <p className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   Eğitmen Önizleme Modu
-                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-500/30">
                     Öğrenci Görünümü
                   </span>
                 </p>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   Kursunuzu, ders içeriklerini ve öğrenci yorumlarını aynen öğrencinin deneyimlediği arayüzde inceliyorsunuz.
                 </p>
               </div>
@@ -256,13 +256,13 @@ export default function CoursePage() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => navigate(`/teacher/courses/${courseId}/edit`)}
-                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all"
+                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-800 dark:text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
               >
                 Kursu Düzenle
               </button>
               <button
                 onClick={() => navigate(`/teacher/courses/${courseId}/details`)}
-                className="px-3.5 py-2 rounded-xl bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition-all"
+                className="px-3.5 py-2 rounded-xl bg-cyan-600/10 hover:bg-cyan-600/20 dark:bg-cyan-600/30 dark:hover:bg-cyan-600/50 text-cyan-700 dark:text-cyan-300 border border-cyan-400/40 dark:border-cyan-500/30 text-xs font-bold transition-all cursor-pointer shadow-sm"
               >
                 Kayıtlı Öğrenciler
               </button>

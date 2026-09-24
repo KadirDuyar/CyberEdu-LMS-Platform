@@ -155,32 +155,32 @@ export default function LeaderboardPage() {
       <div className="space-y-8 max-w-5xl mx-auto pb-16">
 
         {/* ── Üst Başlık & İstatistik Kartı ────────────────────────────── */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-950/80 via-purple-950/60 to-slate-900 border border-violet-500/30 p-6 md:p-8 shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-100 via-purple-50 to-white dark:from-violet-950/80 dark:via-purple-950/60 dark:to-slate-900 border border-violet-200 dark:border-violet-500/30 p-6 md:p-8 shadow-2xl">
           <div className="absolute top-0 right-0 w-80 h-80 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
           
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/20 border border-violet-500/30 text-violet-300 text-xs font-bold mb-3">
-                <Trophy size={14} className="text-amber-400" /> Siber Liderlik Arenası
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-100 dark:bg-violet-500/20 border border-violet-300 dark:border-violet-500/30 text-violet-700 dark:text-violet-300 text-xs font-bold mb-3">
+                <Trophy size={14} className="text-amber-500 dark:text-amber-400" /> Siber Liderlik Arenası
               </div>
-              <h1 className="font-display font-black text-2xl md:text-3xl text-white">
+              <h1 className="font-display font-black text-2xl md:text-3xl text-slate-900 dark:text-white">
                 Öğrenci Liderlik Tablosu 🏆
               </h1>
-              <p className="text-slate-300 text-sm mt-1.5 max-w-xl leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 text-sm mt-1.5 max-w-xl leading-relaxed">
                 CyberEdu'da en çok XP kazanan, dersleri tamamlayan ve siber güvenlik parkurlarında öne çıkan öğrencileri keşfet.
               </p>
             </div>
 
             {/* Kullanıcının Kendi Sıralaması */}
             {myRank > 0 && (
-              <div className="glass-light rounded-2xl p-4 border border-violet-500/30 shrink-0 flex items-center gap-4 bg-violet-900/20">
+              <div className="glass-light rounded-2xl p-4 border border-violet-200 dark:border-violet-500/30 shrink-0 flex items-center gap-4 bg-violet-50 dark:bg-violet-900/20 shadow-sm">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-amber-500/25">
                   #{myRank}
                 </div>
                 <div>
-                  <p className="text-xs text-slate-400 font-semibold">Senin Sıralaman</p>
-                  <p className="text-base font-black text-white">{profile?.xp || 0} XP</p>
-                  <p className="text-[11px] text-violet-300 font-medium">Seviye {profile?.level || 1}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Senin Sıralaman</p>
+                  <p className="text-base font-black text-slate-900 dark:text-white">{profile?.xp || 0} XP</p>
+                  <p className="text-[11px] text-violet-700 dark:text-violet-300 font-medium">Seviye {profile?.level || 1}</p>
                 </div>
               </div>
             )}

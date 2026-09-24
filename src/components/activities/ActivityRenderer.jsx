@@ -651,12 +651,12 @@ function MatchingActivity({ activity, onSubmit, submitted, result, initialAnswer
                 key={idx}
                 disabled={submitted}
                 onClick={() => setSelectedLeft(p.left)}
-                className={`w-full p-3 rounded-xl border text-left font-bold text-xs md:text-sm transition-all ${
+                className={`w-full p-3 rounded-xl border-2 text-left font-bold text-xs md:text-sm transition-all cursor-pointer ${
                   isSelected 
-                    ? 'border-violet-500 bg-violet-50 dark:bg-violet-950/40 text-violet-700' 
+                    ? 'border-violet-500 bg-violet-50 dark:bg-violet-950/40 text-violet-800 dark:text-violet-200 shadow-sm' 
                     : isMatched 
-                      ? 'border-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/20 text-emerald-800' 
-                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200'
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-200 shadow-sm' 
+                      : 'border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:border-violet-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                 }`}
               >
                 {p.left} {matches[p.left] && `→ ${matches[p.left]}`}
@@ -673,10 +673,12 @@ function MatchingActivity({ activity, onSubmit, submitted, result, initialAnswer
                 key={idx}
                 disabled={submitted || selectedLeft === null}
                 onClick={() => handleRightClick(p.right)}
-                className={`w-full p-3 rounded-xl border text-left font-semibold text-xs md:text-sm transition-all ${
+                className={`w-full p-3 rounded-xl border-2 text-left font-semibold text-xs md:text-sm transition-all ${
                   isAssigned 
-                    ? 'border-emerald-500/50 bg-emerald-50/20 text-emerald-700' 
-                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-violet-400 text-slate-800 dark:text-slate-200'
+                    ? 'border-emerald-500/70 bg-emerald-50/70 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-200 font-bold shadow-sm' 
+                    : selectedLeft !== null
+                      ? 'border-violet-300 dark:border-violet-800 bg-white dark:bg-slate-900 hover:border-violet-500 hover:bg-violet-50/40 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 cursor-pointer'
+                      : 'border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200'
                 }`}
               >
                 {p.right}
@@ -687,7 +689,7 @@ function MatchingActivity({ activity, onSubmit, submitted, result, initialAnswer
       </div>
 
       {!submitted && Object.keys(matches).length === pairs.length && (
-        <button onClick={handleCheck} className="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm shadow-md">
+        <button onClick={handleCheck} className="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm shadow-md cursor-pointer">
           Eşleştirmeyi Onayla
         </button>
       )}
@@ -1039,7 +1041,7 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
             <button
               onClick={handleGetHint}
               disabled={loadingHint}
-              className="px-3 py-1.5 rounded-xl bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/30 text-violet-600 dark:text-violet-300 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+              className="px-3 py-1.5 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/20 border border-violet-300 dark:border-violet-500/30 text-violet-700 dark:text-violet-300 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
             >
               {loadingHint ? (
                 <>
@@ -1066,11 +1068,11 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
             {hints.map((h, i) => (
               <div
                 key={i}
-                className="p-3.5 rounded-xl bg-gradient-to-r from-violet-500/10 via-fuchsia-500/5 to-transparent border border-violet-500/20 text-slate-800 dark:text-violet-200 text-xs leading-relaxed animate-in fade-in"
+                className="p-3.5 rounded-xl bg-violet-50/80 dark:bg-gradient-to-r dark:from-violet-500/10 dark:via-fuchsia-500/5 dark:to-transparent border border-violet-200 dark:border-violet-500/20 text-slate-800 dark:text-violet-200 text-xs leading-relaxed animate-in fade-in"
               >
-                <div className="flex items-center gap-1.5 font-bold text-violet-600 dark:text-violet-400 mb-1">
+                <div className="flex items-center gap-1.5 font-bold text-violet-700 dark:text-violet-400 mb-1">
                   <span>🤖 YZ Rehberi</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-500/20 font-mono">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-500/20 font-mono text-violet-800 dark:text-violet-300">
                     Kademe {h.level}
                   </span>
                 </div>
@@ -1084,11 +1086,11 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
                 key={i}
                 className={`p-3 rounded-xl text-xs leading-relaxed animate-in fade-in ${
                   d.role === 'user'
-                    ? 'bg-violet-600/20 border border-violet-500/30 text-violet-200 ml-4'
-                    : 'bg-slate-800/80 border border-white/10 text-slate-200 mr-4'
+                    ? 'bg-violet-600 text-white ml-4 shadow-sm'
+                    : 'bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200 mr-4 shadow-sm'
                 }`}
               >
-                <span className="font-bold text-[10px] uppercase tracking-wider block mb-0.5 opacity-75">
+                <span className={`font-bold text-[10px] uppercase tracking-wider block mb-0.5 ${d.role === 'user' ? 'text-violet-100' : 'text-slate-500 dark:text-slate-400'}`}>
                   {d.role === 'user' ? 'Sen:' : '🤖 YZ Yanıtı:'}
                 </span>
                 <p className="whitespace-pre-wrap">{d.text}</p>
@@ -1097,8 +1099,8 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
 
             {/* Yükleniyor Göstergesi */}
             {replyLoading && (
-              <div className="p-2.5 rounded-xl bg-slate-800/50 border border-white/10 text-xs text-slate-400 flex items-center gap-2 mr-4">
-                <span className="w-2 h-2 rounded-full bg-violet-400 animate-ping" />
+              <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 mr-4">
+                <span className="w-2 h-2 rounded-full bg-violet-500 animate-ping" />
                 <span>YZ yanıtını düşünüyor...</span>
               </div>
             )}
@@ -1111,12 +1113,12 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
                 onChange={(e) => setReplyInput(e.target.value)}
                 disabled={replyLoading}
                 placeholder="YZ'ye cevap ver veya ipucu hakkında soru sor..."
-                className="flex-1 bg-slate-100 dark:bg-slate-900 border border-violet-500/30 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-violet-500"
+                className="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-violet-500/30 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-violet-500 shadow-sm"
               />
               <button
                 type="submit"
                 disabled={!replyInput.trim() || replyLoading}
-                className="px-3 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1 shrink-0"
+                className="px-3 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1 shrink-0 cursor-pointer"
               >
                 {replyLoading ? (
                   <span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />

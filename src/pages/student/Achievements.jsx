@@ -108,35 +108,35 @@ export default function Achievements() {
       <div className="space-y-8 max-w-5xl mx-auto pb-16">
 
         {/* ── Üst Başlık & Özet Kartı ────────────────────────────── */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-950/80 via-purple-950/60 to-slate-900 border border-violet-500/30 p-6 md:p-8 shadow-2xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-violet-100 via-purple-50 to-white dark:from-violet-950/80 dark:via-purple-950/60 dark:to-slate-900 border border-violet-200 dark:border-violet-500/30 p-6 md:p-8 shadow-2xl">
           <div className="absolute top-0 right-0 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             
             <div className="space-y-2 text-center md:text-left">
-              <span className="text-xs font-black uppercase tracking-wider text-amber-300 bg-amber-950/60 border border-amber-500/40 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5">
-                <Trophy size={14} className="text-amber-400" /> Şampiyonlar Odası
+              <span className="text-xs font-black uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-500/40 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5">
+                <Trophy size={14} className="text-amber-500 dark:text-amber-400" /> Şampiyonlar Odası
               </span>
-              <h1 className="font-display font-black text-2xl md:text-3xl text-white">
+              <h1 className="font-display font-black text-2xl md:text-3xl text-slate-900 dark:text-white">
                 Başarılarım & <span className="text-gradient">Karakter Koleksiyonum</span>
               </h1>
-              <p className="text-slate-300 text-sm max-w-xl leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-300 text-sm max-w-xl leading-relaxed">
                 Kursları ve dersleri tamamladıkça yeni karakterlerin kilitlerini aç, başarı rozetleri kazan ve siber güvenlik kimliğini özelleştir!
               </p>
             </div>
 
             {/* Aktif Kuşanılan Karakter Kartı */}
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4 shrink-0 shadow-xl backdrop-blur-md">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600/40 to-pink-600/20 border border-violet-400/40 flex items-center justify-center text-4xl shadow-inner animate-bounce-subtle">
+            <div className="p-4 rounded-2xl bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center gap-4 shrink-0 shadow-xl backdrop-blur-md">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600/20 to-pink-600/10 dark:from-violet-600/40 dark:to-pink-600/20 border border-violet-300 dark:border-violet-400/40 flex items-center justify-center text-4xl shadow-inner animate-bounce-subtle">
                 {profile?.avatar_emoji || '🚀'}
               </div>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full inline-block">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/30 px-2 py-0.5 rounded-full inline-block">
                   Kuşanılan Karakter
                 </span>
-                <h4 className="text-sm font-bold text-white mt-1">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-1">
                   {profile?.full_name || 'Öğrenci'}
                 </h4>
-                <p className="text-xs text-amber-400 font-black">+{profile?.xp || 0} XP</p>
+                <p className="text-xs text-amber-600 dark:text-amber-400 font-black">+{profile?.xp || 0} XP</p>
               </div>
             </div>
 

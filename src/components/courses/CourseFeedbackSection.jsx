@@ -168,21 +168,21 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
 
       {/* Geri Bildirim Formu (Öğrenciye) veya Bilgi Kutusu (Öğretmene) */}
       {currentUser && isTeacher ? (
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-violet-950/40 via-purple-950/30 to-slate-900 border border-violet-500/20 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-violet-500/20 text-violet-400 flex items-center justify-center shrink-0">
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-violet-100 via-purple-50 to-white dark:from-violet-950/40 dark:via-purple-950/30 dark:to-slate-900 border border-violet-200 dark:border-violet-500/20 flex items-center gap-3 shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
             <MessageSquare size={18} />
           </div>
           <div>
-            <p className="text-xs font-bold text-white">Eğitmen Değerlendirme & Yanıt Masası</p>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-xs font-bold text-slate-900 dark:text-white">Eğitmen Değerlendirme & Yanıt Masası</p>
+            <p className="text-[11px] text-slate-600 dark:text-slate-400">
               Öğrencilerinizin kurs hakkındaki değerlendirmelerini aşağıda görebilir ve doğrudan "Cevap Yaz" butonunu kullanarak yanıt verebilirsiniz.
             </p>
           </div>
         </div>
       ) : currentUser ? (
-        <form onSubmit={handleSubmit} className="p-4 rounded-2xl bg-slate-900/60 border border-white/10 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 space-y-4 shadow-sm">
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <label className="text-xs font-bold text-slate-300">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
               {existingFeedbackId ? 'Geri Bildiriminizi Güncelleyin:' : 'Bu kurs nasıldı? Değerlendirin:'}
             </label>
 
@@ -191,10 +191,10 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
               <button
                 type="button"
                 onClick={() => setSelectedRating('like')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedRating === 'like'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-md shadow-emerald-500/20 scale-105'
-                    : 'bg-white/5 text-slate-400 hover:text-white border border-white/10'
+                    ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/50 shadow-md shadow-emerald-500/20 scale-105'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10'
                 }`}
               >
                 <ThumbsUp size={15} /> Faydalı Buldum
@@ -203,10 +203,10 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
               <button
                 type="button"
                 onClick={() => setSelectedRating('dislike')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedRating === 'dislike'
-                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50 shadow-md shadow-rose-500/20 scale-105'
-                    : 'bg-white/5 text-slate-400 hover:text-white border border-white/10'
+                    ? 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/50 shadow-md shadow-rose-500/20 scale-105'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10'
                 }`}
               >
                 <ThumbsDown size={15} /> Geliştirilmeli
@@ -220,12 +220,12 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Kursun anlatımı, soruları veya içeriği hakkında düşünceleriniz (isteğe bağlı)..."
             rows={2}
-            className="w-full px-4 py-2.5 rounded-xl bg-slate-950/80 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-violet-500 resize-none transition-colors"
+            className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 text-xs focus:outline-none focus:border-violet-500 resize-none transition-colors shadow-sm"
           />
 
           {/* Anonim Seçeneği ve Gönder Butonu */}
           <div className="flex items-center justify-between flex-wrap gap-3 pt-1">
-            <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 hover:text-white transition-colors">
+            <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
               <input
                 type="checkbox"
                 checked={isAnonymous}

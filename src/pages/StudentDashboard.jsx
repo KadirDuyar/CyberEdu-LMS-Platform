@@ -276,36 +276,36 @@ export default function StudentDashboard() {
         {/* ── Banner: Kurs Tamamlandı vs Yeni Öğrenci vs Devam Et ──────────────────────── */}
         <div id="tour-resume-card">
           {isCourseFinished ? (
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/90 via-teal-950/70 to-slate-900 border border-emerald-500/40 p-6 md:p-8 shadow-2xl">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-100 via-teal-50 to-white dark:from-emerald-950/90 dark:via-teal-950/70 dark:to-slate-900 border border-emerald-400/50 dark:border-emerald-500/40 p-6 md:p-8 shadow-2xl">
               <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs font-black uppercase tracking-wider text-emerald-300 bg-emerald-900/50 border border-emerald-500/30 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
-                    <Trophy size={14} className="text-amber-400" /> Kurs Başarıyla Tamamlandı!
+                  <span className="text-xs font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 bg-emerald-200/60 dark:bg-emerald-900/50 border border-emerald-400/40 dark:border-emerald-500/30 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+                    <Trophy size={14} className="text-amber-500 dark:text-amber-400" /> Kurs Başarıyla Tamamlandı!
                   </span>
-                  <span className="text-xs font-bold text-slate-300 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 bg-black/5 dark:bg-white/10 px-2.5 py-1 rounded-full border border-black/10 dark:border-white/10">
                     {profile?.learning_area === 'technical' ? '💻 Teknik Parkur' : '🛡️ Farkındalık Parkuru'}
                   </span>
                 </div>
 
-                <h2 className="font-display font-black text-2xl md:text-3xl text-white">
+                <h2 className="font-display font-black text-2xl md:text-3xl text-slate-900 dark:text-white">
                   Tebrikler, <span className="text-gradient">{profile?.full_name?.split(' ')[0] || 'Öğrenci'}!</span> 🎉
                 </h2>
 
-                <p className="text-slate-300 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
-                  <strong className="text-emerald-300 font-bold">{activeCourse?.title}</strong> kursundaki tüm dersleri başarıyla bitirdin! Yeni yetenekler kazanmak ve siber güvenlikte uzmanlaşmak için sıradaki kurslara katılabilirsin.
+                <p className="text-slate-700 dark:text-slate-300 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
+                  <strong className="text-emerald-700 dark:text-emerald-300 font-bold">{activeCourse?.title}</strong> kursundaki tüm dersleri başarıyla bitirdin! Yeni yetenekler kazanmak ve siber güvenlikte uzmanlaşmak için sıradaki kurslara katılabilirsin.
                 </p>
 
                 <div className="mt-5 flex flex-wrap items-center gap-3">
                   <button
                     onClick={() => navigate('/student/courses')}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition-all shadow-lg shadow-emerald-500/25 hover:scale-105"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold transition-all shadow-lg shadow-emerald-500/25 hover:scale-105 cursor-pointer"
                   >
                     <BookOpen size={18} /> Başka Kurslara Göz At
                   </button>
                   <button
                     onClick={() => navigate('/student/learning-path')}
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 text-sm font-bold transition-all"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-slate-800 dark:text-slate-200 text-sm font-bold transition-all cursor-pointer"
                   >
                     <Map size={18} /> Öğrenme Yolculuğum
                   </button>
@@ -614,16 +614,16 @@ export default function StudentDashboard() {
             </div>
 
             {/* Kurs Keşfet Kartı */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-violet-950/40 to-indigo-950/40 border border-violet-500/20">
-              <div className="flex items-center gap-2 text-violet-300 text-sm font-bold mb-1">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-violet-950/40 dark:to-indigo-950/40 border border-violet-200 dark:border-violet-500/20">
+              <div className="flex items-center gap-2 text-violet-700 dark:text-violet-300 text-sm font-bold mb-1">
                 <Sparkles size={16} /> Yeni Kurslar Keşfet
               </div>
-              <p className="text-xs text-slate-400 mb-3">
+              <p className="text-xs text-slate-600 dark:text-slate-400 mb-3">
                 Kataloğumuzdaki diğer siber güvenlik kurslarına katılarak rozet ve XP kazanabilirsin.
               </p>
               <button
                 onClick={() => navigate('/student/courses')}
-                className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md shadow-violet-500/20 cursor-pointer"
               >
                 Kurs Kataloğunu Aç <ArrowRight size={14} />
               </button>
