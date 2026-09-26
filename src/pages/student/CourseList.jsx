@@ -8,7 +8,7 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import Card from '../../components/Card';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState';
-import { BookOpen, Zap, ArrowRight, Shield, Code2, CheckCircle2, Play, Lock, AlertCircle, Sparkles, Filter } from 'lucide-react';
+import { BookOpen, Zap, ArrowRight, Shield, Code2, CheckCircle2, Play, Lock, AlertCircle, Sparkles, Filter, Calendar } from 'lucide-react';
 
 // ─── Kategori görünüm ayarları ────────────────────────────────────────────────
 const CATEGORY_UI = {
@@ -50,6 +50,7 @@ export default function CourseList() {
   const [enrolledMap, setEnrolledMap] = useState({});
   const [completedLessons, setCompletedLessons] = useState(new Set());
   const [courseLessonsMap, setCourseLessonsMap] = useState({});
+  const [cohortCourseIds, setCohortCourseIds] = useState(new Set());
 
   const area = profile?.learning_area ?? 'awareness';
   const ui   = CATEGORY_UI[area] || CATEGORY_UI.awareness;
@@ -92,10 +93,21 @@ export default function CourseList() {
         });
         setCourseLessonsMap(lessonMap);
 
-        // İlk kurs varsa otomatik kayıtlı say
-        if (courses.length > 0 && !enrollMap[courses[0].id]) {
-          enrollMap[courses[0].id] = true;
-          enrollInCourse(user.id, courses[0].id).catch(() => {});
+        // 4. Öğrencinin kayıtlı olduğu haftalık sınıf görevleri (cohort) kursları
+        const { data: memberCohorts } = await supabase
+          .from('cohort_members')
+          .select('cohort_id')
+          .eq('student_id', user.id);
+
+        const cIds = (memberCohorts || []).map((m) => m.cohort_id);
+        if (cIds.length > 0) {
+          const { data: cohortWeeks } = await supabase
+            .from('cohort_weeks')
+            .select('course_id')
+            .in('cohort_id', cIds)
+            .not('course_id', 'is', null);
+
+          setCohortCourseIds(new Set((cohortWeeks || []).map((w) => w.course_id)));
         }
 
         setEnrolledMap(enrollMap);
@@ -161,7 +173,7 @@ export default function CourseList() {
           </div>
         </div>
 
-        {/* Filtreleme Sekmeleri: Tümü, Seçmeli, Zorunlu */}
+        {/* Filtreleme Sekmeleri: Tümü, Zorunlu Patika, Sınıf Görevleri, Seçmeli */}
         <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-4">
           <button
             onClick={() => setActiveTab('all')}
@@ -174,24 +186,34 @@ export default function CourseList() {
             Tüm Kurslar ({courses.filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')).length})
           </button>
           <button
-            onClick={() => setActiveTab('elective')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-              activeTab === 'elective'
-                ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25'
-                : 'bg-white/5 hover:bg-white/10 text-amber-300/90'
-            }`}
-          >
-            <Sparkles size={13} /> Seçmeli Kurslar
-          </button>
-          <button
             onClick={() => setActiveTab('mandatory')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'mandatory'
+                ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/25'
+                : 'bg-white/5 hover:bg-white/10 text-rose-300/90'
+            }`}
+          >
+            🔴 Zorunlu Patika ({courses.filter((c) => c.is_mandatory !== false && c.course_type !== 'elective').length})
+          </button>
+          <button
+            onClick={() => setActiveTab('cohort')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === 'cohort'
                 ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/25'
                 : 'bg-white/5 hover:bg-white/10 text-cyan-300/90'
             }`}
           >
-            📌 Zorunlu Müfredat
+            <Calendar size={13} /> 🔵 Sınıf Görevleri ({courses.filter((c) => cohortCourseIds.has(c.id)).length})
+          </button>
+          <button
+            onClick={() => setActiveTab('elective')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === 'elective'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25'
+                : 'bg-white/5 hover:bg-white/10 text-emerald-300/90'
+            }`}
+          >
+            <Sparkles size={13} /> 🟢 Seçmeli Kurslar ({courses.filter((c) => c.is_mandatory === false || c.course_type === 'elective').length})
           </button>
         </div>
 
@@ -214,6 +236,7 @@ export default function CourseList() {
                 const isElective = c.is_mandatory === false || c.course_type === 'elective';
                 if (activeTab === 'elective') return isElective;
                 if (activeTab === 'mandatory') return !isElective;
+                if (activeTab === 'cohort') return cohortCourseIds.has(c.id);
                 return true;
               })
               .map((course, idx, arr) => {
@@ -245,6 +268,8 @@ export default function CourseList() {
                 }
               }
 
+              const isCohortCourse = cohortCourseIds.has(course.id);
+
               return (
                 <div
                   key={course.id}
@@ -258,11 +283,13 @@ export default function CourseList() {
                         ? 'border-emerald-500/40 bg-emerald-950/10 hover:border-emerald-400'
                         : isLocked
                           ? 'border-white/5 bg-slate-900/40 opacity-60'
-                          : isElective
-                            ? 'border-amber-500/40 bg-amber-950/10 hover:border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.05)] hover:shadow-[0_0_20px_rgba(245,158,11,0.1)]'
-                            : isEnrolled
-                              ? 'border-violet-500/40 hover:border-violet-400'
-                              : 'border-white/10 hover:border-violet-500/40'
+                          : isCohortCourse
+                            ? 'border-cyan-500/50 bg-cyan-950/20 hover:border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.12)]'
+                            : isElective
+                              ? 'border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.05)]'
+                              : isEnrolled
+                                ? 'border-rose-500/40 hover:border-rose-400 bg-rose-950/10'
+                                : 'border-white/10 hover:border-rose-500/40'
                     }`}
                   >
                     {/* Üst: emoji + badge */}
@@ -270,14 +297,16 @@ export default function CourseList() {
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl border ${
                         isLocked 
                           ? 'bg-slate-800/50 border-white/5 grayscale' 
-                          : isElective
-                            ? 'bg-gradient-to-br from-amber-500/20 to-orange-500/10 border-amber-500/30'
-                            : 'bg-gradient-to-br from-violet-500/20 to-pink-500/10 border-white/10'
+                          : isCohortCourse
+                            ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/10 border-cyan-500/40'
+                            : isElective
+                              ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border-emerald-500/30'
+                              : 'bg-gradient-to-br from-rose-500/20 to-pink-500/10 border-rose-500/30'
                       }`}>
                         {isLocked ? '🔒' : (course.thumbnail_emoji || '🛡️')}
                       </div>
                       
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex flex-wrap items-center justify-end gap-1.5 max-w-[70%]">
                         {isCompleted ? (
                           <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
                             <CheckCircle2 size={12} />
@@ -298,12 +327,21 @@ export default function CourseList() {
                           </span>
                         )}
 
+                        {/* Aktif Sınıf Görevi Rozeti */}
+                        {isCohortCourse && (
+                          <span className="text-[10px] font-black px-2 py-1 rounded-full bg-cyan-500/25 text-cyan-300 border border-cyan-500/50 flex items-center gap-1 shadow-sm shadow-cyan-500/20 animate-pulse">
+                            <Calendar size={11} className="text-cyan-400" />
+                            Sınıf Görevi
+                          </span>
+                        )}
+
+                        {/* Müfredat / Patika Türü Rozeti */}
                         <span className={`text-[10px] font-black px-2 py-1 rounded-full border ${
                           isElective
-                            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-                            : 'bg-violet-500/15 text-violet-300 border-violet-500/30'
+                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                            : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
                         }`}>
-                          {isElective ? '🌟 Seçmeli' : '📌 Zorunlu'}
+                          {isElective ? '🟢 Seçmeli' : '🔴 Zorunlu'}
                         </span>
 
                         <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${level.color}`}>

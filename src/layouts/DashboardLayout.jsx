@@ -9,91 +9,139 @@ import { useAuth } from '../context/AuthContext';
 import AiChatWidget from '../components/AiChatWidget';
 import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../services/socialService';
 
-// ─── Sidebar menü konfigürasyonu ──────────────────────────────────────────────
-const NAV_ITEMS = [
+// ─── Sidebar menü ve kategori konfigürasyonu ──────────────────────────────────
+const NAV_SECTIONS = [
   {
-    label: 'Kontrol Paneli',
-    icon: LayoutDashboard,
-    hrefMap: { student: '/student', teacher: '/teacher', admin: '/admin' },
+    id: 'learning',
+    title: 'Müfredat & Eğitim',
+    icon: '🎓',
     roles: ['student', 'teacher', 'admin'],
+    items: [
+      {
+        label: 'Kontrol Paneli',
+        icon: LayoutDashboard,
+        hrefMap: { student: '/student', teacher: '/teacher', admin: '/admin' },
+        roles: ['student', 'teacher', 'admin'],
+      },
+      {
+        label: 'Öğrenme Yolculuğum',
+        icon: Map,
+        href: '/student/learning-path',
+        roles: ['student'],
+        badge: 'Temel',
+      },
+      {
+        label: 'Haftalık Programlarım',
+        icon: Calendar,
+        href: '/student/cohorts',
+        roles: ['student'],
+        badge: 'Sınıf',
+      },
+      {
+        label: 'Kurs Kataloğu',
+        icon: BookOpen,
+        href: '/student/courses',
+        roles: ['student'],
+      },
+      {
+        label: 'Kurslarım',
+        icon: BookOpen,
+        href: '/teacher/courses',
+        roles: ['teacher'],
+      },
+      {
+        label: 'Yeni Kurs',
+        icon: PlusCircle,
+        href: '/teacher/courses/new',
+        roles: ['teacher'],
+      },
+      {
+        label: 'Haftalık Programlar',
+        icon: Calendar,
+        href: '/teacher/cohorts',
+        roles: ['teacher'],
+      },
+    ],
   },
   {
-    label: 'Profilim',
-    icon: User,
-    hrefMap: { student: '/student/profile', teacher: '/teacher/profile', admin: '/admin/profile' },
+    id: 'community',
+    title: 'Gelişim & Topluluk',
+    icon: '🏆',
+    roles: ['student'],
+    items: [
+      {
+        label: 'Liderlik Tablosu',
+        icon: Trophy,
+        href: '/student/leaderboard',
+        roles: ['student'],
+      },
+      {
+        label: 'Başarılar',
+        icon: Award,
+        href: '/student/achievements',
+        roles: ['student'],
+      },
+      {
+        label: 'AI Mentor',
+        icon: Bot,
+        href: '/student/ai-mentor',
+        roles: ['student'],
+      },
+    ],
+  },
+  {
+    id: 'stats',
+    title: 'Analiz & Raporlar',
+    icon: '📊',
+    roles: ['teacher'],
+    items: [
+      {
+        label: 'İstatistikler',
+        icon: BarChart3,
+        href: '/teacher/stats',
+        roles: ['teacher'],
+      },
+    ],
+  },
+  {
+    id: 'admin',
+    title: 'Yönetim & Sistem',
+    icon: '🛡️',
+    roles: ['admin'],
+    items: [
+      {
+        label: 'Kullanıcılar',
+        icon: Users,
+        href: '/admin/users',
+        roles: ['admin'],
+      },
+      {
+        label: 'Kurs Yönetimi',
+        icon: BookOpen,
+        href: '/admin/courses',
+        roles: ['admin'],
+      },
+      {
+        label: 'Sistem Ayarları',
+        icon: Settings,
+        href: '/admin/settings',
+        roles: ['admin'],
+      },
+    ],
+  },
+  {
+    id: 'account',
+    title: 'Hesap',
+    icon: '⚙️',
     roles: ['student', 'teacher', 'admin'],
-  },
-  {
-    label: 'Öğrenme Yolculuğum',
-    icon: Map,
-    href: '/student/learning-path',
-    roles: ['student'],
-  },
-  {
-    label: 'Kurslar',
-    icon: BookOpen,
-    href: '/student/courses',
-    roles: ['student'],
-  },
-  {
-    label: 'Liderlik Tablosu',
-    icon: Trophy,
-    href: '/student/leaderboard',
-    roles: ['student'],
-  },
-  {
-    label: 'Başarılar',
-    icon: Award,
-    href: '/student/achievements',
-    roles: ['student'],
-  },
-  {
-    label: 'AI Mentor',
-    icon: Bot,
-    href: '/student/ai-mentor',
-    roles: ['student'],
-  },
-  {
-    label: 'Kurslarım',
-    icon: BookOpen,
-    href: '/teacher/courses',
-    roles: ['teacher'],
-  },
-  {
-    label: 'Yeni Kurs',
-    icon: PlusCircle,
-    href: '/teacher/courses/new',
-    roles: ['teacher'],
-  },
-  {
-    label: 'Haftalık Programlar',
-    icon: Calendar,
-    href: '/teacher/cohorts',
-    roles: ['teacher'],
-  },
-  {
-    label: 'İstatistikler',
-    icon: BarChart3,
-    href: '/teacher/stats',
-    roles: ['teacher'],
-  },
-  {
-    label: 'Kullanıcılar',
-    icon: Users,
-    href: '/admin/users',
-    roles: ['admin'],
-  },
-  {
-    label: 'Kurslar',
-    icon: BookOpen,
-    href: '/admin/courses',
-    roles: ['admin'],
-  },
-  {
-    label: 'Ayarlar',
-    icon: Settings,
-    href: '/admin/settings',
-    roles: ['admin'],
+    items: [
+      {
+        label: 'Profilim',
+        icon: User,
+        hrefMap: { student: '/student/profile', teacher: '/teacher/profile', admin: '/admin/profile' },
+        roles: ['student', 'teacher', 'admin'],
+      },
+    ],
   },
 ];
 
@@ -113,17 +161,24 @@ function SidebarItem({ item, collapsed, userRole }) {
   const href = item.hrefMap ? item.hrefMap[userRole] : item.href;
   if (!href) return null;
 
+  const isExactRoot = href === '/student' || href === '/teacher' || href === '/admin';
+
   return (
     <NavLink
       to={href}
-      end
+      end={isExactRoot}
       className={({ isActive }) =>
         `sidebar-link ${isActive ? 'active' : ''} ${collapsed ? 'justify-center px-3' : ''}`
       }
       title={collapsed ? item.label : undefined}
     >
-      <item.icon size={20} className="shrink-0" />
-      {!collapsed && <span>{item.label}</span>}
+      <item.icon size={19} className="shrink-0" />
+      {!collapsed && <span className="truncate flex-1">{item.label}</span>}
+      {!collapsed && item.badge && (
+        <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+          {item.badge}
+        </span>
+      )}
     </NavLink>
   );
 }
@@ -186,7 +241,6 @@ export default function DashboardLayout({ children }) {
     }
   }, [isLightMode]);
 
-  const filteredNav = NAV_ITEMS.filter((item) => item.roles.includes(role));
   const levelColor  = LEVEL_COLORS[role] || LEVEL_COLORS.student;
 
   const xp        = profile?.xp ?? 0;
@@ -219,15 +273,35 @@ export default function DashboardLayout({ children }) {
       </div>
 
       {/* Navigasyon */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {filteredNav.map((item) => (
-          <SidebarItem
-            key={item.label}
-            item={item}
-            collapsed={collapsed}
-            userRole={role}
-          />
-        ))}
+      <nav className="flex-1 px-3 py-4 space-y-3 overflow-y-auto">
+        {NAV_SECTIONS.map((section) => {
+          const sectionItems = section.items.filter((item) => item.roles.includes(role));
+          if (sectionItems.length === 0) return null;
+
+          return (
+            <div key={section.id} className="space-y-1">
+              {!collapsed ? (
+                <div className="pt-2 pb-1 px-2.5 first:pt-0">
+                  <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <span>{section.icon}</span>
+                    <span>{section.title}</span>
+                  </p>
+                </div>
+              ) : (
+                <div className="my-2 border-t border-slate-200 dark:border-white/10 first:border-0" />
+              )}
+
+              {sectionItems.map((item) => (
+                <SidebarItem
+                  key={item.label}
+                  item={item}
+                  collapsed={collapsed}
+                  userRole={role}
+                />
+              ))}
+            </div>
+          );
+        })}
       </nav>
 
       {/* Güvenlik rozeti (sadece öğrenciye) */}

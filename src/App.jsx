@@ -16,6 +16,7 @@ import LessonPage       from './pages/student/LessonPage';
 import AiMentor         from './pages/student/AiMentor';
 import Achievements     from './pages/student/Achievements';
 import LeaderboardPage  from './pages/student/LeaderboardPage';
+import StudentCohorts   from './pages/student/StudentCohorts';
 
 // ─── Teacher Pages ────────────────────────────────────────────────────────────
 import TeacherDashboard from './pages/TeacherDashboard';
@@ -81,6 +82,14 @@ export default function App() {
             element={
               <ProtectedRoute allowedRoles={['student']}>
                 <LearningPath />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/cohorts"
+            element={
+              <ProtectedRoute allowedRoles={['student']}>
+                <StudentCohorts />
               </ProtectedRoute>
             }
           />
