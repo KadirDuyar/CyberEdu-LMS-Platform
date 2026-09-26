@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CheckCircle2, XCircle, Play, Pause, RotateCcw, RotateCw, ArrowUp, ArrowDown, Maximize, Minimize } from 'lucide-react';
+import StorylinePlayer from '../player/StorylinePlayer';
 
 const formatAnswer = (ans) => {
   if (ans === undefined || ans === null) return '';
@@ -1154,6 +1155,24 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
       return <div><HotspotActivity {...props} />{renderHintBox()}</div>;
     case 'phishing_detector':
       return <div><PhishingDetectorActivity {...props} />{renderHintBox()}</div>;
+    case 'storyline': {
+      const storylineUrl = activity.options?.url || activity.question || '';
+      const storylineHeight = activity.options?.height || '450px';
+      const storylineTitle = activity.options?.title || activity.question || 'Storyline İçeriği';
+      return (
+        <div>
+          <StorylinePlayer
+            url={storylineUrl}
+            mode="inline"
+            height={storylineHeight}
+            allowFullscreen={activity.options?.allow_fullscreen !== false}
+            title={storylineTitle}
+            submitted={props.submitted}
+            onSubmit={props.onSubmit}
+          />
+        </div>
+      );
+    }
     default:
       return (
         <div>

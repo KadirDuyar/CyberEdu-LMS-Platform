@@ -4,16 +4,18 @@ import { useAuth } from '../../context/AuthContext';
 import { getLessonForBuilder, saveLessonData } from '../../services/teacherService';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import {
-  Save, ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown, CheckSquare, Square, RotateCcw, Sparkles, AlertCircle
+  Save, ArrowLeft, Plus, Trash2, ArrowUp, ArrowDown, CheckSquare, Square, RotateCcw, Sparkles, AlertCircle, MonitorPlay, Link, Info
 } from 'lucide-react';
 import Card from '../../components/Card';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import AiPromptModal from '../../components/ui/AiPromptModal';
+import StorylineZipUploader from '../../components/player/StorylineZipUploader';
 
 const BLOCK_TYPES = {
   heading: { label: 'Başlık', icon: 'H1', isText: true },
   text: { label: 'Metin', icon: 'T', isText: true },
   youtube: { label: 'YouTube Video', icon: '▶️', isText: true },
+  storyline: { label: 'Storyline Aktivitesi', icon: '🎬', isText: false, isStoryline: true },
   multiple_choice: { label: 'Çoktan Seçmeli', icon: '☑️' },
   true_false: { label: 'Doğru/Yanlış', icon: '☯️' },
   fill_blank: { label: 'Boşluk Doldur', icon: '📝' },
@@ -33,6 +35,8 @@ export default function LessonBuilder() {
   const [saving, setSaving] = useState(false);
   const [lessonTitle, setLessonTitle] = useState('');
   const [lessonXp, setLessonXp] = useState(100);
+  const [contentType, setContentType] = useState('default');  // 'default' | 'storyline'
+  const [storylineUrl, setStorylineUrl] = useState('');       // Storyline story.html URL
   const [blocks, setBlocks] = useState([]);
   const [generatingIdx, setGeneratingIdx] = useState(null);
   const [undoHistory, setUndoHistory] = useState({});
@@ -62,6 +66,8 @@ export default function LessonBuilder() {
           setLessonTitle(data.title || '');
           setLessonXp(data.xp_reward || 100);
           setBlocks(data.activities || []);
+          setContentType(data.content_type || 'default');
+          setStorylineUrl(data.storyline_url || '');
         }
       }
       setLoading(false);
@@ -96,7 +102,9 @@ export default function LessonBuilder() {
       course_id: courseId,
       title: lessonTitle,
       xp_reward: lessonXp,
-      is_published: true
+      is_published: true,
+      content_type: contentType,
+      storyline_url: contentType === 'storyline' ? (storylineUrl.trim() || null) : null,
     };
 
     const { data, error } = await saveLessonData(lessonData, updatedBlocks);
@@ -129,7 +137,8 @@ export default function LessonBuilder() {
         { text: 'Gönderici alan adını kontrol ederim', consequence: 'Tebrikler! Oltalama girişimini engellediniz.', isCorrect: true }
       ],
       hotspot: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800',
-      youtube: { require_completion: true }
+      youtube: { require_completion: true },
+      storyline: { url: '', height: '450px', allow_fullscreen: true }
     };
 
     const defaultCorrectAnswers = {
@@ -294,6 +303,82 @@ export default function LessonBuilder() {
           </div>
         </Card>
 
+        {/* ── Ders İçerik Türü Seçimi ───────────────────────────── */}
+        <Card>
+          <div className="space-y-3">
+            <label className="text-xs font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider block">
+              Ders İçerik Türü
+            </label>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setContentType('default')}
+                className={`flex-1 flex items-center gap-2 p-3.5 rounded-xl border-2 text-sm font-bold transition-all cursor-pointer
+                  ${contentType === 'default'
+                    ? 'border-violet-500 bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300'
+                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-violet-400'}`}
+              >
+                <span className="text-lg">📚</span>
+                <div className="text-left">
+                  <p className="font-bold">Standart Ders</p>
+                  <p className="text-xs font-normal opacity-75">Aktivite blokları ile normal ders akışı</p>
+                </div>
+              </button>
+              <button
+                onClick={() => setContentType('storyline')}
+                className={`flex-1 flex items-center gap-2 p-3.5 rounded-xl border-2 text-sm font-bold transition-all cursor-pointer
+                  ${contentType === 'storyline'
+                    ? 'border-violet-500 bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300'
+                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-violet-400'}`}
+              >
+                <MonitorPlay size={22} className={contentType === 'storyline' ? 'text-violet-600 dark:text-violet-400' : 'text-slate-400'} />
+                <div className="text-left">
+                  <p className="font-bold">Storyline Dersi</p>
+                  <p className="text-xs font-normal opacity-75">Tam ekran Articulate Storyline modülü</p>
+                </div>
+              </button>
+            </div>
+
+            {/* Storyline URL Girişi */}
+            {contentType === 'storyline' && (
+              <div className="space-y-3 p-4 rounded-xl bg-violet-50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-800">
+                <div>
+                  <label className="text-xs font-bold text-violet-700 dark:text-violet-300 block mb-1.5 flex items-center gap-1.5">
+                    <Link size={13} /> Storyline story.html URL Adresi
+                  </label>
+                  <input
+                    type="url"
+                    value={storylineUrl}
+                    onChange={(e) => setStorylineUrl(e.target.value)}
+                    placeholder="https://kullaniciadi.github.io/repo/story.html"
+                    className="w-full p-3 rounded-xl border border-violet-300 dark:border-violet-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:border-violet-500 text-sm font-mono"
+                  />
+                </div>
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                  <Info size={15} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                  <div className="text-xs text-amber-700 dark:text-amber-300 space-y-1">
+                    <p className="font-bold">URL Kaynağı Önerileri:</p>
+                    <p>• <strong>GitHub Pages:</strong> <code className="bg-amber-100 dark:bg-amber-950/50 px-1 rounded">https://kullaniciadi.github.io/repo/story.html</code></p>
+                    <p>• <strong>Supabase Storage:</strong> Aşağıdaki ZIP yükleme alanını kullanın</p>
+                    <p>• Dosya yolu <code className="bg-amber-100 dark:bg-amber-950/50 px-1 rounded">story.html</code> ile bitmelidir.</p>
+                  </div>
+                </div>
+                
+                {/* Supabase ZIP Yükleme */}
+                <div>
+                  <label className="text-xs font-bold text-violet-700 dark:text-violet-300 block mb-1.5">
+                    veya Storyline ZIP Paketi Yükle (Supabase Storage)
+                  </label>
+                  <StorylineZipUploader
+                    courseId={courseId}
+                    lessonId={lessonId}
+                    onUrlReady={(url) => setStorylineUrl(url)}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </Card>
+
         {/* Blok Listesi */}
         <div className="space-y-4">
           {blocks.length === 0 && (
@@ -431,7 +516,66 @@ export default function LessonBuilder() {
                     </div>
                   )}
 
-                  {!isText && (
+                  {block.type === 'storyline' && (
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Aktivite Başlığı / Yönerge</label>
+                        <input
+                          value={block.question || ''}
+                          onChange={(e) => updateBlock(idx, 'question', e.target.value)}
+                          placeholder="Örn: Aşağıdaki Storyline modülünü inceleyin ve tamamlayın."
+                          className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:border-violet-500 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Storyline story.html URL</label>
+                        <input
+                          type="url"
+                          value={block.options?.url || ''}
+                          onChange={(e) => {
+                            const curOpts = typeof block.options === 'object' && block.options !== null ? block.options : {};
+                            updateBlock(idx, 'options', { ...curOpts, url: e.target.value });
+                          }}
+                          placeholder="https://kullaniciadi.github.io/repo/story.html"
+                          className="w-full p-3 rounded-xl border border-slate-300 dark:border-violet-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:border-violet-500 text-sm font-mono"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Oynatıcı Yüksekliği</label>
+                          <select
+                            value={block.options?.height || '450px'}
+                            onChange={(e) => {
+                              const curOpts = typeof block.options === 'object' && block.options !== null ? block.options : {};
+                              updateBlock(idx, 'options', { ...curOpts, height: e.target.value });
+                            }}
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white outline-none focus:border-violet-500 text-sm"
+                          >
+                            <option value="350px">350px (Küçük)</option>
+                            <option value="450px">450px (Orta)</option>
+                            <option value="550px">550px (Büyük)</option>
+                            <option value="650px">650px (Geniş)</option>
+                          </select>
+                        </div>
+                        <div className="flex items-end pb-1">
+                          <label className="inline-flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={block.options?.allow_fullscreen !== false}
+                              onChange={(e) => {
+                                const curOpts = typeof block.options === 'object' && block.options !== null ? block.options : {};
+                                updateBlock(idx, 'options', { ...curOpts, allow_fullscreen: e.target.checked });
+                              }}
+                              className="w-4 h-4 text-violet-600 rounded cursor-pointer accent-violet-600"
+                            />
+                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Tam Ekran İzni</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {!isText && block.type !== 'storyline' && (
                     <div className="space-y-4">
                       <div>
                         <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-1">Soru Metni / Yönerge</label>

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getLessonWithActivities, startLesson, completeLesson, rollbackLessonCompletion, saveActivityAttempt } from '../../services/lessonService';
 import { supabase } from '../../lib/supabase';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import ActivityRenderer from '../../components/activities/ActivityRenderer';
+import StorylinePlayer from '../../components/player/StorylinePlayer';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import {
   ArrowLeft, CheckCircle, Zap, BookOpen, ChevronRight,
@@ -140,6 +141,7 @@ export default function LessonPage() {
   const [activityStates, setActivityStates] = useState({});
   const [failedMessage, setFailedMessage] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -477,6 +479,61 @@ export default function LessonPage() {
 
   const activities = [...(lesson.activities ?? [])].sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
 
+  // ─── Storyline TAM DERS MODU ─────────────────────────────────────────────
+  if (lesson.content_type === 'storyline' && lesson.storyline_url) {
+    return (
+      <DashboardLayout forceCollapsed={sidebarCollapsed}>
+        <div className="space-y-4 pb-6">
+          {/* Geri Dön + Başlık */}
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium cursor-pointer"
+          >
+            <ArrowLeft size={16}/> Geri Dön
+          </button>
+
+          <div className="flex items-start gap-4 p-5 rounded-2xl glass border border-slate-200 dark:border-white/10">
+            <div className="w-11 h-11 rounded-xl bg-violet-500/20 flex items-center justify-center shrink-0">
+              <BookOpen className="text-violet-600 dark:text-violet-400" size={20}/>
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-display font-black text-xl text-slate-900 dark:text-white">{lesson.title}</h1>
+                {alreadyCompleted && (
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30">
+                    Daha Önce Tamamlandı
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3 mt-1">
+                <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-semibold">
+                  <Zap size={12}/>
+                  <span>+{lesson.xp_reward || 0} XP</span>
+                </div>
+                <span className="text-xs text-violet-600 dark:text-violet-400 font-bold bg-violet-50 dark:bg-violet-500/10 px-2 py-0.5 rounded-full border border-violet-200 dark:border-violet-500/30">
+                  🎬 Storyline Modülü
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* StorylinePlayer — Full Mod */}
+          <StorylinePlayer
+            url={lesson.storyline_url}
+            mode="full"
+            title={lesson.title}
+            allowFullscreen={true}
+            onCollapseSidebar={setSidebarCollapsed}
+            submitted={alreadyCompleted}
+            onSubmit={alreadyCompleted ? undefined : async () => {
+              await handleComplete();
+            }}
+          />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="max-w-3xl mx-auto space-y-6 pb-16">
@@ -583,7 +640,8 @@ export default function LessonPage() {
                         memory_card:       'Hafıza Kartı',
                         hotspot:           'Resim Hedefi (Hotspot)',
                         scenario:          'Senaryo',
-                        phishing_detector: 'Oltalama Analizi'
+                        phishing_detector: 'Oltalama Analizi',
+                        storyline:         'Storyline Modülü',
                       }[activity.type] || activity.type}
                     </span>
                     <div className="ml-auto flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-semibold">

@@ -189,10 +189,17 @@ function SidebarItem({ item, collapsed, userRole }) {
   );
 }
 
-export default function DashboardLayout({ children }) {
+export default function DashboardLayout({ children, forceCollapsed }) {
   const { user, profile, role, logout } = useAuth();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+
+  // forceCollapsed prop geldiğinde sidebar'ı otomatik daralt
+  useEffect(() => {
+    if (forceCollapsed !== undefined) {
+      setCollapsed(forceCollapsed);
+    }
+  }, [forceCollapsed]);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
