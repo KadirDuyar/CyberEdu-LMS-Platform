@@ -161,7 +161,7 @@ export default function CourseEditor() {
         )}
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <button onClick={() => navigate('/teacher/courses')} className="flex items-center gap-2 text-slate-400 hover:text-white text-sm w-fit">
+          <button onClick={() => navigate('/teacher/courses')} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-sm w-fit transition-colors">
             <ArrowLeft size={16}/> Kurslara Dön
           </button>
 
@@ -177,13 +177,13 @@ export default function CourseEditor() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-4">
             <Card className="space-y-5">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <h2 className="font-display font-bold text-lg text-white">Kurs Detayları</h2>
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
+                <h2 className="font-display font-bold text-lg text-slate-900 dark:text-white">Kurs Detayları</h2>
                 <button
                   type="button"
                   onClick={() => setShowAiModal(true)}
                   disabled={generatingWithAI}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-600/20 text-violet-300 hover:bg-violet-600 hover:text-white border border-violet-500/30 text-xs font-bold transition-all disabled:opacity-50 shadow-sm hover:scale-105"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-600/10 text-violet-700 dark:bg-violet-600/20 dark:text-violet-300 hover:bg-violet-600 hover:text-white border border-violet-500/30 text-xs font-bold transition-all disabled:opacity-50 shadow-sm hover:scale-105"
                   title="Yapay Zeka ile kurs başlığı, açıklaması ve seviyesini otomatik doldur"
                 >
                   <Sparkles size={14} className={generatingWithAI ? 'animate-spin' : ''} />
@@ -193,7 +193,7 @@ export default function CourseEditor() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5">Kurs Başlığı</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Kurs Başlığı</label>
                   <input
                     type="text"
                     value={course.title}
@@ -204,7 +204,7 @@ export default function CourseEditor() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5">Açıklama</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Açıklama</label>
                   <textarea
                     value={course.description}
                     onChange={(e) => handleChange('description', e.target.value)}
@@ -215,15 +215,15 @@ export default function CourseEditor() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">Kurs Türü</label>
-                    <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/10">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Kurs Türü</label>
+                    <div className="flex bg-slate-100 dark:bg-slate-900/50 p-1 rounded-xl border border-slate-200 dark:border-white/10">
                       <button
                         type="button"
                         onClick={() => handleChange('course_type', 'mandatory')}
                         className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                           course.course_type === 'mandatory'
                             ? 'bg-violet-600 text-white shadow-lg'
-                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/5'
                         }`}
                       >
                         📌 Zorunlu Müfredat
@@ -234,7 +234,7 @@ export default function CourseEditor() {
                         className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                           course.course_type === 'elective'
                             ? 'bg-amber-500 text-slate-950 shadow-lg'
-                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/5'
                         }`}
                       >
                         🌟 Seçmeli Kurs
@@ -243,15 +243,15 @@ export default function CourseEditor() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">Kategori (Hedef Kitle)</label>
-                    <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/10">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Kategori (Hedef Kitle)</label>
+                    <div className="flex bg-slate-100 dark:bg-slate-900/50 p-1 rounded-xl border border-slate-200 dark:border-white/10">
                       <button
                         type="button"
                         onClick={() => handleChange('category', 'awareness')}
                         className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                           course.category === 'awareness'
                             ? 'bg-cyan-600 text-white shadow-lg'
-                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/5'
                         }`}
                       >
                         🛡️ Farkındalık
@@ -262,7 +262,7 @@ export default function CourseEditor() {
                         className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                           course.category === 'technical'
                             ? 'bg-orange-600 text-white shadow-lg'
-                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/5'
                         }`}
                       >
                         ⚔️ Teknik
@@ -272,15 +272,15 @@ export default function CourseEditor() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5">Zorluk Seviyesi</label>
-                  <div className="flex bg-slate-900/50 p-1 rounded-xl border border-white/10">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Zorluk Seviyesi</label>
+                  <div className="flex bg-slate-100 dark:bg-slate-900/50 p-1 rounded-xl border border-slate-200 dark:border-white/10">
                     <button
                       type="button"
                       onClick={() => handleChange('level', 'beginner')}
                       className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                         course.level === 'beginner'
                           ? 'bg-emerald-600 text-white shadow-lg'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/5'
                       }`}
                     >
                       🌱 Başlangıç
@@ -291,7 +291,7 @@ export default function CourseEditor() {
                       className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                         course.level === 'intermediate'
                           ? 'bg-amber-600 text-white shadow-lg'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/5'
                       }`}
                     >
                       🔥 Orta
@@ -302,7 +302,7 @@ export default function CourseEditor() {
                       className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                         course.level === 'advanced'
                           ? 'bg-rose-600 text-white shadow-lg'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/5'
                       }`}
                     >
                       ⚡ İleri
@@ -312,7 +312,7 @@ export default function CourseEditor() {
 
                 <div className="flex gap-4">
                   <div className="w-24">
-                    <label className="block text-xs font-semibold text-slate-400 mb-1.5">Emoji</label>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Emoji</label>
                     <input
                       type="text"
                       value={course.thumbnail_emoji}
@@ -326,13 +326,13 @@ export default function CourseEditor() {
           </div>
 
           <div className="md:col-span-1">
-            <Card className="h-full flex flex-col">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
-                <h2 className="font-display font-bold text-lg text-white">Dersler ({lessons.length})</h2>
+            <Card className="h-full flex flex-col shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3 mb-4">
+                <h2 className="font-display font-bold text-lg text-slate-900 dark:text-white">Dersler ({lessons.length})</h2>
                 {!isNew && (
                   <button
                     onClick={() => navigate(`/teacher/courses/${courseId}/lessons/new`)}
-                    className="w-8 h-8 rounded-lg bg-violet-500/20 text-violet-400 flex items-center justify-center hover:bg-violet-500/30 transition-colors"
+                    className="w-8 h-8 rounded-lg bg-violet-600/10 text-violet-700 dark:bg-violet-500/20 dark:text-violet-400 flex items-center justify-center hover:bg-violet-600/20 dark:hover:bg-violet-500/30 transition-colors"
                     title="Yeni Ders Ekle"
                   >
                     <Plus size={16}/>
@@ -341,15 +341,15 @@ export default function CourseEditor() {
               </div>
 
               {isNew ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-4 border-2 border-dashed border-white/5 rounded-xl">
-                  <p className="text-slate-500 text-sm">Ders eklemek için önce kursu kaydedin.</p>
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-4 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-xl">
+                  <p className="text-slate-500 dark:text-slate-400 text-sm">Ders eklemek için önce kursu kaydedin.</p>
                 </div>
               ) : lessons.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-4 border-2 border-dashed border-white/10 rounded-xl">
-                  <p className="text-slate-400 text-sm mb-3">Bu kursta hiç ders yok.</p>
+                <div className="flex-1 flex flex-col items-center justify-center text-center p-4 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl">
+                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-3">Bu kursta hiç ders yok.</p>
                   <button
                     onClick={() => navigate(`/teacher/courses/${courseId}/lessons/new`)}
-                    className="text-xs font-bold text-violet-400 hover:text-violet-300"
+                    className="text-xs font-bold text-violet-700 dark:text-violet-400 hover:text-violet-900 dark:hover:text-violet-300"
                   >
                     + İlk dersi ekle
                   </button>
@@ -359,13 +359,13 @@ export default function CourseEditor() {
                   {lessons.map((lesson, idx) => (
                     <div
                       key={lesson.id}
-                      className="group flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-violet-500/30 transition-all"
+                      className="group flex items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:border-violet-400 dark:hover:border-violet-500/30 transition-all shadow-sm"
                     >
                       <div className="flex flex-col gap-0.5">
                         <button
                           onClick={(e) => { e.stopPropagation(); moveLesson(idx, -1); }}
                           disabled={idx === 0}
-                          className="p-1 rounded text-slate-500 hover:text-violet-400 hover:bg-white/10 disabled:opacity-20"
+                          className="p-1 rounded text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-slate-200 dark:hover:bg-white/10 disabled:opacity-20"
                           title="Yukarı Taşı"
                         >
                           <ArrowUp size={12}/>
@@ -373,7 +373,7 @@ export default function CourseEditor() {
                         <button
                           onClick={(e) => { e.stopPropagation(); moveLesson(idx, 1); }}
                           disabled={idx === lessons.length - 1}
-                          className="p-1 rounded text-slate-500 hover:text-violet-400 hover:bg-white/10 disabled:opacity-20"
+                          className="p-1 rounded text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-slate-200 dark:hover:bg-white/10 disabled:opacity-20"
                           title="Aşağı Taşı"
                         >
                           <ArrowDown size={12}/>
@@ -384,20 +384,20 @@ export default function CourseEditor() {
                         onClick={() => navigate(`/teacher/courses/${courseId}/lessons/${lesson.id}/edit`)}
                         className="flex-1 min-w-0 cursor-pointer"
                       >
-                        <p className="text-sm font-semibold text-white truncate">{lesson.title}</p>
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{lesson.title}</p>
                         <p className="text-xs text-slate-500">Adım {idx + 1} {lesson.is_published ? '• Yayında' : ''}</p>
                       </div>
 
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => navigate(`/teacher/courses/${courseId}/lessons/${lesson.id}/edit`)}
-                          className="p-1.5 text-slate-400 hover:text-violet-400 hover:bg-violet-500/20 rounded-lg"
+                          className="p-1.5 text-slate-500 hover:text-violet-600 hover:bg-violet-50 dark:text-slate-400 dark:hover:text-violet-400 dark:hover:bg-violet-500/20 rounded-lg"
                         >
                           <Edit size={14}/>
                         </button>
                         <button
                           onClick={(e) => handleDeleteLesson(e, lesson.id, lesson.title)}
-                          className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/20 rounded-lg"
+                          className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:text-slate-400 dark:hover:text-rose-400 dark:hover:bg-rose-500/20 rounded-lg"
                         >
                           <Trash2 size={14}/>
                         </button>

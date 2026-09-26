@@ -136,12 +136,12 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
 
   return (
     <Card className="p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-4">
         <div>
-          <h3 className="font-display font-bold text-lg text-white flex items-center gap-2">
-            <MessageSquare size={20} className="text-violet-400" /> Kurs Değerlendirmeleri & Geri Bildirim
+          <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+            <MessageSquare size={20} className="text-violet-600 dark:text-violet-400" /> Kurs Değerlendirmeleri & Geri Bildirim
           </h3>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
             {isTeacher 
               ? 'Öğrencilerinizin bu kurs hakkındaki yorumlarını inceleyin ve yanıtlayın.'
               : 'Bu kurs hakkındaki görüşlerinizi paylaşarak eğitmenimize ve diğer öğrencilere katkı sağlayın.'}
@@ -149,18 +149,18 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
         </div>
 
         {/* Özet Puan */}
-        <div className="flex items-center gap-4 bg-white/5 px-4 py-2 rounded-xl border border-white/10 shrink-0">
-          <div className="flex items-center gap-1.5 text-emerald-400 text-sm font-bold">
+        <div className="flex items-center gap-4 bg-slate-100 dark:bg-white/5 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 shrink-0">
+          <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-sm font-bold">
             <ThumbsUp size={16} /> <span>{likesCount}</span>
           </div>
-          <div className="w-px h-4 bg-white/10" />
-          <div className="flex items-center gap-1.5 text-rose-400 text-sm font-bold">
+          <div className="w-px h-4 bg-slate-200 dark:bg-white/10" />
+          <div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 text-sm font-bold">
             <ThumbsDown size={16} /> <span>{dislikesCount}</span>
           </div>
           {totalCount > 0 && (
             <>
-              <div className="w-px h-4 bg-white/10" />
-              <span className="text-xs font-semibold text-slate-300">%{satisfactionRate} Memnuniyet</span>
+              <div className="w-px h-4 bg-slate-200 dark:bg-white/10" />
+              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">%{satisfactionRate} Memnuniyet</span>
             </>
           )}
         </div>
@@ -275,15 +275,15 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
 
       {/* Yorum Listesi */}
       <div className="space-y-3">
-        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+        <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
           Öğrenci Yorumları ({feedbacks.filter(f => f.comment).length})
         </h4>
 
         {loading ? (
           <div className="py-6 flex justify-center"><LoadingSpinner size="sm" /></div>
         ) : feedbacks.length === 0 ? (
-          <div className="py-8 text-center border border-dashed border-white/10 rounded-2xl">
-            <p className="text-xs text-slate-400">Henüz bir geri bildirim bırakılmamış.</p>
+          <div className="py-8 text-center border border-dashed border-slate-200 dark:border-white/10 rounded-2xl">
+            <p className="text-xs text-slate-600 dark:text-slate-400">Henüz bir geri bildirim bırakılmamış.</p>
             <p className="text-[11px] text-slate-500 mt-0.5">İlk değerlendiren sen ol!</p>
           </div>
         ) : (
@@ -298,7 +298,7 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
                 <div
                   key={fb.id}
                   className={`p-3.5 rounded-xl border transition-all ${
-                    isMine ? 'glass border-violet-500/40 bg-violet-950/10' : 'bg-slate-900/40 border-white/5'
+                    isMine ? 'bg-violet-50 dark:glass border-violet-300 dark:border-violet-500/40 dark:bg-violet-950/10 shadow-sm' : 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-white/5'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -306,9 +306,9 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
                       <span className="text-lg">{authorAvatar}</span>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-white">{authorName}</span>
+                          <span className="text-xs font-bold text-slate-900 dark:text-white">{authorName}</span>
                           {isMine && (
-                            <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-violet-600/30 text-violet-300 border border-violet-500/40">
+                            <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-600/30 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-500/40">
                               Sen
                             </span>
                           )}
@@ -326,24 +326,24 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
 
                     <span className={`flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-lg border ${
                       fb.rating === 'like'
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                        : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                        ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/20'
+                        : 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-300 dark:border-rose-500/20'
                     }`}>
                       {fb.rating === 'like' ? <><ThumbsUp size={12} /> Beğendi</> : <><ThumbsDown size={12} /> Geliştirilmeli</>}
                     </span>
                   </div>
 
                   {fb.comment && (
-                    <p className="text-xs text-slate-300 mt-2.5 pl-9 leading-relaxed break-words">
+                    <p className="text-xs text-slate-700 dark:text-slate-300 mt-2.5 pl-9 leading-relaxed break-words">
                       "{fb.comment}"
                     </p>
                   )}
 
                   {/* Eğitmen Yanıtı */}
                   {fb.teacher_reply && (
-                    <div className="mt-3 ml-7 p-3 rounded-xl bg-violet-950/40 border border-violet-500/25">
-                      <div className="flex items-center gap-1.5 text-violet-300 font-bold text-[11px] mb-1">
-                        <MessageSquare size={13} className="text-violet-400" />
+                    <div className="mt-3 ml-7 p-3 rounded-xl bg-violet-100/70 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-500/25">
+                      <div className="flex items-center gap-1.5 text-violet-800 dark:text-violet-300 font-bold text-[11px] mb-1">
+                        <MessageSquare size={13} className="text-violet-600 dark:text-violet-400" />
                         <span>Eğitmen Yanıtı</span>
                         {fb.replied_at && (
                           <span className="text-[10px] text-slate-500 font-normal">
@@ -351,7 +351,7 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-200 leading-relaxed pl-4">
+                      <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed pl-4">
                         {fb.teacher_reply}
                       </p>
                     </div>
@@ -361,8 +361,8 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
                   {isTeacher && (
                     <div className="mt-2.5 ml-7">
                       {replyingId === fb.id ? (
-                        <div className="p-3 rounded-xl bg-slate-950/90 border border-violet-500/40 space-y-2.5">
-                          <label className="text-[11px] font-bold text-violet-300 flex items-center gap-1.5">
+                        <div className="p-3 rounded-xl bg-white dark:bg-slate-950/90 border border-violet-300 dark:border-violet-500/40 space-y-2.5 shadow-md">
+                          <label className="text-[11px] font-bold text-violet-700 dark:text-violet-300 flex items-center gap-1.5">
                             <MessageSquare size={13} />
                             Öğrenci Yorumuna Yanıtınız:
                           </label>
@@ -370,18 +370,18 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
                             placeholder="Öğrenciye geri bildirimini yanıtlayan açıklayıcı bir mesaj yazın..."
-                            className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 resize-none"
+                            className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-white/10 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-violet-500 resize-none shadow-sm"
                             rows={3}
                             autoFocus
                           />
                           {replyError && (
-                            <p className="text-[11px] text-rose-400">{replyError}</p>
+                            <p className="text-[11px] text-rose-600 dark:text-rose-400">{replyError}</p>
                           )}
                           <div className="flex items-center justify-end gap-2">
                             <button
                               type="button"
                               onClick={() => { setReplyingId(null); setReplyText(''); setReplyError(''); }}
-                              className="px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white transition-colors"
+                              className="px-3 py-1.5 rounded-lg text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                             >
                               İptal
                             </button>
@@ -404,7 +404,7 @@ export default function CourseFeedbackSection({ courseId, currentUser }) {
                             setReplyText(fb.teacher_reply || '');
                             setReplyError('');
                           }}
-                          className="text-[11px] font-bold text-violet-400 hover:text-violet-300 transition-colors inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20"
+                          className="text-[11px] font-bold text-violet-700 dark:text-violet-400 hover:text-violet-900 dark:hover:text-violet-300 transition-colors inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-100 dark:bg-violet-500/10 hover:bg-violet-200 dark:hover:bg-violet-500/20 border border-violet-200 dark:border-violet-500/20"
                         >
                           <MessageSquare size={12} />
                           {fb.teacher_reply ? 'Yanıtı Düzenle' : 'Cevap Yaz'}

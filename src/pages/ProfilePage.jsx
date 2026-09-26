@@ -454,13 +454,13 @@ export default function ProfilePage() {
         {profile?.role === 'student' && (
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Users size={20} className="text-violet-400" /> Takip Ettiğim Arkadaşlarım ({friends.length})
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Users size={20} className="text-violet-600 dark:text-violet-400" /> Takip Ettiğim Arkadaşlarım ({friends.length})
               </h3>
               <button
                 type="button"
                 onClick={() => navigate('/student/leaderboard')}
-                className="text-xs font-bold text-violet-400 hover:text-violet-300 flex items-center gap-1 transition-colors"
+                className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 flex items-center gap-1 transition-colors"
               >
                 Yeni Arkadaşlar Keşfet <ArrowRight size={13} />
               </button>
@@ -469,16 +469,16 @@ export default function ProfilePage() {
             {statsLoading ? (
               <div className="py-8 flex justify-center"><LoadingSpinner /></div>
             ) : friends.length === 0 ? (
-              <div className="py-10 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
+              <div className="py-10 text-center border border-dashed border-slate-300 dark:border-white/10 rounded-2xl bg-slate-50 dark:bg-white/[0.02]">
                 <span className="text-3xl mb-2 block">🤝</span>
-                <p className="text-slate-300 font-semibold text-sm">Henüz kimseyi takip etmiyorsun.</p>
+                <p className="text-slate-700 dark:text-slate-300 font-semibold text-sm">Henüz kimseyi takip etmiyorsun.</p>
                 <p className="text-slate-500 text-xs mt-1 mb-4">Liderlik tablosundaki diğer siber güvenlik öğrencilerini takip ederek yarışabilirsin!</p>
                 <button
                   type="button"
                   onClick={() => navigate('/student/leaderboard')}
-                  className="px-4 py-2 rounded-xl bg-violet-600/30 hover:bg-violet-600 border border-violet-500/40 text-violet-200 text-xs font-bold transition-all inline-flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-violet-600/10 hover:bg-violet-600 border border-violet-500/30 text-violet-700 hover:text-white dark:bg-violet-600/30 dark:hover:bg-violet-600 dark:text-violet-200 text-xs font-bold transition-all inline-flex items-center gap-1.5"
                 >
-                  <Trophy size={14} className="text-amber-400" /> Liderlik Tablosuna Git
+                  <Trophy size={14} className="text-amber-500 dark:text-amber-400" /> Liderlik Tablosuna Git
                 </button>
               </div>
             ) : (
@@ -486,20 +486,20 @@ export default function ProfilePage() {
                 {friends.map((friend) => (
                   <div
                     key={friend.id}
-                    className="p-3.5 rounded-2xl glass border border-white/10 bg-slate-900/60 flex items-center justify-between gap-3 hover:border-violet-500/40 transition-all"
+                    className="p-3.5 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between gap-3 hover:border-violet-400 dark:hover:border-violet-500/40 transition-all shadow-sm"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="text-2xl shrink-0 p-1.5 rounded-xl bg-white/5 border border-white/10">
+                      <span className="text-2xl shrink-0 p-1.5 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
                         {friend.avatar_emoji || '🚀'}
                       </span>
                       <div className="min-w-0">
-                        <h4 className="font-bold text-sm text-white truncate">
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">
                           {friend.full_name || 'Öğrenci'}
                         </h4>
-                        <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
-                          <span className="font-bold text-amber-400">Lv.{friend.level || 1}</span>
+                        <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                          <span className="font-bold text-amber-600 dark:text-amber-400">Lv.{friend.level || 1}</span>
                           <span>•</span>
-                          <span className="text-violet-300 font-semibold">{friend.xp || 0} XP</span>
+                          <span className="text-violet-600 dark:text-violet-300 font-semibold">{friend.xp || 0} XP</span>
                         </div>
                       </div>
                     </div>
@@ -507,7 +507,7 @@ export default function ProfilePage() {
                     <button
                       type="button"
                       onClick={() => handleUnfollowFriend(friend.id)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-white/5 hover:border-rose-500/20 transition-all shrink-0"
+                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 border border-slate-200 dark:border-white/5 hover:border-rose-200 dark:hover:border-rose-500/20 transition-all shrink-0"
                       title="Takipten Çık"
                     >
                       <UserMinus size={15} />
@@ -520,13 +520,13 @@ export default function ProfilePage() {
         )}
 
         {/* Tehlikeli Bölge: Hesabı Sil */}
-        <Card className="p-6 border-rose-500/20 bg-rose-950/10">
+        <Card className="p-6 border-rose-200 dark:border-rose-500/20 bg-rose-50/70 dark:bg-rose-950/10 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-bold text-rose-400 flex items-center gap-2">
+              <h3 className="text-base font-bold text-rose-700 dark:text-rose-400 flex items-center gap-2">
                 <Trash2 size={18} /> Tehlikeli Bölge: Hesabı Sil
               </h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-lg leading-relaxed">
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 max-w-lg leading-relaxed">
                 Hesabınızı sildiğinizde kazandığınız tüm XP'ler, seviyeniz, rozetleriniz ve tamamladığınız ders kayıtları kalıcı olarak kaldırılır. Bu işlem geri alınamaz.
               </p>
             </div>
@@ -538,7 +538,7 @@ export default function ProfilePage() {
                 setDeleteConfirmText('');
                 setDeleteError('');
               }}
-              className="px-4 py-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 text-xs font-bold transition-all shrink-0 flex items-center justify-center gap-2"
+              className="px-4 py-2.5 rounded-xl bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white border border-rose-300 dark:bg-rose-600/20 dark:hover:bg-rose-600 dark:text-rose-300 dark:hover:text-white dark:border-rose-500/30 text-xs font-bold transition-all shrink-0 flex items-center justify-center gap-2 shadow-sm"
             >
               <Trash2 size={14} /> Hesabımı Sil
             </button>
@@ -548,20 +548,20 @@ export default function ProfilePage() {
         {/* Hesap Silme Onay Modalı */}
         {showDeleteModal && (
           <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-            <div className="relative w-full max-w-md rounded-3xl glass border border-rose-500/30 p-6 md:p-8 shadow-2xl bg-slate-900/95 space-y-5 animate-scale-up">
-              <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
+            <div className="relative w-full max-w-md rounded-3xl border border-rose-300 dark:border-rose-500/30 p-6 md:p-8 shadow-2xl bg-white dark:bg-slate-900/95 space-y-5 animate-scale-up">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
                 <Trash2 size={24} />
               </div>
 
               <div className="text-center">
-                <h3 className="font-display font-black text-xl text-white">Hesabınızı Silmek İstiyor Musunuz?</h3>
-                <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                  Tüm ilerlemeniz, rozetleriniz ve kayıtlarınız tamamen silinecektir. Onaylamak için lütfen aşağıdaki kutuya büyük harflerle <strong className="text-rose-400">HESABIMI SİL</strong> yazın:
+                <h3 className="font-display font-black text-xl text-slate-900 dark:text-white">Hesabınızı Silmek İstiyor Musunuz?</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                  Tüm ilerlemeniz, rozetleriniz ve kayıtlarınız tamamen silinecektir. Onaylamak için lütfen aşağıdaki kutuya büyük harflerle <strong className="text-rose-600 dark:text-rose-400">HESABIMI SİL</strong> yazın:
                 </p>
               </div>
 
               {deleteError && (
-                <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs text-center font-medium">
+                <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-700 dark:text-rose-300 text-xs text-center font-medium">
                   {deleteError}
                 </div>
               )}
@@ -572,7 +572,7 @@ export default function ProfilePage() {
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   placeholder='HESABIMI SİL'
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-rose-500/40 text-white placeholder-slate-600 text-center font-mono font-bold text-sm tracking-wider focus:outline-none focus:border-rose-400"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-rose-300 dark:border-rose-500/40 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 text-center font-mono font-bold text-sm tracking-wider focus:outline-none focus:border-rose-500"
                   autoFocus
                 />
 
@@ -581,7 +581,7 @@ export default function ProfilePage() {
                     type="button"
                     onClick={() => setShowDeleteModal(false)}
                     disabled={deleteLoading}
-                    className="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 font-semibold text-xs transition-colors"
+                    className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors"
                   >
                     Vazgeç
                   </button>

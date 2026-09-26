@@ -121,13 +121,13 @@ export default function LearningPath() {
         
         {/* Başlık */}
         <div className="text-center space-y-2">
-          <span className="text-xs font-black uppercase tracking-widest text-violet-400 bg-violet-950/60 border border-violet-800/40 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5">
+          <span className="text-xs font-black uppercase tracking-widest text-violet-700 dark:text-violet-400 bg-violet-100 dark:bg-violet-950/60 border border-violet-300 dark:border-violet-800/40 px-3.5 py-1 rounded-full inline-flex items-center gap-1.5">
             📌 Zorunlu Müfredat Yol Haritası
           </span>
-          <h2 className="text-2xl md:text-3xl font-black text-white">
+          <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white">
             {profile?.learning_area === 'technical' ? 'Teknik Güvenlik' : 'Siber Farkındalık'} Çekirdek Müfredatı
           </h2>
-          <p className="text-xs md:text-sm text-slate-400 max-w-lg mx-auto">
+          <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
             Aşağıdaki zorunlu kursları sırasıyla tamamlayarak temel uzmanlık ve sertifikanızı kazanın. İsteğe bağlı seçmeli dersler için kurslar menüsünü ziyaret edebilirsiniz.
           </p>
         </div>
@@ -135,7 +135,7 @@ export default function LearningPath() {
         {/* Sarmal / Zigzag Kurs Haritası */}
         <div className="relative pt-6">
           {/* Ortadaki Dikey Çizgi */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-1 -translate-x-1/2 bg-gradient-to-b from-violet-600 via-pink-600 to-slate-800 rounded-full z-0 hidden md:block" />
+          <div className="absolute left-1/2 top-0 bottom-0 w-1 -translate-x-1/2 bg-gradient-to-b from-violet-600 via-pink-600 to-slate-300 dark:to-slate-800 rounded-full z-0 hidden md:block" />
 
           <div className="space-y-12 relative z-10">
             {courses.map((course, idx, arr) => {
@@ -168,32 +168,32 @@ export default function LearningPath() {
                       onClick={() => handleCourseClick(course, isEnrolled, isLocked, prevCourse)}
                       className={`p-5 rounded-2xl border transition-all duration-300 ${
                         isCompleted
-                          ? 'glass border-emerald-500/50 bg-emerald-950/20 hover:border-emerald-400 hover:scale-[1.02] cursor-pointer'
+                          ? 'glass border-emerald-500/50 bg-emerald-50/80 dark:bg-emerald-950/20 hover:border-emerald-400 hover:scale-[1.02] cursor-pointer shadow-sm'
                           : isLocked
-                            ? 'glass border-white/5 bg-slate-900/40 opacity-60 cursor-not-allowed'
+                            ? 'glass border-slate-200 dark:border-white/5 bg-slate-100/80 dark:bg-slate-900/40 opacity-75 dark:opacity-60 cursor-not-allowed'
                             : isActive || isEnrolled
-                              ? 'glass border-violet-500 shadow-[0_0_25px_rgba(124,58,237,0.3)] hover:scale-[1.02] cursor-pointer' 
-                              : 'glass border-white/10 hover:border-violet-500/40 hover:scale-[1.02] cursor-pointer'
+                              ? 'glass border-violet-500 bg-white dark:bg-transparent shadow-[0_0_25px_rgba(124,58,237,0.15)] dark:shadow-[0_0_25px_rgba(124,58,237,0.3)] hover:scale-[1.02] cursor-pointer' 
+                              : 'glass border-slate-200 dark:border-white/10 hover:border-violet-500/40 hover:scale-[1.02] cursor-pointer shadow-sm'
                       }`}
                     >
                       {/* Rozetler ve Başlık */}
                       <div className={`flex items-center gap-2 mb-2 flex-wrap ${isLeft ? 'md:justify-end' : 'md:justify-start'}`}>
                         {isCompleted ? (
-                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
+                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/40 flex items-center gap-1">
                             <CheckCircle2 size={12} />
                             Tamamlandı
                           </span>
                         ) : isLocked ? (
-                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-white/10 flex items-center gap-1">
+                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-white/10 flex items-center gap-1">
                             <Lock size={11} />
                             Kilitli
                           </span>
                         ) : isEnrolled ? (
-                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/40">
+                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-500/40">
                             Kayıtlı • {completedCount}/{totalLessons} Ders
                           </span>
                         ) : (
-                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30">
                             Kursa Katıl
                           </span>
                         )}
@@ -202,14 +202,14 @@ export default function LearningPath() {
                       <div className={`flex items-start gap-3 ${isLeft ? 'md:flex-row-reverse' : ''}`}>
                         <div className={`text-3xl shrink-0 p-2 rounded-xl border ${
                           isLocked 
-                            ? 'bg-slate-800/40 border-white/5 grayscale' 
-                            : 'bg-white/5 border-white/10'
+                            ? 'bg-slate-200/80 dark:bg-slate-800/40 border-slate-300 dark:border-white/5 grayscale' 
+                            : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 shadow-sm'
                         }`}>
                           {isLocked ? '🔒' : (course.thumbnail_emoji || '🛡️')}
                         </div>
                         <div className="flex-1">
-                          <h3 className={`font-bold text-base ${isLocked ? 'text-slate-400' : 'text-white'}`}>{course.title}</h3>
-                          <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                          <h3 className={`font-bold text-base ${isLocked ? 'text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-white'}`}>{course.title}</h3>
+                          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">
                             {course.description || 'İnteraktif siber güvenlik modülleri ve pratik senaryolar.'}
                           </p>
                         </div>
@@ -217,12 +217,12 @@ export default function LearningPath() {
                       
                       {/* Aksiyon Butonu */}
                       {isLocked ? (
-                        <div className={`mt-4 pt-3 border-t border-white/5 flex items-center gap-1.5 text-xs font-semibold text-slate-500 ${isLeft ? 'md:justify-end' : ''}`}>
+                        <div className={`mt-4 pt-3 border-t border-slate-200 dark:border-white/5 flex items-center gap-1.5 text-xs font-semibold text-slate-500 ${isLeft ? 'md:justify-end' : ''}`}>
                           <Lock size={12} /> Önceki Kursu Tamamla
                         </div>
                       ) : (
-                        <div className={`mt-4 pt-3 border-t border-white/10 flex items-center gap-1.5 text-xs font-bold ${
-                          isCompleted ? 'text-emerald-400' : isEnrolled ? 'text-violet-400' : 'text-cyan-400'
+                        <div className={`mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex items-center gap-1.5 text-xs font-bold ${
+                          isCompleted ? 'text-emerald-600 dark:text-emerald-400' : isEnrolled ? 'text-violet-600 dark:text-violet-400' : 'text-cyan-600 dark:text-cyan-400'
                         } ${isLeft ? 'md:justify-end' : ''}`}>
                           {isCompleted ? (
                             <><span>Tekrar İncele</span> <ArrowRight size={14} /></>
@@ -237,13 +237,13 @@ export default function LearningPath() {
                   </div>
 
                   {/* Bağlantı Çemberi */}
-                  <div className="w-12 h-12 rounded-full border-4 border-[#0F0A1E] flex items-center justify-center font-black text-sm z-20 my-4 md:my-0 shrink-0 shadow-xl bg-slate-900">
+                  <div className="w-12 h-12 rounded-full border-4 border-slate-100 dark:border-[#0F0A1E] flex items-center justify-center font-black text-sm z-20 my-4 md:my-0 shrink-0 shadow-md dark:shadow-xl bg-white dark:bg-slate-900">
                     {isCompleted ? (
                       <div className="w-full h-full rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
                         <CheckCircle2 size={20} />
                       </div>
                     ) : isLocked ? (
-                      <div className="w-full h-full rounded-full bg-slate-800 text-slate-500 flex items-center justify-center border border-white/5">
+                      <div className="w-full h-full rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500 flex items-center justify-center border border-slate-300 dark:border-white/5">
                         <Lock size={16} />
                       </div>
                     ) : isActive || isEnrolled ? (
@@ -251,7 +251,7 @@ export default function LearningPath() {
                         {idx + 1}
                       </div>
                     ) : (
-                      <div className="w-full h-full rounded-full bg-slate-800 text-slate-300 flex items-center justify-center">
+                      <div className="w-full h-full rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center border border-slate-200 dark:border-transparent">
                         {idx + 1}
                       </div>
                     )}
@@ -266,19 +266,19 @@ export default function LearningPath() {
         </div>
 
         {/* Seçmeli Kursları Keşfet Bölümü */}
-        <div className="mt-12 p-6 md:p-8 rounded-3xl bg-gradient-to-r from-amber-950/40 via-violet-950/40 to-slate-900 border border-amber-500/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className="mt-12 p-6 md:p-8 rounded-3xl bg-gradient-to-r from-amber-50 via-purple-50 to-white dark:from-amber-950/40 dark:via-violet-950/40 dark:to-slate-900 border border-amber-300 dark:border-amber-500/20 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="space-y-1 text-center md:text-left">
-            <div className="inline-flex items-center gap-1.5 text-amber-400 font-bold text-xs uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full">
+            <div className="inline-flex items-center gap-1.5 text-amber-800 dark:text-amber-400 font-bold text-xs uppercase tracking-wider bg-amber-100 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/30 px-3 py-1 rounded-full">
               <Sparkles size={13} /> Ekstra Beceriler & Puanlar
             </div>
-            <h3 className="text-xl font-black text-white mt-1">Seçmeli Kursları Keşfet</h3>
-            <p className="text-slate-400 text-xs md:text-sm max-w-xl">
+            <h3 className="text-xl font-black text-slate-900 dark:text-white mt-1">Seçmeli Kursları Keşfet</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-xs md:text-sm max-w-xl">
               Zorunlu müfredat haricinde kendi ilgi alanına göre serbestçe katılabileceğin seçmeli kurslara Kurslar menüsünden ulaşabilirsin.
             </p>
           </div>
           <button
             onClick={() => navigate('/student/courses?filter=elective')}
-            className="shrink-0 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all shadow-lg shadow-amber-500/20 hover:scale-105 flex items-center gap-2"
+            className="shrink-0 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all shadow-lg shadow-amber-500/20 hover:scale-105 flex items-center gap-2 cursor-pointer"
           >
             Seçmeli Kursları Gör <ArrowRight size={16} />
           </button>

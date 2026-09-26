@@ -216,57 +216,57 @@ export default function TeacherStats() {
 
         {/* ── KPI Metrik Kartları ────────────────────────────── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card hover className="border-cyan-500/20">
+          <Card hover className="border-slate-200 dark:border-cyan-500/20 bg-white dark:bg-transparent shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400">
+              <div className="w-11 h-11 rounded-xl bg-cyan-100 dark:bg-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
                 <Users size={22} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold">Kayıtlı Öğrenci</p>
-                <p className="text-xl font-black text-cyan-400">{totalStudents}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Kayıtlı Öğrenci</p>
+                <p className="text-xl font-black text-cyan-700 dark:text-cyan-400">{totalStudents}</p>
               </div>
             </div>
           </Card>
 
-          <Card hover className="border-emerald-500/20">
+          <Card hover className="border-slate-200 dark:border-emerald-500/20 bg-white dark:bg-transparent shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <div className="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                 <CheckCircle2 size={22} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold">Bitirilen Toplam Ders</p>
-                <p className="text-xl font-black text-emerald-400">{totalCompletedLessons}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Bitirilen Toplam Ders</p>
+                <p className="text-xl font-black text-emerald-700 dark:text-emerald-400">{totalCompletedLessons}</p>
               </div>
             </div>
           </Card>
 
-          <Card hover className="border-amber-500/20">
+          <Card hover className="border-slate-200 dark:border-amber-500/20 bg-white dark:bg-transparent shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
+              <div className="w-11 h-11 rounded-xl bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
                 <Trophy size={22} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold">Ortalama Öğrenci XP</p>
-                <p className="text-xl font-black text-amber-400">{averageXP} XP</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Ortalama Öğrenci XP</p>
+                <p className="text-xl font-black text-amber-700 dark:text-amber-400">{averageXP} XP</p>
               </div>
             </div>
           </Card>
 
-          <Card hover className="border-violet-500/20">
+          <Card hover className="border-slate-200 dark:border-violet-500/20 bg-white dark:bg-transparent shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-violet-500/20 flex items-center justify-center text-violet-400">
+              <div className="w-11 h-11 rounded-xl bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400">
                 <BookOpen size={22} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold">Yayındaki Kurs Sayısı</p>
-                <p className="text-xl font-black text-violet-400">{courses.length}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Yayındaki Kurs Sayısı</p>
+                <p className="text-xl font-black text-violet-700 dark:text-violet-400">{courses.length}</p>
               </div>
             </div>
           </Card>
         </div>
 
         {/* ── Arama, Filtre ve Sıralama Çubuğu ────────────────────────────── */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 rounded-2xl glass border border-white/10">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:glass border border-slate-200 dark:border-white/10 shadow-sm">
           
           {/* Arama Input */}
           <div className="relative flex-1">
@@ -276,19 +276,19 @@ export default function TeacherStats() {
               placeholder="Öğrenci adı ile ara..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/60 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-cyan-500"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-xs focus:outline-none focus:border-cyan-500 shadow-sm"
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
             {/* Parkur Filtresi */}
-            <div className="flex items-center gap-1 bg-slate-900/60 border border-white/10 p-1 rounded-xl">
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 p-1 rounded-xl">
               <button
                 onClick={() => setSelectedArea('all')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   selectedArea === 'all'
                     ? 'bg-cyan-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Tümü
@@ -298,7 +298,7 @@ export default function TeacherStats() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
                   selectedArea === 'awareness'
                     ? 'bg-cyan-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <Shield size={12} /> Farkındalık
@@ -308,7 +308,7 @@ export default function TeacherStats() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
                   selectedArea === 'technical'
                     ? 'bg-orange-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <Code2 size={12} /> Teknik
@@ -319,7 +319,7 @@ export default function TeacherStats() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3.5 py-2 rounded-xl bg-slate-900/60 border border-white/10 text-xs text-slate-200 font-bold focus:outline-none focus:border-cyan-500"
+              className="px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 text-xs text-slate-800 dark:text-slate-200 font-bold focus:outline-none focus:border-cyan-500 shadow-sm"
             >
               <option value="recent">En Son Tamamlayanlar</option>
               <option value="xp">En Çok XP Kazananlar</option>
@@ -330,13 +330,13 @@ export default function TeacherStats() {
         </div>
 
         {/* ── Öğrenci Detaylı İlerleme Tablosu ────────────────────────────── */}
-        <div className="glass rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
-          <div className="p-5 border-b border-white/10 flex items-center justify-between">
+        <div className="bg-white dark:glass rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-sm">
+          <div className="p-5 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
             <div>
-              <h3 className="font-bold text-base text-white flex items-center gap-2">
-                <Users size={18} className="text-cyan-400" /> Öğrenci İlerleme Kayıtları
+              <h3 className="font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                <Users size={18} className="text-cyan-600 dark:text-cyan-400" /> Öğrenci İlerleme Kayıtları
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
                 Gösterilen: {filteredStudents.length} / {students.length} Öğrenci
               </p>
             </div>
@@ -345,15 +345,15 @@ export default function TeacherStats() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-white/5 bg-slate-900/60 text-slate-400 uppercase font-black tracking-wider text-[10px]">
+                <tr className="border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 uppercase font-black tracking-wider text-[10px]">
                   <th className="py-3.5 px-5">Öğrenci</th>
                   <th className="py-3.5 px-4">Parkur</th>
-                  <th className="py-3.5 px-4 font-bold text-cyan-300">En Son Tamamladığı Ders</th>
+                  <th className="py-3.5 px-4 font-bold text-cyan-700 dark:text-cyan-300">En Son Tamamladığı Ders</th>
                   <th className="py-3.5 px-4 text-center">Biten Ders</th>
                   <th className="py-3.5 px-4 text-right">Puan & Seviye</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                 {filteredStudents.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="py-12 text-center text-slate-500 text-sm">
@@ -365,17 +365,17 @@ export default function TeacherStats() {
                     const last = st.lastCompletedLesson;
 
                     return (
-                      <tr key={st.id} className="hover:bg-white/[0.02] transition-colors">
+                      <tr key={st.id} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.02] transition-colors">
                         
                         {/* Öğrenci Bilgisi */}
                         <td className="py-4 px-5">
                           <div className="flex items-center gap-3">
-                            <span className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl shrink-0">
+                            <span className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-2xl shrink-0">
                               {st.avatar_emoji || '👤'}
                             </span>
                             <div>
-                              <p className="font-bold text-sm text-white">{st.full_name || 'İsimsiz Öğrenci'}</p>
-                              <span className="text-[10px] text-slate-400 font-mono">
+                              <p className="font-bold text-sm text-slate-900 dark:text-white">{st.full_name || 'İsimsiz Öğrenci'}</p>
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                                 {st.created_at ? new Date(st.created_at).toLocaleDateString('tr-TR') : 'Kayıtlı'}
                               </span>
                             </div>
@@ -386,8 +386,8 @@ export default function TeacherStats() {
                         <td className="py-4 px-4">
                           <span className={`text-[10px] font-black px-2.5 py-1 rounded-full border inline-flex items-center gap-1 ${
                             st.learning_area === 'technical'
-                              ? 'bg-orange-500/10 text-orange-400 border-orange-500/30'
-                              : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
+                              ? 'bg-orange-100 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-300 dark:border-orange-500/30'
+                              : 'bg-cyan-100 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-300 dark:border-cyan-500/30'
                           }`}>
                             {st.learning_area === 'technical' ? (
                               <><Code2 size={11} /> Teknik</>
@@ -402,41 +402,41 @@ export default function TeacherStats() {
                           {last ? (
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <span className="font-bold text-white text-xs hover:text-cyan-300 transition-colors">
+                                <span className="font-bold text-slate-900 dark:text-white text-xs hover:text-cyan-600 dark:hover:text-cyan-300 transition-colors">
                                   {last.lessonTitle}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-2 text-[10px] text-slate-400">
-                                <span className="font-semibold text-slate-300 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                              <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
+                                <span className="font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200 dark:border-white/10">
                                   {last.courseTitle}
                                 </span>
-                                <span className="flex items-center gap-1 text-slate-400">
-                                  <Clock size={10} className="text-cyan-400" />
+                                <span className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+                                  <Clock size={10} className="text-cyan-600 dark:text-cyan-400" />
                                   {formatTimeAgo(last.completedAt)}
                                 </span>
                               </div>
                             </div>
                           ) : (
-                            <span className="text-slate-500 italic text-xs flex items-center gap-1">
-                              <Clock size={12} className="text-slate-600" /> Henüz ders tamamlamadı
+                            <span className="text-slate-400 dark:text-slate-500 italic text-xs flex items-center gap-1">
+                              <Clock size={12} className="text-slate-400 dark:text-slate-600" /> Henüz ders tamamlamadı
                             </span>
                           )}
                         </td>
 
                         {/* Tamamlanan Ders Sayısı */}
                         <td className="py-4 px-4 text-center">
-                          <span className="font-display font-black text-base text-white">
+                          <span className="font-display font-black text-base text-slate-900 dark:text-white">
                             {st.completedLessonsCount}
                           </span>
-                          <span className="text-[10px] text-slate-500 block">Ders Bitti</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-500 block">Ders Bitti</span>
                         </td>
 
                         {/* XP ve Seviye */}
                         <td className="py-4 px-4 text-right">
-                          <span className="font-black text-amber-400 text-sm font-mono block">
+                          <span className="font-black text-amber-600 dark:text-amber-400 text-sm font-mono block">
                             +{st.xp || 0} XP
                           </span>
-                          <span className="text-[10px] font-bold text-slate-400">
+                          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
                             Seviye {st.level || 1}
                           </span>
                         </td>

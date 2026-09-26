@@ -68,15 +68,15 @@ export default function TeacherCourses() {
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-display font-black text-2xl text-white">Kurslarım</h1>
-            <p className="text-slate-400 text-sm mt-1">Öğrenciler için oluşturduğun tüm içerikler</p>
+            <h1 className="font-display font-black text-2xl text-slate-900 dark:text-white">Kurslarım</h1>
+            <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Öğrenciler için oluşturduğun tüm içerikler</p>
           </div>
           
           <div className="flex gap-2">
             <button
               onClick={handleCreateDemo}
               disabled={seeding}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 font-bold transition-all disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10 dark:text-slate-300 font-bold transition-all disabled:opacity-50 shadow-sm"
             >
               {seeding ? <LoadingSpinner size="sm" /> : <Wand2 size={18} />} Örnek Kurs Yükle
             </button>
@@ -104,55 +104,55 @@ export default function TeacherCourses() {
               const isAwareness = course.category === 'awareness';
               const Icon = isAwareness ? Shield : Code2;
               const bannerColor = isAwareness 
-                ? 'from-cyan-900/40 to-blue-900/20 border-cyan-500/20' 
-                : 'from-orange-900/40 to-red-900/20 border-orange-500/20';
+                ? 'from-cyan-50 to-blue-50/50 border-cyan-200 dark:from-cyan-900/40 dark:to-blue-900/20 dark:border-cyan-500/20' 
+                : 'from-orange-50 to-amber-50/50 border-orange-200 dark:from-orange-900/40 dark:to-red-900/20 dark:border-orange-500/20';
 
               return (
-                <Card key={course.id} hover className={`border ${bannerColor} p-0 overflow-hidden flex flex-col`}>
+                <Card key={course.id} hover className={`border ${bannerColor} p-0 overflow-hidden flex flex-col bg-white dark:bg-slate-900/60 shadow-sm`}>
                   <div className={`p-5 flex-1 bg-gradient-to-br ${bannerColor}`}>
                     <div className="flex items-start justify-between mb-3">
-                      <div className="text-3xl bg-white/10 w-12 h-12 rounded-xl flex items-center justify-center border border-white/10">
+                      <div className="text-3xl bg-white/80 dark:bg-white/10 w-12 h-12 rounded-xl flex items-center justify-center border border-slate-200 dark:border-white/10">
                         {course.thumbnail_emoji}
                       </div>
                       <div className="flex flex-col items-end gap-2">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border bg-white/10 ${isAwareness ? 'text-cyan-400 border-cyan-500/30' : 'text-orange-400 border-orange-500/30'}`}>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${isAwareness ? 'text-cyan-700 dark:text-cyan-400 bg-cyan-100 dark:bg-white/10 border-cyan-300 dark:border-cyan-500/30' : 'text-orange-700 dark:text-orange-400 bg-orange-100 dark:bg-white/10 border-orange-300 dark:border-orange-500/30'}`}>
                           {isAwareness ? 'Farkındalık' : 'Teknik'}
                         </span>
                         <button 
                           onClick={() => handleDelete(course.id, course.title)} 
-                          className="text-slate-400 hover:text-rose-400 transition-colors bg-white/5 hover:bg-rose-500/20 p-1.5 rounded-lg"
+                          className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors bg-white/60 dark:bg-white/5 hover:bg-rose-50 dark:hover:bg-rose-500/20 p-1.5 rounded-lg border border-slate-200/50 dark:border-transparent"
                           title="Kursu Sil"
                         >
                           <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
-                    <h3 className="font-bold text-white mb-1">{course.title}</h3>
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <h3 className="font-bold text-slate-900 dark:text-white mb-1">{course.title}</h3>
+                    <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
                       <BookOpen size={14} />
                       <span>{course.lessons?.[0]?.count || 0} Ders</span>
                       <span className="mx-1">•</span>
-                      <span className={course.is_published ? 'text-emerald-400' : 'text-amber-400'}>
+                      <span className={course.is_published ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-amber-600 dark:text-amber-400 font-semibold'}>
                         {course.is_published ? 'Yayında' : 'Taslak'}
                       </span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-white/5">
+                  <div className="grid grid-cols-3 divide-x divide-slate-200 dark:divide-white/10 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
                     <button
                       onClick={() => navigate(`/teacher/courses/${course.id}/edit`)}
-                      className="py-3 text-xs text-slate-300 font-medium hover:text-white hover:bg-white/5 transition-colors flex items-center justify-center gap-1.5"
+                      className="py-3 text-xs text-slate-700 dark:text-slate-300 font-medium hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-1.5"
                     >
                       <Edit size={14} /> Düzenle
                     </button>
                     <button
                       onClick={() => navigate(`/teacher/courses/${course.id}/details`)}
-                      className="py-3 text-xs text-cyan-400 font-medium hover:text-cyan-300 hover:bg-white/5 transition-colors flex items-center justify-center gap-1.5"
+                      className="py-3 text-xs text-cyan-700 dark:text-cyan-400 font-medium hover:text-cyan-800 dark:hover:text-cyan-300 hover:bg-cyan-50 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-1.5"
                     >
                       <Users size={14} /> Detaylar
                     </button>
                     <button
                       onClick={() => navigate(`/student/courses/${course.id}`)}
-                      className="py-3 text-xs text-violet-400 font-medium hover:text-violet-300 hover:bg-white/5 transition-colors flex items-center justify-center gap-1.5"
+                      className="py-3 text-xs text-violet-700 dark:text-violet-400 font-medium hover:text-violet-800 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-white/5 transition-colors flex items-center justify-center gap-1.5"
                     >
                       <Eye size={14} /> Önizle
                     </button>

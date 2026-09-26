@@ -147,20 +147,20 @@ export default function CoursePage() {
         {/* Geri */}
         <button
           onClick={() => navigate(isTeacher ? '/teacher/courses' : '/student/courses')}
-          className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm"
+          className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors text-sm"
         >
           <ArrowLeft size={16} /> {isTeacher ? 'Eğitmen Kurslarıma Dön' : 'Kurslara Dön'}
         </button>
 
         {/* Kurs Kilitli Uyarısı (Öğretmene asla kilit uygulanmaz) */}
         {!isTeacher && courseLockInfo.isLocked ? (
-          <Card className="border border-amber-500/30 bg-amber-950/20 text-center py-12 px-6 space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/20 flex items-center justify-center text-3xl border border-amber-500/40">
+          <Card className="border border-amber-300 dark:border-amber-500/30 bg-amber-50/80 dark:bg-amber-950/20 text-center py-12 px-6 space-y-4 shadow-sm">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center text-3xl border border-amber-300 dark:border-amber-500/40">
               🔒
             </div>
-            <h2 className="text-2xl font-black text-white">Bu Kurs Henüz Kilitli</h2>
-            <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-              Müfredat akışına göre bu kursa başlayabilmek için öncelikle bir önceki kurs olan <strong className="text-amber-400">"{courseLockInfo.prevCourse?.title}"</strong> kursundaki tüm dersleri tamamlamanız gerekmektedir.
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white">Bu Kurs Henüz Kilitli</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
+              Müfredat akışına göre bu kursa başlayabilmek için öncelikle bir önceki kurs olan <strong className="text-amber-700 dark:text-amber-400">"{courseLockInfo.prevCourse?.title}"</strong> kursundaki tüm dersleri tamamlamanız gerekmektedir.
             </p>
             <div className="pt-3 flex items-center justify-center gap-3">
               <button
@@ -171,7 +171,7 @@ export default function CoursePage() {
               </button>
               <button
                 onClick={() => navigate('/student/courses')}
-                className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-medium text-sm transition-all"
+                className="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/15 text-slate-800 dark:text-white font-medium text-sm transition-all"
               >
                 Tüm Kurslar
               </button>
@@ -180,29 +180,29 @@ export default function CoursePage() {
         ) : (
           <>
             {/* Kurs Header */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-900/50 to-purple-900/30 border border-violet-500/20 p-6">
-              <div className="absolute -top-8 -right-8 w-36 h-36 bg-violet-500/20 rounded-full blur-3xl" />
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-100 via-purple-50 to-white dark:bg-gradient-to-br dark:from-violet-900/50 dark:to-purple-900/30 border border-violet-200 dark:border-violet-500/20 p-6 shadow-sm">
+              <div className="absolute -top-8 -right-8 w-36 h-36 bg-violet-500/10 dark:bg-violet-500/20 rounded-full blur-3xl" />
           <div className="relative flex gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500/30 to-pink-500/20 flex items-center justify-center text-4xl border border-white/10 shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-100 to-pink-100 dark:from-violet-500/30 dark:to-pink-500/20 flex items-center justify-center text-4xl border border-violet-200 dark:border-white/10 shrink-0">
               {course.thumbnail_emoji}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border text-violet-400 bg-violet-500/10 border-violet-500/30">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border text-violet-700 dark:text-violet-400 bg-violet-100 dark:bg-violet-500/10 border-violet-300 dark:border-violet-500/30">
                   {course.category === 'awareness' ? '🛡️ Farkındalık' : '⚔️ Teknik'}
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border text-slate-400 bg-white/5 border-white/10">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border text-slate-700 dark:text-slate-400 bg-white/80 dark:bg-white/5 border-slate-300 dark:border-white/10">
                   {LEVEL_LABELS[course.level]}
                 </span>
               </div>
-              <h1 className="font-display font-black text-xl text-white">{course.title}</h1>
+              <h1 className="font-display font-black text-xl text-slate-900 dark:text-white">{course.title}</h1>
               {course.description && (
-                <p className="text-sm text-slate-400 mt-1 leading-relaxed">{course.description}</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">{course.description}</p>
               )}
 
               {/* Stats */}
               <div className="flex items-center gap-4 mt-3">
-                <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
                   <BookOpen size={13} />
                   <span>{totalCount} ders</span>
                 </div>
@@ -269,9 +269,9 @@ export default function CoursePage() {
             </div>
           </div>
         ) : !enrolled ? (
-          <Card className="border border-violet-500/30 bg-violet-500/5 text-center space-y-3">
-            <p className="text-white font-semibold">Bu kursa kayıt ol ve öğrenmeye başla!</p>
-            <p className="text-xs text-slate-400">Dersleri görmek ve ilerlemeyi takip etmek için kayıt gerekiyor.</p>
+          <Card className="border border-violet-300 dark:border-violet-500/30 bg-violet-50 dark:bg-violet-500/5 text-center space-y-3 shadow-sm">
+            <p className="text-slate-900 dark:text-white font-semibold">Bu kursa kayıt ol ve öğrenmeye başla!</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">Dersleri görmek ve ilerlemeyi takip etmek için kayıt gerekiyor.</p>
             <button
               onClick={handleEnroll}
               disabled={enrolling}
@@ -296,8 +296,8 @@ export default function CoursePage() {
 
         {/* Ders Listesi */}
         <div>
-          <h2 className="font-display font-bold text-lg text-white mb-4 flex items-center gap-2">
-            <BookOpen size={18} className="text-violet-400" />
+          <h2 className="font-display font-bold text-lg text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+            <BookOpen size={18} className="text-violet-600 dark:text-violet-400" />
             Dersler
           </h2>
 
@@ -315,46 +315,46 @@ export default function CoursePage() {
                   className={[
                     'flex items-center gap-4 p-4 rounded-2xl border transition-all duration-200',
                     !unlocked
-                      ? 'glass border-white/5 opacity-50 cursor-not-allowed'
+                      ? 'bg-slate-100/70 dark:bg-transparent border-slate-200 dark:border-white/5 opacity-60 cursor-not-allowed'
                       : isDone
-                      ? 'glass border-emerald-500/20 hover:border-emerald-500/40 cursor-pointer card-lift'
+                      ? 'bg-white dark:glass border-emerald-300 dark:border-emerald-500/20 hover:border-emerald-400 dark:hover:border-emerald-500/40 cursor-pointer card-lift shadow-sm'
                       : isActive
-                      ? 'glass border-violet-500/30 shadow-[0_0_20px_rgba(124,58,237,0.15)] cursor-pointer card-lift'
-                      : 'glass border-white/10 hover:border-violet-500/40 cursor-pointer card-lift',
+                      ? 'bg-white dark:glass border-violet-400 dark:border-violet-500/30 shadow-[0_0_20px_rgba(124,58,237,0.15)] cursor-pointer card-lift'
+                      : 'bg-white dark:glass border-slate-200 dark:border-white/10 hover:border-violet-300 dark:hover:border-violet-500/40 cursor-pointer card-lift shadow-sm',
                   ].join(' ')}
                 >
                   {/* Adım göstergesi */}
                   <div className={[
                     'w-10 h-10 rounded-full flex items-center justify-center text-sm font-black shrink-0',
-                    isDone    ? 'bg-emerald-500/20 text-emerald-400 ring-2 ring-emerald-500/30' :
-                    isActive  ? 'bg-violet-500/20 text-violet-400 ring-2 ring-violet-500/50 animate-pulse-slow' :
-                    !unlocked ? 'bg-white/5 text-slate-600' :
-                    'bg-white/10 text-slate-300',
+                    isDone    ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 ring-2 ring-emerald-300 dark:ring-emerald-500/30' :
+                    isActive  ? 'bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 ring-2 ring-violet-300 dark:ring-violet-500/50 animate-pulse-slow' :
+                    !unlocked ? 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-600' :
+                    'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300',
                   ].join(' ')}>
                     {isDone ? <CheckCircle size={18} /> : !unlocked ? <Lock size={15} /> : idx + 1}
                   </div>
 
                   {/* Bilgi */}
                   <div className="flex-1 min-w-0">
-                    <p className={`font-semibold text-sm ${!unlocked ? 'text-slate-600' : 'text-white'}`}>
+                    <p className={`font-semibold text-sm ${!unlocked ? 'text-slate-400 dark:text-slate-600' : 'text-slate-900 dark:text-white'}`}>
                       {lesson.title}
                     </p>
                     <div className="flex items-center gap-3 mt-0.5">
                       {isTeacher ? (
-                        <span className="text-[10px] font-semibold text-cyan-400">İçeriği görmek için tıkla</span>
+                        <span className="text-[10px] font-semibold text-cyan-600 dark:text-cyan-400">İçeriği görmek için tıkla</span>
                       ) : (
                         <>
                           {isDone && (
-                            <span className="text-[10px] font-bold text-emerald-400">✓ Tamamlandı</span>
+                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">✓ Tamamlandı</span>
                           )}
                           {isActive && (
-                            <span className="text-[10px] font-bold text-violet-400">▶ Devam ediyor</span>
+                            <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400">▶ Devam ediyor</span>
                           )}
                           {!isDone && !isActive && unlocked && (
                             <span className="text-[10px] text-slate-500">Başlanmadı</span>
                           )}
                           {!unlocked && (
-                            <span className="text-[10px] text-slate-600">Önceki dersi tamamla</span>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-600">Önceki dersi tamamla</span>
                           )}
                         </>
                       )}
@@ -363,15 +363,15 @@ export default function CoursePage() {
 
                   {/* XP */}
                   <div className="shrink-0 flex items-center gap-1">
-                    <Zap size={13} className={!unlocked ? 'text-slate-600' : 'text-amber-400'} />
-                    <span className={`text-xs font-bold ${!unlocked ? 'text-slate-600' : 'text-amber-400'}`}>
+                    <Zap size={13} className={!unlocked ? 'text-slate-400 dark:text-slate-600' : 'text-amber-500 dark:text-amber-400'} />
+                    <span className={`text-xs font-bold ${!unlocked ? 'text-slate-400 dark:text-slate-600' : 'text-amber-600 dark:text-amber-400'}`}>
                       +{lesson.xp_reward}
                     </span>
                   </div>
 
                   {/* Ok */}
                   {unlocked && (
-                    <ChevronRight size={16} className="text-slate-500 shrink-0" />
+                    <ChevronRight size={16} className="text-slate-400 dark:text-slate-500 shrink-0" />
                   )}
                 </div>
               );

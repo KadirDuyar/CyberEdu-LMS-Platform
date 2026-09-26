@@ -16,28 +16,28 @@ const CATEGORY_UI = {
     label: 'Siber Güvenlik Farkındalığı',
     desc: 'Günlük dijital hayatında güvende olman için gereken temel bilgiler',
     icon: Shield,
-    banner: 'from-cyan-900/50 to-blue-900/30 border-cyan-500/20',
-    glow: 'bg-cyan-500/20',
-    badge: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30',
-    btn: 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-500/30',
+    banner: 'from-cyan-50 via-blue-50 to-white dark:from-cyan-900/50 dark:to-blue-900/30 border-cyan-200 dark:border-cyan-500/20 text-slate-900 dark:text-white',
+    glow: 'bg-cyan-500/10 dark:bg-cyan-500/20',
+    badge: 'text-cyan-700 dark:text-cyan-400 bg-cyan-100 dark:bg-cyan-500/10 border-cyan-300 dark:border-cyan-500/30',
+    btn: 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-500/30 text-white',
     progress: 'cyan',
   },
   technical: {
     label: 'Web Güvenliği & Teknik',
     desc: 'HTTP, SQL Injection, XSS ve güvenli kod yazımı üzerine teknik dersler',
     icon: Code2,
-    banner: 'from-orange-900/50 to-red-900/30 border-orange-500/20',
-    glow: 'bg-orange-500/20',
-    badge: 'text-orange-400 bg-orange-500/10 border-orange-500/30',
-    btn: 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/30',
+    banner: 'from-orange-50 via-red-50 to-white dark:from-orange-900/50 dark:to-red-900/30 border-orange-200 dark:border-orange-500/20 text-slate-900 dark:text-white',
+    glow: 'bg-orange-500/10 dark:bg-orange-500/20',
+    badge: 'text-orange-700 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 border-orange-300 dark:border-orange-500/30',
+    btn: 'bg-orange-600 hover:bg-orange-500 shadow-orange-500/30 text-white',
     progress: 'amber',
   },
 };
 
 const LEVEL_LABELS = {
-  beginner:     { label: 'Başlangıç', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' },
-  intermediate: { label: 'Orta',      color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
-  advanced:     { label: 'İleri',     color: 'text-rose-400 bg-rose-500/10 border-rose-500/30' },
+  beginner:     { label: 'Başlangıç', color: 'text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-500/30' },
+  intermediate: { label: 'Orta',      color: 'text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/30' },
+  advanced:     { label: 'İleri',     color: 'text-rose-700 dark:text-rose-400 bg-rose-100 dark:bg-rose-500/10 border-rose-300 dark:border-rose-500/30' },
 };
 
 export default function CourseList() {
@@ -157,30 +157,30 @@ export default function CourseList() {
       <div className="space-y-6 max-w-4xl mx-auto pb-16">
 
         {/* Banner */}
-        <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-r ${ui.banner} border p-6`}>
+        <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-r ${ui.banner} border p-6 shadow-sm`}>
           <div className={`absolute -top-8 -right-8 w-36 h-36 ${ui.glow} rounded-full blur-3xl`} />
           <div className="relative flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-white/80 dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center shrink-0">
               <Icon size={24} className={ui.badge.split(' ')[0]} />
             </div>
             <div>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${ui.badge}`}>
                 {area === 'awareness' ? '🛡️ Normal Kullanıcı' : '⚔️ Teknik Öğrenci'}
               </span>
-              <h1 className="font-display font-black text-xl text-white mt-1">{ui.label}</h1>
-              <p className="text-slate-400 text-sm mt-1">{ui.desc}</p>
+              <h1 className="font-display font-black text-xl text-slate-900 dark:text-white mt-1">{ui.label}</h1>
+              <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">{ui.desc}</p>
             </div>
           </div>
         </div>
 
         {/* Filtreleme Sekmeleri: Tümü, Zorunlu Patika, Sınıf Görevleri, Seçmeli */}
-        <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-4">
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-white/10 pb-4">
           <button
             onClick={() => setActiveTab('all')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'all'
                 ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25'
-                : 'bg-white/5 hover:bg-white/10 text-slate-300'
+                : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-transparent'
             }`}
           >
             Tüm Kurslar ({courses.filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')).length})
@@ -190,7 +190,7 @@ export default function CourseList() {
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'mandatory'
                 ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/25'
-                : 'bg-white/5 hover:bg-white/10 text-rose-300/90'
+                : 'bg-rose-50 hover:bg-rose-100 dark:bg-white/5 dark:hover:bg-white/10 text-rose-700 dark:text-rose-300/90 border border-rose-200 dark:border-transparent'
             }`}
           >
             🔴 Zorunlu Patika ({courses.filter((c) => c.is_mandatory !== false && c.course_type !== 'elective').length})
@@ -200,7 +200,7 @@ export default function CourseList() {
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'cohort'
                 ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/25'
-                : 'bg-white/5 hover:bg-white/10 text-cyan-300/90'
+                : 'bg-cyan-50 hover:bg-cyan-100 dark:bg-white/5 dark:hover:bg-white/10 text-cyan-700 dark:text-cyan-300/90 border border-cyan-200 dark:border-transparent'
             }`}
           >
             <Calendar size={13} /> 🔵 Sınıf Görevleri ({courses.filter((c) => cohortCourseIds.has(c.id)).length})
@@ -210,7 +210,7 @@ export default function CourseList() {
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'elective'
                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25'
-                : 'bg-white/5 hover:bg-white/10 text-emerald-300/90'
+                : 'bg-emerald-50 hover:bg-emerald-100 dark:bg-white/5 dark:hover:bg-white/10 text-emerald-700 dark:text-emerald-300/90 border border-emerald-200 dark:border-transparent'
             }`}
           >
             <Sparkles size={13} /> 🟢 Seçmeli Kurslar ({courses.filter((c) => c.is_mandatory === false || c.course_type === 'elective').length})
@@ -278,59 +278,59 @@ export default function CourseList() {
                 >
                   <Card
                     hover={!isLocked}
-                    className={`h-full border transition-all duration-200 ${
+                    className={`h-full border transition-all duration-200 shadow-sm ${
                       isCompleted
-                        ? 'border-emerald-500/40 bg-emerald-950/10 hover:border-emerald-400'
+                        ? 'border-emerald-300 dark:border-emerald-500/40 bg-emerald-50/70 dark:bg-emerald-950/10 hover:border-emerald-400'
                         : isLocked
-                          ? 'border-white/5 bg-slate-900/40 opacity-60'
+                          ? 'border-slate-200 dark:border-white/5 bg-slate-100/70 dark:bg-slate-900/40 opacity-60'
                           : isCohortCourse
-                            ? 'border-cyan-500/50 bg-cyan-950/20 hover:border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.12)]'
+                            ? 'border-cyan-300 dark:border-cyan-500/50 bg-cyan-50/70 dark:bg-cyan-950/20 hover:border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.12)]'
                             : isElective
-                              ? 'border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.05)]'
+                              ? 'border-emerald-300 dark:border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/10 hover:border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.05)]'
                               : isEnrolled
-                                ? 'border-rose-500/40 hover:border-rose-400 bg-rose-950/10'
-                                : 'border-white/10 hover:border-rose-500/40'
+                                ? 'border-rose-300 dark:border-rose-500/40 hover:border-rose-400 bg-rose-50/50 dark:bg-rose-950/10'
+                                : 'border-slate-200 dark:border-white/10 hover:border-rose-300 dark:hover:border-rose-500/40 bg-white dark:bg-transparent'
                     }`}
                   >
                     {/* Üst: emoji + badge */}
                     <div className="flex items-start justify-between mb-4">
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl border ${
                         isLocked 
-                          ? 'bg-slate-800/50 border-white/5 grayscale' 
+                          ? 'bg-slate-200 dark:bg-slate-800/50 border-slate-300 dark:border-white/5 grayscale' 
                           : isCohortCourse
-                            ? 'bg-gradient-to-br from-cyan-500/20 to-blue-500/10 border-cyan-500/40'
+                            ? 'bg-cyan-100 dark:bg-gradient-to-br dark:from-cyan-500/20 dark:to-blue-500/10 border-cyan-300 dark:border-cyan-500/40'
                             : isElective
-                              ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border-emerald-500/30'
-                              : 'bg-gradient-to-br from-rose-500/20 to-pink-500/10 border-rose-500/30'
+                              ? 'bg-emerald-100 dark:bg-gradient-to-br dark:from-emerald-500/20 dark:to-teal-500/10 border-emerald-300 dark:border-emerald-500/30'
+                              : 'bg-rose-100 dark:bg-gradient-to-br dark:from-rose-500/20 dark:to-pink-500/10 border-rose-300 dark:border-rose-500/30'
                       }`}>
                         {isLocked ? '🔒' : (course.thumbnail_emoji || '🛡️')}
                       </div>
                       
                       <div className="flex flex-wrap items-center justify-end gap-1.5 max-w-[70%]">
                         {isCompleted ? (
-                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
+                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/40 flex items-center gap-1">
                             <CheckCircle2 size={12} />
                             Tamamlandı
                           </span>
                         ) : isLocked ? (
-                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-slate-800/80 text-slate-400 border border-white/10 flex items-center gap-1">
+                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-white/10 flex items-center gap-1">
                             <Lock size={11} />
                             Kilitli
                           </span>
                         ) : isEnrolled ? (
-                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/40">
+                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-500/40">
                             Kayıtlı ({completedCount}/{lessonCount})
                           </span>
                         ) : (
-                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-cyan-100 dark:bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30">
                             Kursa Katıl
                           </span>
                         )}
 
                         {/* Aktif Sınıf Görevi Rozeti */}
                         {isCohortCourse && (
-                          <span className="text-[10px] font-black px-2 py-1 rounded-full bg-cyan-500/25 text-cyan-300 border border-cyan-500/50 flex items-center gap-1 shadow-sm shadow-cyan-500/20 animate-pulse">
-                            <Calendar size={11} className="text-cyan-400" />
+                          <span className="text-[10px] font-black px-2 py-1 rounded-full bg-cyan-100 dark:bg-cyan-500/25 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/50 flex items-center gap-1 shadow-sm">
+                            <Calendar size={11} className="text-cyan-600 dark:text-cyan-400" />
                             Sınıf Görevi
                           </span>
                         )}
@@ -338,8 +338,8 @@ export default function CourseList() {
                         {/* Müfredat / Patika Türü Rozeti */}
                         <span className={`text-[10px] font-black px-2 py-1 rounded-full border ${
                           isElective
-                            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                            : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                            ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30'
+                            : 'bg-rose-100 dark:bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-500/30'
                         }`}>
                           {isElective ? '🟢 Seçmeli' : '🔴 Zorunlu'}
                         </span>
@@ -352,31 +352,31 @@ export default function CourseList() {
 
                     {/* Başlık ve açıklama */}
                     <h3 className={`font-display font-bold text-lg transition-colors ${
-                      isLocked ? 'text-slate-400' : 'text-white group-hover:text-violet-300'
+                      isLocked ? 'text-slate-400' : 'text-slate-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-300'
                     }`}>
                       {course.title}
                     </h3>
                     {course.description && (
-                      <p className="text-sm text-slate-400 mt-1.5 leading-relaxed line-clamp-2">
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mt-1.5 leading-relaxed line-clamp-2">
                         {course.description}
                       </p>
                     )}
 
                     {/* Alt bilgi */}
-                    <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/10">
-                      <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                    <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-white/10">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
                         <BookOpen size={13} />
                         <span>{lessonCount} ders</span>
                       </div>
                       <div className="ml-auto flex items-center gap-1 text-xs font-semibold transition-all">
                         {isCompleted ? (
-                          <span className="text-emerald-400 flex items-center gap-1">Tekrar İncele <ArrowRight size={13} /></span>
+                          <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">Tekrar İncele <ArrowRight size={13} /></span>
                         ) : isLocked ? (
-                          <span className="text-slate-500 flex items-center gap-1">Önceki Kursu Tamamla <Lock size={12} /></span>
+                          <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1">Önceki Kursu Tamamla <Lock size={12} /></span>
                         ) : isEnrolled ? (
-                          <span className="text-violet-400 flex items-center gap-1">Devam Et <ArrowRight size={13} /></span>
+                          <span className="text-violet-600 dark:text-violet-400 flex items-center gap-1">Devam Et <ArrowRight size={13} /></span>
                         ) : (
-                          <span className="text-cyan-400 flex items-center gap-1 font-bold">Kursa Katıl <Play size={12} /></span>
+                          <span className="text-cyan-600 dark:text-cyan-400 flex items-center gap-1 font-bold">Kursa Katıl <Play size={12} /></span>
                         )}
                       </div>
                     </div>
