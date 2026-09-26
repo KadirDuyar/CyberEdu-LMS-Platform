@@ -69,12 +69,14 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 1d. Storage RLS politikaları
 -- Herkes okuyabilir (public bucket)
-CREATE POLICY IF NOT EXISTS "storyline_public_read"
+DROP POLICY IF EXISTS "storyline_public_read" ON storage.objects;
+CREATE POLICY "storyline_public_read"
   ON storage.objects FOR SELECT
   USING (bucket_id = 'storyline-packages');
 
 -- Sadece öğretmenler yükleyebilir
-CREATE POLICY IF NOT EXISTS "storyline_teacher_insert"
+DROP POLICY IF EXISTS "storyline_teacher_insert" ON storage.objects;
+CREATE POLICY "storyline_teacher_insert"
   ON storage.objects FOR INSERT
   WITH CHECK (
     bucket_id = 'storyline-packages'
@@ -87,7 +89,8 @@ CREATE POLICY IF NOT EXISTS "storyline_teacher_insert"
   );
 
 -- Sadece sahibi silebilir
-CREATE POLICY IF NOT EXISTS "storyline_teacher_delete"
+DROP POLICY IF EXISTS "storyline_teacher_delete" ON storage.objects;
+CREATE POLICY "storyline_teacher_delete"
   ON storage.objects FOR DELETE
   USING (
     bucket_id = 'storyline-packages'
