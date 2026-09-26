@@ -10,6 +10,7 @@ import {
 import Card from '../components/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import OnboardingTour from '../components/ui/OnboardingTour';
+import WeeklyTasksBanner from '../components/cohorts/WeeklyTasksBanner';
 import { getFollowingIds, followUser, unfollowUser } from '../services/socialService';
 
 export default function StudentDashboard() {
@@ -272,6 +273,12 @@ export default function StudentDashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6 max-w-5xl mx-auto pb-12">
+
+        {/* ── Haftalık Görevler & Grup Programı Bannerı ─────────────────── */}
+        <WeeklyTasksBanner
+          userId={user?.id}
+          onProgressUpdated={() => loadDashboardData(false)}
+        />
 
         {/* ── Banner: Kurs Tamamlandı vs Yeni Öğrenci vs Devam Et ──────────────────────── */}
         <div id="tour-resume-card">

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, BookOpen, TrendingUp, CheckCircle,
-  PlusCircle, Edit2, ShieldAlert, Cpu
+  PlusCircle, Edit2, ShieldAlert, Cpu, Calendar
 } from 'lucide-react';
 import Card from '../components/Card';
 import { supabase } from '../lib/supabase';
@@ -71,12 +71,20 @@ export default function TeacherDashboard() {
             <p className="text-slate-300 text-sm md:text-base mt-2 max-w-xl">
               Öğrencilerin için yeni siber güvenlik modülleri ve interaktif etkinlikler tasarlayabilirsin.
             </p>
-            <button
-              onClick={() => navigate('/teacher/courses/new')}
-              className="mt-5 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold transition-all shadow-lg shadow-cyan-500/20 hover:scale-105"
-            >
-              <PlusCircle size={18} /> Yeni Kurs Oluştur
-            </button>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => navigate('/teacher/courses/new')}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-bold transition-all shadow-lg shadow-cyan-500/20 hover:scale-105"
+              >
+                <PlusCircle size={18} /> Yeni Kurs Oluştur
+              </button>
+              <button
+                onClick={() => navigate('/teacher/cohorts')}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white text-sm font-bold transition-all hover:scale-105"
+              >
+                <Calendar size={18} className="text-cyan-400" /> Haftalık Programlar
+              </button>
+            </div>
           </div>
         </div>
 

@@ -66,6 +66,13 @@ export async function completeLesson(userId, lessonId) {
     .select()
     .single();
 
+  if (!error && userId) {
+    // Arka planda haftalık grup görevini de kontrol edip tamamla
+    import('./cohortService').then(({ syncStudentCohortProgress }) => {
+      syncStudentCohortProgress(userId).catch(() => {});
+    });
+  }
+
   return { data, error };
 }
 

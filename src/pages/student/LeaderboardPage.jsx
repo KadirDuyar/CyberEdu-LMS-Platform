@@ -10,6 +10,7 @@ import {
   Shield, Zap, Star, ArrowRight, X, BookOpen, Clock, CheckCircle2, Flame
 } from 'lucide-react';
 import { getFollowingIds, followUser, unfollowUser } from '../../services/socialService';
+import { getWeeklyLeaderboardData } from '../../services/cohortService';
 import { BADGES, CHARACTERS } from '../../data/achievementsData';
 
 export default function LeaderboardPage() {
@@ -22,6 +23,7 @@ export default function LeaderboardPage() {
   const [followingIds, setFollowingIds] = useState(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [areaFilter, setAreaFilter] = useState('all'); // 'all' | 'awareness' | 'technical'
+  const [timeRange, setTimeRange] = useState('all'); // 'all' | 'week'
 
   // Profil Modalı için seçili öğrenci
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -30,7 +32,7 @@ export default function LeaderboardPage() {
 
   useEffect(() => {
     loadLeaderboardData();
-  }, [user]);
+  }, [user, timeRange]);
 
   // URL parametresi ile belirli bir profil açılmışsa
   useEffect(() => {
@@ -45,20 +47,25 @@ export default function LeaderboardPage() {
   async function loadLeaderboardData() {
     setLoading(true);
     try {
-      // 1. Tüm öğrencileri XP'ye göre sıralı çek
-      const { data: profilesData, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('role', 'student')
-        .order('xp', { ascending: false });
-
-      if (error) {
-        console.error('Liderlik tablosu hatası:', error.message);
+      if (timeRange === 'week') {
+        const weeklyData = await getWeeklyLeaderboardData();
+        setStudents(weeklyData || []);
       } else {
-        setStudents(profilesData || []);
+        // Tüm zamanlar: Tüm öğrencileri XP'ye göre sıralı çek
+        const { data: profilesData, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('role', 'student')
+          .order('xp', { ascending: false });
+
+        if (error) {
+          console.error('Liderlik tablosu hatası:', error.message);
+        } else {
+          setStudents(profilesData || []);
+        }
       }
 
-      // 2. Takip edilenleri çek
+      // Takip edilenleri çek
       if (user) {
         const ids = await getFollowingIds(user.id);
         setFollowingIds(ids);
@@ -147,8 +154,10 @@ export default function LeaderboardPage() {
     return matchesSearch && matchesArea;
   });
 
+  const myStudent = students.find((s) => s.id === user?.id);
   const myRank = students.findIndex((s) => s.id === user?.id) + 1;
-  const topThree = students.slice(0, 3);
+  const myDisplayXp = timeRange === 'week' ? (myStudent?.weekly_xp || 0) : (profile?.xp || 0);
+  const topThree = filteredStudents.slice(0, 3);
 
   return (
     <DashboardLayout>
@@ -178,13 +187,51 @@ export default function LeaderboardPage() {
                   #{myRank}
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Senin Sıralaman</p>
-                  <p className="text-base font-black text-slate-900 dark:text-white">{profile?.xp || 0} XP</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
+                    {timeRange === 'week' ? 'Haftalık Sıralaman' : 'Senin Sıralaman'}
+                  </p>
+                  <p className="text-base font-black text-slate-900 dark:text-white">
+                    {myDisplayXp.toLocaleString('tr-TR')} {timeRange === 'week' ? 'Haftalık XP' : 'XP'}
+                  </p>
                   <p className="text-[11px] text-violet-700 dark:text-violet-300 font-medium">Seviye {profile?.level || 1}</p>
                 </div>
               </div>
             )}
           </div>
+        </div>
+
+        {/* ── Zaman Dilimi Filtresi ([Tüm Zamanlar] / [Bu Hafta]) ───────── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-2 rounded-2xl glass border border-white/10 bg-slate-900/40">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setTimeRange('all')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                timeRange === 'all'
+                  ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/30'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Trophy size={15} />
+              Tüm Zamanlar
+            </button>
+            <button
+              onClick={() => setTimeRange('week')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                timeRange === 'week'
+                  ? 'bg-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Flame size={15} className={timeRange === 'week' ? 'text-slate-950' : 'text-amber-400'} />
+              Bu Hafta (Son 7 Gün)
+            </button>
+          </div>
+
+          {timeRange === 'week' && (
+            <span className="text-[11px] text-amber-300 font-medium flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              ⚡ Son 7 günün aktivite ve haftalık görev başarılarına göre sıralanır
+            </span>
+          )}
         </div>
 
         {/* ── İlk 3 Podyumu (Top 3) ─────────────────────────────────────── */}
@@ -206,7 +253,7 @@ export default function LeaderboardPage() {
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">Seviye {topThree[1].level || 1}</p>
               <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-400/10 border border-slate-400/20 text-slate-200 text-xs font-black font-mono">
-                <Zap size={13} className="text-amber-400" /> {topThree[1].xp} XP
+                <Zap size={13} className="text-amber-400" /> {timeRange === 'week' ? `${topThree[1].weekly_xp || 0} Haftalık XP` : `${topThree[1].xp} XP`}
               </div>
             </div>
 
@@ -227,7 +274,7 @@ export default function LeaderboardPage() {
               </h3>
               <p className="text-xs text-amber-400/80 font-bold mt-0.5">Seviye {topThree[0].level || 1} • Siber Usta</p>
               <div className="mt-3 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-sm font-black font-mono shadow-md">
-                <Flame size={15} className="text-amber-400 animate-pulse" /> {topThree[0].xp} XP
+                <Flame size={15} className="text-amber-400 animate-pulse" /> {timeRange === 'week' ? `${topThree[0].weekly_xp || 0} Haftalık XP` : `${topThree[0].xp} XP`}
               </div>
             </div>
 
@@ -247,7 +294,7 @@ export default function LeaderboardPage() {
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">Seviye {topThree[2].level || 1}</p>
               <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-700/10 border border-amber-700/20 text-amber-400 text-xs font-black font-mono">
-                <Zap size={13} className="text-amber-400" /> {topThree[2].xp} XP
+                <Zap size={13} className="text-amber-400" /> {timeRange === 'week' ? `${topThree[2].weekly_xp || 0} Haftalık XP` : `${topThree[2].xp} XP`}
               </div>
             </div>
           </div>
@@ -371,10 +418,12 @@ export default function LeaderboardPage() {
                       <div className="text-right">
                         <div className="flex items-center gap-1 font-mono font-black text-sm sm:text-base text-amber-400 justify-end">
                           <Zap size={14} />
-                          <span>{st.xp.toLocaleString('tr-TR')}</span>
+                          <span>
+                            {(timeRange === 'week' ? (st.weekly_xp || 0) : st.xp).toLocaleString('tr-TR')}
+                          </span>
                         </div>
                         <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">
-                          Toplam XP
+                          {timeRange === 'week' ? `Haftalık XP (Toplam: ${st.xp})` : 'Toplam XP'}
                         </p>
                       </div>
 

@@ -24,6 +24,8 @@ import CourseEditor     from './pages/teacher/CourseEditor';
 import TeacherCourseDetails from './pages/teacher/TeacherCourseDetails';
 import LessonBuilder    from './pages/teacher/LessonBuilder';
 import TeacherStats     from './pages/teacher/TeacherStats';
+import TeacherCohorts   from './pages/teacher/TeacherCohorts';
+import CohortDetails   from './pages/teacher/CohortDetails';
 
 // ─── Admin Pages ──────────────────────────────────────────────────────────────
 import AdminDashboard from './pages/AdminDashboard';
@@ -217,6 +219,22 @@ export default function App() {
             element={
               <ProtectedRoute allowedRoles={['teacher', 'admin']}>
                 <TeacherStats />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/cohorts"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <TeacherCohorts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teacher/cohorts/:cohortId"
+            element={
+              <ProtectedRoute allowedRoles={['teacher']}>
+                <CohortDetails />
               </ProtectedRoute>
             }
           />

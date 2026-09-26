@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, LogOut, ChevronLeft, ChevronRight,
   Star, Zap, Bell, Map, Trophy, Award, Bot, BookOpen,
-  BarChart3, Settings, Users, Shield, PlusCircle, Menu, X, Sun, Moon, User, Check
+  BarChart3, Settings, Users, Shield, PlusCircle, Menu, X, Sun, Moon, User, Check, Calendar
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import AiChatWidget from '../components/AiChatWidget';
@@ -63,6 +63,12 @@ const NAV_ITEMS = [
     label: 'Yeni Kurs',
     icon: PlusCircle,
     href: '/teacher/courses/new',
+    roles: ['teacher'],
+  },
+  {
+    label: 'Haftalık Programlar',
+    icon: Calendar,
+    href: '/teacher/cohorts',
     roles: ['teacher'],
   },
   {
