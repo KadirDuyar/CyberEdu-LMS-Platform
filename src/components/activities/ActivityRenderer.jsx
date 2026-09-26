@@ -1068,15 +1068,15 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
             {hints.map((h, i) => (
               <div
                 key={i}
-                className="p-3.5 rounded-xl bg-violet-50/80 dark:bg-gradient-to-r dark:from-violet-500/10 dark:via-fuchsia-500/5 dark:to-transparent border border-violet-200 dark:border-violet-500/20 text-slate-800 dark:text-violet-200 text-xs leading-relaxed animate-in fade-in"
+                className="p-3.5 rounded-xl bg-violet-100/70 dark:bg-slate-900/90 border border-violet-300/80 dark:border-violet-500/30 text-slate-900 dark:text-violet-200 text-xs leading-relaxed animate-in fade-in shadow-sm"
               >
-                <div className="flex items-center gap-1.5 font-bold text-violet-700 dark:text-violet-400 mb-1">
+                <div className="flex items-center gap-1.5 font-bold text-violet-800 dark:text-violet-300 mb-1.5">
                   <span>🤖 YZ Rehberi</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-500/20 font-mono text-violet-800 dark:text-violet-300">
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-violet-200/80 dark:bg-violet-500/20 font-mono font-bold text-violet-900 dark:text-violet-200 border border-violet-300 dark:border-violet-500/30">
                     Kademe {h.level}
                   </span>
                 </div>
-                <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{h.text}</p>
+                <p className="text-slate-800 dark:text-slate-200 font-medium whitespace-pre-wrap">{h.text}</p>
               </div>
             ))}
 
@@ -1086,22 +1086,22 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
                 key={i}
                 className={`p-3 rounded-xl text-xs leading-relaxed animate-in fade-in ${
                   d.role === 'user'
-                    ? 'bg-violet-600 text-white ml-4 shadow-sm'
-                    : 'bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200 mr-4 shadow-sm'
+                    ? 'bg-violet-600 text-white ml-4 shadow-sm font-medium'
+                    : 'bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100 mr-4 shadow-sm'
                 }`}
               >
-                <span className={`font-bold text-[10px] uppercase tracking-wider block mb-0.5 ${d.role === 'user' ? 'text-violet-100' : 'text-slate-500 dark:text-slate-400'}`}>
+                <span className={`font-bold text-[10px] uppercase tracking-wider block mb-0.5 ${d.role === 'user' ? 'text-violet-100' : 'text-violet-700 dark:text-violet-300'}`}>
                   {d.role === 'user' ? 'Sen:' : '🤖 YZ Yanıtı:'}
                 </span>
-                <p className="whitespace-pre-wrap">{d.text}</p>
+                <p className="whitespace-pre-wrap font-medium">{d.text}</p>
               </div>
             ))}
 
             {/* Yükleniyor Göstergesi */}
             {replyLoading && (
-              <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 mr-4">
+              <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-white/10 text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2 mr-4">
                 <span className="w-2 h-2 rounded-full bg-violet-500 animate-ping" />
-                <span>YZ yanıtını düşünüyor...</span>
+                <span className="font-medium">YZ yanıtını düşünüyor...</span>
               </div>
             )}
 
@@ -1113,12 +1113,12 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
                 onChange={(e) => setReplyInput(e.target.value)}
                 disabled={replyLoading}
                 placeholder="YZ'ye cevap ver veya ipucu hakkında soru sor..."
-                className="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-violet-500/30 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-violet-500 shadow-sm"
+                className="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-violet-500/30 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-violet-500 shadow-sm"
               />
               <button
                 type="submit"
                 disabled={!replyInput.trim() || replyLoading}
-                className="px-3 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1 shrink-0 cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1 shrink-0 cursor-pointer"
               >
                 {replyLoading ? (
                   <span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />

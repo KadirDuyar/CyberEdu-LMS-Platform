@@ -34,7 +34,7 @@ function FormattedMessage({ text }) {
                 const itemText = line.trim().slice(2);
                 return (
                   <div key={lIdx} className="flex items-start gap-2 pl-2">
-                    <span className="text-violet-400 mt-1">•</span>
+                    <span className="text-violet-600 dark:text-violet-400 mt-1 font-bold">•</span>
                     <span>{renderInlineStyles(itemText)}</span>
                   </div>
                 );
@@ -45,7 +45,7 @@ function FormattedMessage({ text }) {
               if (numMatch) {
                 return (
                   <div key={lIdx} className="flex items-start gap-2 pl-2">
-                    <span className="text-violet-400 font-bold text-xs mt-0.5">{numMatch[1]}.</span>
+                    <span className="text-violet-700 dark:text-violet-400 font-bold text-xs mt-0.5">{numMatch[1]}.</span>
                     <span>{renderInlineStyles(numMatch[2])}</span>
                   </div>
                 );
@@ -65,11 +65,11 @@ function renderInlineStyles(text) {
   const tokens = text.split(/(\*\*.*?\*\*|`.*?`)/g);
   return tokens.map((token, i) => {
     if (token.startsWith('**') && token.endsWith('**')) {
-      return <strong key={i} className="font-bold text-violet-200">{token.slice(2, -2)}</strong>;
+      return <strong key={i} className="font-bold text-violet-900 dark:text-violet-200">{token.slice(2, -2)}</strong>;
     }
     if (token.startsWith('`') && token.endsWith('`')) {
       return (
-        <code key={i} className="px-1.5 py-0.5 rounded bg-violet-950/60 text-violet-300 font-mono text-xs border border-violet-800/40">
+        <code key={i} className="px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-950/60 text-violet-800 dark:text-violet-300 font-mono text-xs border border-violet-200 dark:border-violet-800/40">
           {token.slice(1, -1)}
         </code>
       );

@@ -63,21 +63,21 @@ function FormattedContent({ text }) {
 
               // Markdown başlıkları (#, ##, ###)
               if (trimmed.startsWith('### ')) {
-                return <h4 key={lIdx} className="font-bold text-base text-violet-300 pt-2">{trimmed.slice(4)}</h4>;
+                return <h4 key={lIdx} className="font-bold text-base text-violet-700 dark:text-violet-300 pt-2">{trimmed.slice(4)}</h4>;
               }
               if (trimmed.startsWith('## ')) {
-                return <h3 key={lIdx} className="font-black text-lg text-white pt-2">{trimmed.slice(3)}</h3>;
+                return <h3 key={lIdx} className="font-black text-lg text-slate-900 dark:text-white pt-2">{trimmed.slice(3)}</h3>;
               }
               if (trimmed.startsWith('# ')) {
-                return <h2 key={lIdx} className="font-black text-xl text-white pt-3">{trimmed.slice(2)}</h2>;
+                return <h2 key={lIdx} className="font-black text-xl text-slate-900 dark:text-white pt-3">{trimmed.slice(2)}</h2>;
               }
 
               // Liste elemanı
               if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
                 return (
                   <div key={lIdx} className="flex items-start gap-2 pl-2">
-                    <span className="text-violet-400 mt-1.5 leading-none">•</span>
-                    <span className="text-slate-200">{renderInlineStyles(trimmed.slice(2))}</span>
+                    <span className="text-violet-600 dark:text-violet-400 mt-1.5 leading-none">•</span>
+                    <span className="text-slate-800 dark:text-slate-200">{renderInlineStyles(trimmed.slice(2))}</span>
                   </div>
                 );
               }
@@ -87,13 +87,13 @@ function FormattedContent({ text }) {
               if (numMatch) {
                 return (
                   <div key={lIdx} className="flex items-start gap-2 pl-2">
-                    <span className="text-violet-400 font-bold text-xs mt-0.5">{numMatch[1]}.</span>
-                    <span className="text-slate-200">{renderInlineStyles(numMatch[2])}</span>
+                    <span className="text-violet-600 dark:text-violet-400 font-bold text-xs mt-0.5">{numMatch[1]}.</span>
+                    <span className="text-slate-800 dark:text-slate-200">{renderInlineStyles(numMatch[2])}</span>
                   </div>
                 );
               }
 
-              return <p key={lIdx} className="text-slate-200">{renderInlineStyles(line)}</p>;
+              return <p key={lIdx} className="text-slate-800 dark:text-slate-200">{renderInlineStyles(line)}</p>;
             })}
           </div>
         );
@@ -106,11 +106,11 @@ function renderInlineStyles(text) {
   const tokens = text.split(/(\*\*.*?\*\*|`.*?`)/g);
   return tokens.map((token, i) => {
     if (token.startsWith('**') && token.endsWith('**')) {
-      return <strong key={i} className="font-bold text-white">{token.slice(2, -2)}</strong>;
+      return <strong key={i} className="font-bold text-slate-950 dark:text-white">{token.slice(2, -2)}</strong>;
     }
     if (token.startsWith('`') && token.endsWith('`')) {
       return (
-        <code key={i} className="px-1.5 py-0.5 rounded bg-violet-950 text-violet-300 font-mono text-xs border border-violet-800/40">
+        <code key={i} className="px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-950 text-violet-800 dark:text-violet-300 font-mono text-xs border border-violet-200 dark:border-violet-800/40">
           {token.slice(1, -1)}
         </code>
       );
@@ -244,26 +244,26 @@ export default function AiMentor() {
       <div className="max-w-5xl mx-auto flex flex-col h-[calc(100vh-9.5rem)] md:h-[calc(100vh-10.5rem)] min-h-[480px]">
         
         {/* Üst Başlık & Kontroller */}
-        <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md mb-4 shrink-0">
+        <div className="flex items-center justify-between p-4 rounded-2xl bg-white/70 dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm backdrop-blur-md mb-4 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-violet-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-violet-600/30">
               <Bot size={24} />
             </div>
             <div>
-              <h1 className="text-lg font-black text-white flex items-center gap-2">
+              <h1 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
                 CyberEdu AI Mentor
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
                   Çevrimiçi
                 </span>
               </h1>
-              <p className="text-xs text-slate-400">7/24 Kişisel Siber Güvenlik Rehberiniz</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">7/24 Kişisel Siber Güvenlik Rehberiniz</p>
             </div>
           </div>
 
           <button
             onClick={clearChat}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 text-xs font-semibold transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-white/5 dark:hover:bg-rose-500/20 text-slate-600 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-300 border border-slate-200 dark:border-white/10 hover:border-rose-300 dark:hover:border-rose-500/30 text-xs font-semibold transition-all cursor-pointer"
             title="Sohbet geçmişini sıfırla"
           >
             <Trash2 size={14} />
@@ -272,12 +272,12 @@ export default function AiMentor() {
         </div>
 
         {/* Mesaj Listesi Alanı */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 rounded-3xl bg-slate-900/60 border border-white/10 backdrop-blur-xl mb-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 rounded-3xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200 dark:border-white/10 shadow-sm backdrop-blur-xl mb-4">
           
           {/* Başlangıç Kartları (Sadece az mesaj varken göster) */}
           {messages.length <= 2 && (
             <div className="my-4 space-y-3">
-              <p className="text-xs font-extrabold uppercase tracking-wider text-slate-400 px-1">
+              <p className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1">
                 Önerilen Başlangıç Konuları
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -287,14 +287,14 @@ export default function AiMentor() {
                     <button
                       key={i}
                       onClick={() => handleSend(card.prompt)}
-                      className={`flex items-start gap-3 p-3.5 rounded-2xl bg-gradient-to-br ${card.color} border text-left hover:scale-[1.01] active:scale-[0.99] transition-all`}
+                      className="flex items-start gap-3 p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/10 text-left hover:scale-[1.01] active:scale-[0.99] transition-all shadow-sm"
                     >
-                      <div className="p-2 rounded-xl bg-white/10 shrink-0 mt-0.5">
+                      <div className="p-2 rounded-xl bg-violet-50 dark:bg-white/10 shrink-0 mt-0.5 text-violet-600 dark:text-violet-400">
                         <Icon size={18} />
                       </div>
                       <div>
-                        <h3 className="text-xs font-bold text-white mb-1">{card.title}</h3>
-                        <p className="text-[11px] text-slate-300 line-clamp-2">{card.prompt}</p>
+                        <h3 className="text-xs font-bold text-slate-900 dark:text-white mb-1">{card.title}</h3>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2">{card.prompt}</p>
                       </div>
                     </button>
                   );
@@ -312,7 +312,7 @@ export default function AiMentor() {
                 className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
               >
                 {!isUser && (
-                  <div className="w-8 h-8 rounded-xl bg-violet-600/30 border border-violet-500/40 flex items-center justify-center text-violet-300 shrink-0 mt-1">
+                  <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-600/30 border border-violet-200 dark:border-violet-500/40 flex items-center justify-center text-violet-700 dark:text-violet-300 shrink-0 mt-1 shadow-sm">
                     <Bot size={18} />
                   </div>
                 )}
@@ -321,7 +321,7 @@ export default function AiMentor() {
                   className={`max-w-[85%] sm:max-w-[78%] px-5 py-3.5 rounded-3xl shadow-md ${
                     isUser
                       ? 'bg-violet-600 text-white rounded-br-sm'
-                      : 'bg-slate-800/95 border border-white/10 text-slate-200 rounded-bl-sm'
+                      : 'bg-white dark:bg-slate-800/95 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100 rounded-bl-sm'
                   }`}
                 >
                   <FormattedContent text={msg.content} />
@@ -333,14 +333,14 @@ export default function AiMentor() {
           {/* Yükleniyor Durumu */}
           {loading && (
             <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 rounded-xl bg-violet-600/30 border border-violet-500/40 flex items-center justify-center text-violet-300 shrink-0 mt-1">
-                <Sparkles size={18} className="animate-spin text-violet-400" />
+              <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-600/30 border border-violet-200 dark:border-violet-500/40 flex items-center justify-center text-violet-700 dark:text-violet-300 shrink-0 mt-1 shadow-sm">
+                <Sparkles size={18} className="animate-spin text-violet-600 dark:text-violet-400" />
               </div>
-              <div className="bg-slate-800/95 px-5 py-4 rounded-3xl rounded-bl-sm border border-white/10 flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2.5 h-2.5 rounded-full bg-pink-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2.5 h-2.5 rounded-full bg-violet-300 animate-bounce" style={{ animationDelay: '300ms' }} />
-                <span className="text-xs text-slate-400 font-medium ml-2">Mentorünüz düşünüyor...</span>
+              <div className="bg-white dark:bg-slate-800/95 px-5 py-4 rounded-3xl rounded-bl-sm border border-slate-200 dark:border-white/10 flex items-center gap-2 shadow-sm">
+                <span className="w-2.5 h-2.5 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2.5 h-2.5 rounded-full bg-pink-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2.5 h-2.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="text-xs text-slate-600 dark:text-slate-300 font-medium ml-2">Mentorünüz düşünüyor...</span>
               </div>
             </div>
           )}
@@ -349,7 +349,7 @@ export default function AiMentor() {
         </div>
 
         {/* Mesaj Gönderme Giriş Alanı */}
-        <div className="p-3 bg-slate-900/95 border border-white/10 rounded-2xl backdrop-blur-xl flex items-center gap-3 shrink-0 shadow-2xl sticky bottom-0 z-20">
+        <div className="p-3 bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl flex items-center gap-3 shrink-0 sticky bottom-0 z-20">
           <input
             ref={inputRef}
             type="text"
@@ -358,12 +358,12 @@ export default function AiMentor() {
             onKeyDown={handleKeyDown}
             disabled={loading}
             placeholder="Siber güvenlik mentorünüze bir soru sorun veya konu belirtin..."
-            className="flex-1 bg-transparent px-3 py-2 text-sm text-white placeholder-slate-400 outline-none disabled:opacity-50"
+            className="flex-1 bg-transparent px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none disabled:opacity-50"
           />
           <button
             onClick={() => handleSend()}
             disabled={!input.trim() || loading}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 disabled:opacity-40 disabled:hover:from-violet-600 disabled:hover:to-pink-500 text-white font-bold text-xs sm:text-sm shadow-md transition-all shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-pink-500 hover:from-violet-500 hover:to-pink-400 disabled:opacity-40 disabled:hover:from-violet-600 disabled:hover:to-pink-500 text-white font-bold text-xs sm:text-sm shadow-md transition-all shrink-0 cursor-pointer"
           >
             <span>Gönder</span>
             <Send size={15} />

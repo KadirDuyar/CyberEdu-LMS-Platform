@@ -144,6 +144,12 @@ html.light,
 body.light-mode {
   background-color: #F8FAFC !important;
   color: #0F172A !important;
+  color-scheme: light;
+}
+
+html.dark,
+body:not(.light-mode) {
+  color-scheme: dark;
 }
 
 html.light .bg-\[\#0f172a\],
@@ -171,6 +177,78 @@ body.light-mode .glass-light {
   background: #FFFFFF !important;
   border-color: #E2E8F0 !important;
   box-shadow: 0 2px 8px -1px rgba(15, 23, 42, 0.04) !important;
+}
+
+/* Text Contrast Stabilization in Light Mode */
+html.light .text-slate-400,
+body.light-mode .text-slate-400 {
+  color: #64748B;
+}
+
+html.light .text-slate-300,
+body.light-mode .text-slate-300 {
+  color: #475569;
+}
+
+html.light .text-slate-200,
+body.light-mode .text-slate-200 {
+  color: #334155;
+}
+
+/* Headings inside white cards in Light Mode */
+html.light .glass h1,
+html.light .glass h2,
+html.light .glass h3,
+html.light .glass h4,
+html.light .glass-light h1,
+html.light .glass-light h2,
+html.light .glass-light h3,
+html.light .glass-light h4,
+body.light-mode .glass h1,
+body.light-mode .glass h2,
+body.light-mode .glass h3,
+body.light-mode .glass h4,
+body.light-mode .glass-light h1,
+body.light-mode .glass-light h2,
+body.light-mode .glass-light h3,
+body.light-mode .glass-light h4 {
+  color: #0F172A;
+}
+
+/* Retain gradient clips for special headings */
+html.light .text-gradient,
+body.light-mode .text-gradient,
+html.light .text-gradient-cyan,
+body.light-mode .text-gradient-cyan {
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Fix invisible border-white in Light Mode */
+html.light .border-white\/10,
+html.light .border-white\/5,
+html.light .border-white\/15,
+html.light .border-white\/20,
+body.light-mode .border-white\/10,
+body.light-mode .border-white\/5,
+body.light-mode .border-white\/15,
+body.light-mode .border-white\/20 {
+  border-color: #E2E8F0 !important;
+}
+
+/* Fix divide lines in Light Mode */
+html.light .divide-white\/5 > :not([hidden]) ~ :not([hidden]),
+html.light .divide-white\/10 > :not([hidden]) ~ :not([hidden]),
+body.light-mode .divide-white\/5 > :not([hidden]) ~ :not([hidden]),
+body.light-mode .divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #F1F5F9 !important;
+}
+
+/* Safeguard for hardcoded text-white inside .glass in Light Mode (except inside buttons/badges) */
+html.light .glass p.text-white,
+html.light .glass span.text-white:not(button *):not([class*="bg-"]):not([class*="bg-"] *),
+body.light-mode .glass p.text-white,
+body.light-mode .glass span.text-white:not(button *):not([class*="bg-"]):not([class*="bg-"] *) {
+  color: #0F172A;
 }
 
 /* Form Inputs in Light Mode */

@@ -147,61 +147,61 @@ export default function Achievements() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card hover className="border-amber-500/20">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
+              <div className="w-11 h-11 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-500 dark:text-amber-400">
                 <Trophy size={22} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold">Kazanılan Rozetler</p>
-                <p className="text-xl font-black text-amber-400">{unlockedBadgesCount} / {BADGES.length}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 font-bold">Kazanılan Rozetler</p>
+                <p className="text-xl font-black text-amber-600 dark:text-amber-400">{unlockedBadgesCount} / {BADGES.length}</p>
               </div>
             </div>
           </Card>
 
           <Card hover className="border-violet-500/20">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-violet-500/20 flex items-center justify-center text-violet-400">
+              <div className="w-11 h-11 rounded-xl bg-violet-500/20 flex items-center justify-center text-violet-600 dark:text-violet-400">
                 <Sparkles size={22} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold">Açılan Karakterler</p>
-                <p className="text-xl font-black text-violet-400">{unlockedCharactersCount} / {CHARACTERS.length}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 font-bold">Açılan Karakterler</p>
+                <p className="text-xl font-black text-violet-600 dark:text-violet-400">{unlockedCharactersCount} / {CHARACTERS.length}</p>
               </div>
             </div>
           </Card>
 
           <Card hover className="border-cyan-500/20">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400">
+              <div className="w-11 h-11 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
                 <CheckCircle2 size={22} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold">Bitirilen Kurslar</p>
-                <p className="text-xl font-black text-cyan-400">{stats.completedCoursesCount} Kurs</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 font-bold">Bitirilen Kurslar</p>
+                <p className="text-xl font-black text-cyan-600 dark:text-cyan-400">{stats.completedCoursesCount} Kurs</p>
               </div>
             </div>
           </Card>
 
           <Card hover className="border-emerald-500/20">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <div className="w-11 h-11 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                 <Flame size={22} />
               </div>
               <div>
-                <p className="text-xs text-slate-400 font-bold">Tamamlanan Ders</p>
-                <p className="text-xl font-black text-emerald-400">{stats.completedLessonsCount} Ders</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 font-bold">Tamamlanan Ders</p>
+                <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">{stats.completedLessonsCount} Ders</p>
               </div>
             </div>
           </Card>
         </div>
 
         {/* ── Sekmeler: Madalyalar, Rozetler, Unvanlar ────────────── */}
-        <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+        <div className="flex items-center gap-3 border-b border-slate-200 dark:border-white/10 pb-4 overflow-x-auto">
           <button
             onClick={() => setActiveTab('characters')}
-            className={`px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'characters'
                 ? 'bg-gradient-to-r from-violet-600 to-pink-600 text-white shadow-lg shadow-violet-600/30'
-                : 'bg-white/5 hover:bg-white/10 text-slate-300'
+                : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-transparent'
             }`}
           >
             <Award size={16} /> Kurs Madalyaları ({unlockedCharactersCount}/{CHARACTERS.length})
@@ -209,10 +209,10 @@ export default function Achievements() {
 
           <button
             onClick={() => setActiveTab('badges')}
-            className={`px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'badges'
                 ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30'
-                : 'bg-white/5 hover:bg-white/10 text-amber-300/90'
+                : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-amber-700 dark:text-amber-300/90 border border-slate-200 dark:border-transparent'
             }`}
           >
             <Trophy size={16} /> Başarı Rozetleri ({unlockedBadgesCount}/{BADGES.length})
@@ -220,10 +220,10 @@ export default function Achievements() {
 
           <button
             onClick={() => setActiveTab('titles')}
-            className={`px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'titles'
                 ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/30'
-                : 'bg-white/5 hover:bg-white/10 text-cyan-300/90'
+                : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-cyan-700 dark:text-cyan-300/90 border border-slate-200 dark:border-transparent'
             }`}
           >
             <Star size={16} /> Siber Unvanlar
@@ -235,8 +235,8 @@ export default function Achievements() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-lg text-white">Kurs Tamamlama Madalyaları</h3>
-                <p className="text-xs text-slate-400">Kursları tamamladıkça siber güvenlik koleksiyonuna yeni madalyalar eklersin.</p>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white">Kurs Tamamlama Madalyaları</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Kursları tamamladıkça siber güvenlik koleksiyonuna yeni madalyalar eklersin.</p>
               </div>
             </div>
 
@@ -249,8 +249,8 @@ export default function Achievements() {
                     key={char.id}
                     className={`rounded-2xl border p-5 transition-all duration-200 flex flex-col justify-between ${
                       isUnlocked
-                        ? 'border-violet-500/30 bg-slate-900/60 hover:border-violet-400 hover:bg-slate-800/60 shadow-lg'
-                        : 'border-white/5 bg-slate-900/30 opacity-60'
+                        ? 'border-violet-200 dark:border-violet-500/30 bg-white dark:bg-slate-900/60 hover:border-violet-400 hover:bg-slate-50/80 dark:hover:bg-slate-800/60 shadow-md dark:shadow-lg'
+                        : 'border-slate-200 dark:border-white/5 bg-slate-100/70 dark:bg-slate-900/30 opacity-75 dark:opacity-60'
                     }`}
                   >
                     <div>
@@ -258,33 +258,33 @@ export default function Achievements() {
                       <div className="flex items-start justify-between mb-4">
                         <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-4xl border ${
                           isUnlocked
-                            ? 'bg-gradient-to-br from-violet-500/20 to-pink-500/10 border-violet-500/30 shadow-md'
-                            : 'bg-slate-800/50 border-white/5 grayscale'
+                            ? 'bg-violet-50 dark:bg-gradient-to-br dark:from-violet-500/20 dark:to-pink-500/10 border-violet-200 dark:border-violet-500/30 shadow-md'
+                            : 'bg-slate-200/80 dark:bg-slate-800/50 border-slate-300 dark:border-white/5 grayscale'
                         }`}>
                           {char.emoji}
                         </div>
 
                         {isUnlocked ? (
-                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/40">
+                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-500/40">
                             Açıldı
                           </span>
                         ) : (
-                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-white/10 flex items-center gap-1">
+                          <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-white/10 flex items-center gap-1">
                             <Lock size={11} /> Kilitli
                           </span>
                         )}
                       </div>
 
                       {/* Madalya Bilgileri */}
-                      <h4 className="font-display font-bold text-base text-white">{char.name}</h4>
-                      <p className="text-xs font-bold text-violet-400 mb-1">{char.title}</p>
-                      <p className="text-xs text-slate-400 leading-relaxed mb-4">{char.description}</p>
+                      <h4 className="font-display font-bold text-base text-slate-900 dark:text-white">{char.name}</h4>
+                      <p className="text-xs font-bold text-violet-700 dark:text-violet-400 mb-1">{char.title}</p>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">{char.description}</p>
                     </div>
 
                     {/* Alt Kısım: Açılma Şartı */}
-                    <div className="pt-3 border-t border-white/10">
-                      <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                        <span className="text-amber-400">🎯</span>
+                    <div className="pt-3 border-t border-slate-200 dark:border-white/10">
+                      <div className="text-[11px] text-slate-600 dark:text-slate-400 flex items-center gap-1.5 font-medium">
+                        <span className="text-amber-500 dark:text-amber-400">🎯</span>
                         <span>{char.condition}</span>
                       </div>
                     </div>
@@ -300,8 +300,8 @@ export default function Achievements() {
         {activeTab === 'badges' && (
           <div className="space-y-4">
             <div>
-              <h3 className="font-bold text-lg text-white">Başarı Rozetleri</h3>
-              <p className="text-xs text-slate-400">Eğitimlerdeki kilometre taşlarına ulaşarak kazandığın rozetler.</p>
+              <h3 className="font-bold text-lg text-slate-900 dark:text-white">Başarı Rozetleri</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Eğitimlerdeki kilometre taşlarına ulaşarak kazandığın rozetler.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -313,34 +313,34 @@ export default function Achievements() {
                     key={badge.id}
                     className={`rounded-2xl border p-5 transition-all duration-200 ${
                       isEarned
-                        ? 'border-amber-500/40 bg-amber-950/15 shadow-[0_0_20px_rgba(245,158,11,0.1)]'
-                        : 'border-white/5 bg-slate-900/30 opacity-60'
+                        ? 'border-amber-400/60 dark:border-amber-500/40 bg-amber-50/70 dark:bg-amber-950/15 shadow-sm dark:shadow-[0_0_20px_rgba(245,158,11,0.1)]'
+                        : 'border-slate-200 dark:border-white/5 bg-slate-100/70 dark:bg-slate-900/30 opacity-75 dark:opacity-60'
                     }`}
                   >
                     <div className="flex items-start gap-4">
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl border shrink-0 ${
                         isEarned
-                          ? 'bg-gradient-to-br from-amber-500/20 to-orange-500/10 border-amber-500/40 shadow-md'
-                          : 'bg-slate-800/40 border-white/5 grayscale'
+                          ? 'bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-500/20 dark:to-orange-500/10 border-amber-300 dark:border-amber-500/40 shadow-sm'
+                          : 'bg-slate-200/80 dark:bg-slate-800/40 border-slate-300 dark:border-white/5 grayscale'
                       }`}>
                         {badge.emoji}
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1 mb-1">
-                          <h4 className="font-bold text-sm text-white truncate">{badge.name}</h4>
+                          <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate">{badge.name}</h4>
                           {isEarned ? (
-                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30 shrink-0">
                               Kazanıldı ✅
                             </span>
                           ) : (
-                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-white/10 shrink-0">
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-white/10 shrink-0">
                               Kilitli 🔒
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-400 leading-relaxed mb-2">{badge.description}</p>
-                        <p className="text-[11px] text-amber-400 font-bold flex items-center gap-1">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-2">{badge.description}</p>
+                        <p className="text-[11px] text-amber-700 dark:text-amber-400 font-bold flex items-center gap-1">
                           <span>🎯 Hedef:</span> {badge.condition}
                         </p>
                       </div>
@@ -356,8 +356,8 @@ export default function Achievements() {
         {activeTab === 'titles' && (
           <div className="space-y-4">
             <div>
-              <h3 className="font-bold text-lg text-white">Kazanılan Siber Unvanlar</h3>
-              <p className="text-xs text-slate-400">Tamamladığın her uzmanlık konusu sana saygın bir unvan kazandırır.</p>
+              <h3 className="font-bold text-lg text-slate-900 dark:text-white">Kazanılan Siber Unvanlar</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Tamamladığın her uzmanlık konusu sana saygın bir unvan kazandırır.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -369,29 +369,29 @@ export default function Achievements() {
                     key={char.id}
                     className={`p-4 rounded-2xl border flex items-center justify-between gap-4 transition-all ${
                       isUnlocked
-                        ? 'border-cyan-500/30 bg-cyan-950/15 shadow-md'
-                        : 'border-white/5 bg-slate-900/30 opacity-50'
+                        ? 'border-cyan-300 dark:border-cyan-500/30 bg-cyan-50/70 dark:bg-cyan-950/15 shadow-sm dark:shadow-md'
+                        : 'border-slate-200 dark:border-white/5 bg-slate-100/70 dark:bg-slate-900/30 opacity-75 dark:opacity-50'
                     }`}
                   >
                     <div className="flex items-center gap-3.5">
                       <span className="text-3xl">{char.emoji}</span>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-sm text-white">{char.title}</h4>
+                          <h4 className="font-bold text-sm text-slate-900 dark:text-white">{char.title}</h4>
                           {isUnlocked && (
-                            <span className="text-[10px] font-black px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30">
                               Kazanıldı
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-400">{char.name} • {char.condition}</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400">{char.name} • {char.condition}</p>
                       </div>
                     </div>
 
                     {isUnlocked ? (
-                      <span className="text-xs font-bold text-cyan-400 shrink-0">Aktif Edilebilir</span>
+                      <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400 shrink-0">Aktif Edilebilir</span>
                     ) : (
-                      <Lock size={16} className="text-slate-500 shrink-0" />
+                      <Lock size={16} className="text-slate-400 dark:text-slate-500 shrink-0" />
                     )}
                   </div>
                 );

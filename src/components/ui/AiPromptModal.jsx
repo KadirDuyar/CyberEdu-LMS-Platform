@@ -52,25 +52,25 @@ export default function AiPromptModal({
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150">
       <div 
-        className="w-full max-w-lg bg-slate-900 border border-violet-500/40 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+        className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-violet-500/40 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-violet-950/70 via-purple-950/50 to-slate-900 border-b border-white/10">
+        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-violet-100 via-purple-50 to-white dark:from-violet-950/70 dark:via-purple-950/50 dark:to-slate-900 border-b border-slate-200 dark:border-white/10">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-violet-600/30">
               <Sparkles size={18} className="animate-pulse" />
             </div>
             <div>
-              <h3 className="font-display font-bold text-base text-white">{title}</h3>
-              <p className="text-xs text-slate-400">{subtitle}</p>
+              <h3 className="font-display font-bold text-base text-slate-900 dark:text-white">{title}</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-colors disabled:opacity-30"
+            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl transition-colors disabled:opacity-30 cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -81,7 +81,7 @@ export default function AiPromptModal({
           {/* Opsiyonel Tür Seçimi */}
           {options && options.length > 0 && (
             <div>
-              <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
                 {optionsLabel}
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -92,10 +92,10 @@ export default function AiPromptModal({
                       key={opt.value}
                       type="button"
                       onClick={() => setSelectedOption(opt.value)}
-                      className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all text-left flex items-center gap-1.5 ${
+                      className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all text-left flex items-center gap-1.5 cursor-pointer ${
                         isSelected
-                          ? 'bg-violet-600/30 border-violet-500 text-white shadow-md shadow-violet-600/20'
-                          : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:text-white hover:border-slate-600'
+                          ? 'bg-violet-600/10 dark:bg-violet-600/30 border-violet-500 text-violet-700 dark:text-white shadow-md shadow-violet-600/20'
+                          : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       {opt.icon && <span>{opt.icon}</span>}
@@ -109,7 +109,7 @@ export default function AiPromptModal({
 
           {/* Konu / İstem Metni */}
           <div>
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
               Konu veya İstek Detayı
             </label>
             <textarea
@@ -120,14 +120,14 @@ export default function AiPromptModal({
               onKeyDown={handleKeyDown}
               disabled={loading}
               placeholder={placeholder}
-              className="w-full bg-slate-950/70 border border-white/15 focus:border-violet-500 rounded-2xl p-3.5 text-sm text-white placeholder-slate-500 outline-none transition-all resize-none shadow-inner"
+              className="w-full bg-slate-50 dark:bg-slate-950/70 border border-slate-300 dark:border-white/15 focus:border-violet-500 rounded-2xl p-3.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition-all resize-none shadow-inner"
             />
           </div>
 
           {/* Hızlı Öneri Etiketleri */}
           {suggestions && suggestions.length > 0 && (
             <div className="space-y-1.5">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                 Örnek Konular:
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -136,7 +136,7 @@ export default function AiPromptModal({
                     key={i}
                     type="button"
                     onClick={() => setPromptText(sug)}
-                    className="px-2.5 py-1 rounded-lg text-xs bg-violet-500/10 hover:bg-violet-500/25 text-violet-300 border border-violet-500/25 transition-all text-left"
+                    className="px-2.5 py-1 rounded-lg text-xs bg-violet-50 hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/25 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-500/25 transition-all text-left shadow-sm cursor-pointer"
                   >
                     {sug}
                   </button>
@@ -146,12 +146,12 @@ export default function AiPromptModal({
           )}
 
           {/* Footer Butonları */}
-          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-white/10">
+          <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200 dark:border-white/10">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all disabled:opacity-40"
+              className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all disabled:opacity-40 cursor-pointer"
             >
               Vazgeç
             </button>
