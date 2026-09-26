@@ -30,7 +30,7 @@ export default function WeeklyTasksBanner({ userId, onProgressUpdated }) {
   const [cohorts, setCohorts] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [activeTask, setActiveTask] = useState(null);
-  const [selectedWeekId, setSelectedWeekId] = useState(null);
+  const [selectedWeekByCohort, setSelectedWeekByCohort] = useState({});
 
   // Koda göre katılma modalı / inputu
   const [joinCodeInput, setJoinCodeInput] = useState('');
@@ -57,11 +57,17 @@ export default function WeeklyTasksBanner({ userId, onProgressUpdated }) {
     setCohorts(loadedCohorts);
     setTasks(loadedTasks);
     setActiveTask(loadedActive);
-    if (loadedActive?.id) {
-      setSelectedWeekId(loadedActive.id);
-    } else if (loadedTasks.length > 0) {
-      setSelectedWeekId(loadedTasks[0].id);
+
+    // Her program için varsayılan seçili haftayı belirle (ilk aktif veya ilk hafta)
+    const initialSelected = {};
+    for (const c of loadedCohorts) {
+      const cTasks = loadedTasks.filter((t) => t.cohort_id === c.id);
+      const firstActive = cTasks.find((t) => !t.isCompleted && !t.isLocked) || cTasks[0];
+      if (firstActive?.id) {
+        initialSelected[c.id] = firstActive.id;
+      }
     }
+    setSelectedWeekByCohort(initialSelected);
     setLoading(false);
   }
 
@@ -196,13 +202,35 @@ export default function WeeklyTasksBanner({ userId, onProgressUpdated }) {
     );
   }
 
-  // 2. ÖĞRENCİ EN AZ BİR PROGRAMA KAYITLIYSA
-  const primaryCohort = cohorts[0];
-  const displayedTask = tasks.find((t) => t.id === selectedWeekId) || activeTask || tasks[0];
-  const remaining = displayedTask ? getRemainingTime(displayedTask.due_date) : null;
-
   return (
-    <div className="space-y-3">
+    <div className="space-y-6">
+      {/* Üst Çubuk: Genel Başlık & Yeni Koda Katıl Butonu */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+        <div className="flex items-center gap-2.5">
+          <span className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <Calendar size={18} />
+          </span>
+          <div>
+            <h2 className="text-lg md:text-xl font-display font-black text-white flex items-center gap-2">
+              Haftalık Görev Planlarım
+              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                {cohorts.length} Program
+              </span>
+            </h2>
+            <p className="text-xs text-slate-400">
+              Dahil olduğun sınıfların haftalık görev ve teslim takvimleri
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setJoinModalOpen(true)}
+          className="text-xs font-bold text-slate-300 hover:text-cyan-300 transition-all inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 shadow-sm"
+        >
+          <Plus size={14} /> Yeni Koda Katıl
+        </button>
+      </div>
+
       {/* Bildirim Toast */}
       {feedback && (
         <div
@@ -217,151 +245,171 @@ export default function WeeklyTasksBanner({ userId, onProgressUpdated }) {
         </div>
       )}
 
-      {/* Ana Haftalık Görev Kartı */}
-      <div className="relative overflow-hidden rounded-3xl glass border border-cyan-500/30 p-6 md:p-8 bg-gradient-to-r from-slate-900/90 via-cyan-950/40 to-slate-900 shadow-2xl">
-        <div className="absolute -top-10 -right-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Alt Alta Program Kartları (1. Program, 2. Program vb.) */}
+      <div className="space-y-6">
+        {cohorts.map((cohort, index) => {
+          const cohortTasks = tasks.filter((t) => t.cohort_id === cohort.id);
+          const selectedId = selectedWeekByCohort[cohort.id];
+          const cohortActiveTask = cohortTasks.find((t) => !t.isCompleted && !t.isLocked) || cohortTasks[0];
+          const displayedTask = cohortTasks.find((t) => t.id === selectedId) || cohortActiveTask || cohortTasks[0];
+          const remaining = displayedTask ? getRemainingTime(displayedTask.due_date) : null;
+          const completedCount = cohortTasks.filter((t) => t.isCompleted).length;
 
-        {/* Üst Kısım: Program Bilgisi & Katıl Butonu */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-white/10">
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-              <Calendar size={18} />
-            </span>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-cyan-400">
-                  Haftalık Görev Planı
-                </span>
-                <span className="text-slate-600">•</span>
-                <span className="text-xs text-slate-300 font-semibold">{primaryCohort?.title}</span>
-              </div>
-              {primaryCohort?.profiles?.full_name && (
-                <p className="text-[11px] text-slate-400">
-                  👨‍🏫 Eğitmen: {primaryCohort.profiles.full_name}
-                </p>
-              )}
-            </div>
-          </div>
+          return (
+            <div
+              key={cohort.id}
+              className="relative overflow-hidden rounded-3xl glass border border-cyan-500/30 p-6 md:p-8 bg-gradient-to-r from-slate-900/90 via-cyan-950/40 to-slate-900 shadow-2xl"
+            >
+              <div className="absolute -top-10 -right-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <button
-            onClick={() => setJoinModalOpen(true)}
-            className="text-xs font-bold text-slate-400 hover:text-cyan-300 transition-colors inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10"
-          >
-            <Plus size={14} /> Başka Koda Katıl
-          </button>
-        </div>
-
-        {/* Hafta Sekmeleri / Yol Haritası */}
-        {tasks.length > 0 && (
-          <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
-            {tasks.map((task) => {
-              const isSelected = task.id === displayedTask?.id;
-              return (
-                <button
-                  key={task.id}
-                  onClick={() => setSelectedWeekId(task.id)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 border ${
-                    isSelected
-                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 shadow-lg shadow-cyan-500/10'
-                      : task.isCompleted
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
-                      : 'bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  {task.isCompleted ? (
-                    <CheckCircle2 size={14} className="text-emerald-400" />
-                  ) : task.isLocked ? (
-                    <Lock size={12} className="text-slate-500" />
-                  ) : (
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                  )}
-                  <span>{task.week_number}. Hafta</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Gösterilen Görev Detayları */}
-        {displayedTask ? (
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-3 max-w-2xl">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-black px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                  {displayedTask.week_number}. Hafta Görevi
-                </span>
-
-                {displayedTask.isCompleted ? (
-                  <span className="text-xs font-black px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 inline-flex items-center gap-1.5">
-                    <CheckCircle2 size={14} /> Görev Tamamlandı (+{displayedTask.earned_xp || 100} XP)
+              {/* Üst Kısım: Program Sırası & Başlığı & İlerleme */}
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <span className="px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20 shrink-0">
+                    {index + 1}. Program
                   </span>
-                ) : remaining?.isExpired ? (
-                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 inline-flex items-center gap-1.5">
-                    <AlertCircle size={14} /> Teslim Süresi Geçti
-                  </span>
-                ) : (
-                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 inline-flex items-center gap-1.5">
-                    <Clock size={14} /> {remaining?.text}
-                  </span>
-                )}
-              </div>
-
-              <h2 className="font-display font-black text-2xl md:text-3xl text-white">
-                {displayedTask.title}
-              </h2>
-
-              {/* Kurs & Ders Kutusu */}
-              <div className="flex flex-wrap items-center gap-2.5 pt-1">
-                <div className="p-3 rounded-2xl bg-slate-900/80 border border-white/10 flex items-center gap-3">
-                  <span className="text-2xl">{displayedTask.courses?.thumbnail_emoji || '🛡️'}</span>
                   <div>
-                    <p className="text-xs text-slate-400">Hedef Kurs</p>
-                    <p className="font-bold text-sm text-white">{displayedTask.courses?.title}</p>
+                    <h3 className="font-display font-black text-lg md:text-xl text-white">
+                      {cohort.title}
+                    </h3>
+                    {cohort.profiles?.full_name && (
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        👨‍🏫 Eğitmen: {cohort.profiles.full_name}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                {displayedTask.lessons && (
-                  <div className="p-3 rounded-2xl bg-violet-950/40 border border-violet-500/20 flex items-center gap-2">
-                    <span className="text-base">🎯</span>
-                    <div>
-                      <p className="text-[10px] text-violet-300 font-semibold">Özel Ders</p>
-                      <p className="font-bold text-xs text-white">{displayedTask.lessons.title}</p>
-                    </div>
+                {cohortTasks.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-slate-400">
+                      İlerleme:
+                    </span>
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      {completedCount} / {cohortTasks.length} Hafta
+                    </span>
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Aksiyon Butonu */}
-            <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col gap-3">
-              {displayedTask.isCompleted ? (
-                <button
-                  onClick={() => handleGoToTask(displayedTask)}
-                  className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <BookOpen size={18} /> Tekrar İncele
-                </button>
-              ) : displayedTask.isLocked ? (
-                <button
-                  disabled
-                  className="px-6 py-3.5 rounded-2xl bg-slate-800 text-slate-500 text-sm font-bold flex items-center justify-center gap-2 cursor-not-allowed border border-white/5"
-                >
-                  <Lock size={16} /> Bu Hafta Henüz Kilitli
-                </button>
+              {/* Bu Programa Ait Hafta Sekmeleri / Yol Haritası */}
+              {cohortTasks.length > 0 ? (
+                <>
+                  <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
+                    {cohortTasks.map((task) => {
+                      const isSelected = task.id === displayedTask?.id;
+                      return (
+                        <button
+                          key={task.id}
+                          onClick={() =>
+                            setSelectedWeekByCohort((prev) => ({ ...prev, [cohort.id]: task.id }))
+                          }
+                          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 border ${
+                            isSelected
+                              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 shadow-lg shadow-cyan-500/10'
+                              : task.isCompleted
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
+                              : 'bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white'
+                          }`}
+                        >
+                          {task.isCompleted ? (
+                            <CheckCircle2 size={14} className="text-emerald-400" />
+                          ) : task.isLocked ? (
+                            <Lock size={12} className="text-slate-500" />
+                          ) : (
+                            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                          )}
+                          <span>{task.week_number}. Hafta</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Seçili Hafta Görev Detayları */}
+                  {displayedTask ? (
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                      <div className="space-y-3 max-w-2xl">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs font-black px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                            {displayedTask.week_number}. Hafta Görevi
+                          </span>
+
+                          {displayedTask.isCompleted ? (
+                            <span className="text-xs font-black px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 inline-flex items-center gap-1.5">
+                              <CheckCircle2 size={14} /> Görev Tamamlandı (+{displayedTask.earned_xp || 100} XP)
+                            </span>
+                          ) : remaining?.isExpired ? (
+                            <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 inline-flex items-center gap-1.5">
+                              <AlertCircle size={14} /> Teslim Süresi Geçti
+                            </span>
+                          ) : (
+                            <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 inline-flex items-center gap-1.5">
+                              <Clock size={14} /> {remaining?.text}
+                            </span>
+                          )}
+                        </div>
+
+                        <h2 className="font-display font-black text-2xl md:text-3xl text-white">
+                          {displayedTask.title}
+                        </h2>
+
+                        {/* Kurs & Ders Kutusu */}
+                        <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                          <div className="p-3 rounded-2xl bg-slate-900/80 border border-white/10 flex items-center gap-3">
+                            <span className="text-2xl">{displayedTask.courses?.thumbnail_emoji || '🛡️'}</span>
+                            <div>
+                              <p className="text-xs text-slate-400">Hedef Kurs</p>
+                              <p className="font-bold text-sm text-white">{displayedTask.courses?.title}</p>
+                            </div>
+                          </div>
+
+                          {displayedTask.lessons && (
+                            <div className="p-3 rounded-2xl bg-violet-950/40 border border-violet-500/20 flex items-center gap-2">
+                              <span className="text-base">🎯</span>
+                              <div>
+                                <p className="text-[10px] text-violet-300 font-semibold">Özel Ders</p>
+                                <p className="font-bold text-xs text-white">{displayedTask.lessons.title}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Aksiyon Butonu */}
+                      <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col gap-3">
+                        {displayedTask.isCompleted ? (
+                          <button
+                            onClick={() => handleGoToTask(displayedTask)}
+                            className="px-6 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+                          >
+                            <BookOpen size={18} /> Tekrar İncele
+                          </button>
+                        ) : displayedTask.isLocked ? (
+                          <button
+                            disabled
+                            className="px-6 py-3.5 rounded-2xl bg-slate-800 text-slate-500 text-sm font-bold flex items-center justify-center gap-2 cursor-not-allowed border border-white/5"
+                          >
+                            <Lock size={16} /> Bu Hafta Henüz Kilitli
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleGoToTask(displayedTask)}
+                            className="px-8 py-4 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white text-base font-black transition-all shadow-xl shadow-cyan-500/25 hover:scale-105 flex items-center justify-center gap-2.5 cursor-pointer"
+                          >
+                            <span>Haftalık Göreve Başla</span>
+                            <ArrowRight size={18} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ) : null}
+                </>
               ) : (
-                <button
-                  onClick={() => handleGoToTask(displayedTask)}
-                  className="px-8 py-4 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white text-base font-black transition-all shadow-xl shadow-cyan-500/25 hover:scale-105 flex items-center justify-center gap-2.5 cursor-pointer"
-                >
-                  <span>Haftalık Göreve Başla</span>
-                  <ArrowRight size={18} />
-                </button>
+                <p className="text-xs text-slate-400 py-3">Bu programa henüz haftalık görev atanmadı.</p>
               )}
             </div>
-          </div>
-        ) : (
-          <p className="text-xs text-slate-400">Bu programa henüz haftalık görev atanmadı.</p>
-        )}
+          );
+        })}
       </div>
 
       {/* Koda Katılma Açılır Modalı */}
