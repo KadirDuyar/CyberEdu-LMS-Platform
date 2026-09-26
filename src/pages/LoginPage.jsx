@@ -156,21 +156,34 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Demo Hesaplar */}
-        <div>
-          <p className="text-xs text-slate-500 mb-2 text-center uppercase tracking-wider font-semibold">
-            Hızlı Demo Girişi
+        {/* Demo Hesaplar – Öne Çıkarılmış & Yönergeli */}
+        <div className="p-4 rounded-2xl bg-gradient-to-b from-violet-500/10 via-purple-500/5 to-transparent border-2 border-violet-500/30 dark:border-violet-500/40 shadow-lg relative overflow-hidden">
+          <div className="flex items-center justify-between gap-2 mb-2.5">
+            <span className="flex items-center gap-1.5 text-xs font-black text-violet-700 dark:text-violet-300 uppercase tracking-wider">
+              <span className="inline-block animate-bounce">👇</span> TEK TIKLA HIZLI GİRİŞ
+            </span>
+            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 animate-pulse">
+              Şifre Gerekmez ⚡
+            </span>
+          </div>
+          <p className="text-xs text-slate-600 dark:text-slate-300 mb-3 font-medium">
+            Platformu hemen denemek için giriş yapmak istediğiniz role tıklayın:
           </p>
-          <div className="grid grid-cols-3 gap-2">
+
+          <div className="grid grid-cols-3 gap-2.5">
             {DEMO_ACCOUNTS.map((acc) => (
               <button
                 key={acc.role}
                 onClick={() => handleDemoLogin(acc)}
                 disabled={loading}
-                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-gradient-to-b ${acc.color} ${acc.border} hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50`}
+                className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 bg-gradient-to-b ${acc.color} ${acc.border} hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg disabled:opacity-50 group`}
+                title={`${acc.label} hesabı ile hemen giriş yap`}
               >
-                <span className="text-2xl">{acc.icon}</span>
-                <span className="text-xs font-bold text-slate-800 dark:text-white leading-tight text-center">{acc.label}</span>
+                <span className="text-2xl group-hover:scale-110 transition-transform">{acc.icon}</span>
+                <span className="text-xs font-black text-slate-900 dark:text-white leading-tight text-center">{acc.label}</span>
+                <span className="text-[9px] font-bold text-violet-700 dark:text-violet-300 bg-white/70 dark:bg-black/40 px-1.5 py-0.5 rounded-full mt-0.5">
+                  Giriş Yap →
+                </span>
               </button>
             ))}
           </div>

@@ -682,18 +682,18 @@ export default function LessonBuilder() {
                                 max="100"
                                 value={block.correct_answer?.x !== undefined ? block.correct_answer.x : 50}
                                 onChange={(e) => updateBlock(idx, 'correct_answer', { ...(block.correct_answer || {}), x: Number(e.target.value) })}
-                                className="w-20 p-1.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-center font-bold text-sm"
+                                className="w-20 p-1.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-center font-bold text-sm"
                               />
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold text-slate-500">Y Koordinatı (%):</span>
+                              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Y Koordinatı (%):</span>
                               <input
                                 type="number"
                                 min="0"
                                 max="100"
                                 value={block.correct_answer?.y !== undefined ? block.correct_answer.y : 50}
                                 onChange={(e) => updateBlock(idx, 'correct_answer', { ...(block.correct_answer || {}), y: Number(e.target.value) })}
-                                className="w-20 p-1.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-center font-bold text-sm"
+                                className="w-20 p-1.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-center font-bold text-sm"
                               />
                             </div>
                           </div>

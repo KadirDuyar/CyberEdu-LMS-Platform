@@ -1,10 +1,51 @@
+import { useState, useEffect } from 'react';
+import { Sun, Moon } from 'lucide-react';
+
 /**
  * AuthLayout – Login / Kayıt sayfaları için animasyonlu arka planlı wrapper.
  * Siber güvenlik teması: 🔐 🛡️ 🔑 🌐 semboller
  */
 export default function AuthLayout({ children }) {
+  const [isLightMode, setIsLightMode] = useState(() => {
+    return localStorage.getItem('cyberedu_theme') === 'light';
+  });
+
+  useEffect(() => {
+    if (isLightMode) {
+      document.documentElement.classList.add('light');
+      document.documentElement.classList.remove('dark');
+      document.body.classList.add('light-mode');
+      localStorage.setItem('cyberedu_theme', 'light');
+    } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+      document.body.classList.remove('light-mode');
+      localStorage.setItem('cyberedu_theme', 'dark');
+    }
+  }, [isLightMode]);
+
   return (
     <div className="relative min-h-screen login-bg flex items-center justify-center p-4 overflow-hidden">
+      {/* Sağ Üst Tema Butonu */}
+      <div className="absolute top-4 right-4 z-50">
+        <button
+          onClick={() => setIsLightMode(!isLightMode)}
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold transition-all shadow-md cursor-pointer select-none"
+          title={isLightMode ? 'Koyu Temaya Geç' : 'Açık Temaya Geç'}
+        >
+          {isLightMode ? (
+            <>
+              <span className="text-slate-800 font-bold">Açık Tema</span>
+              <Sun size={15} className="text-amber-500 shrink-0" />
+            </>
+          ) : (
+            <>
+              <span className="text-slate-200 font-bold">Koyu Tema</span>
+              <Moon size={15} className="text-cyan-300 shrink-0" />
+            </>
+          )}
+        </button>
+      </div>
 
       {/* Dekoratif floating orbs */}
       <div

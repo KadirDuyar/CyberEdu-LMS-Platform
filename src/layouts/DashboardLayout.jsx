@@ -445,10 +445,20 @@ export default function DashboardLayout({ children }) {
             {/* Tema Butonu */}
             <button
               onClick={() => setIsLightMode(!isLightMode)}
-              className="w-9 h-9 glass-light rounded-xl flex items-center justify-center border border-slate-200 dark:border-white/10 hover:border-violet-500/50 transition-colors"
-              title={isLightMode ? 'Koyu Tema' : 'Açık Tema'}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-xs font-bold transition-all shadow-sm cursor-pointer select-none"
+              title={isLightMode ? 'Koyu Temaya Geç' : 'Açık Temaya Geç'}
             >
-              {isLightMode ? <Moon size={17} className="text-slate-600" /> : <Sun size={17} className="text-amber-300" />}
+              {isLightMode ? (
+                <>
+                  <span className="text-slate-800 font-bold">Açık Tema</span>
+                  <Sun size={15} className="text-amber-500 shrink-0" />
+                </>
+              ) : (
+                <>
+                  <span className="text-slate-200 font-bold">Koyu Tema</span>
+                  <Moon size={15} className="text-cyan-300 shrink-0" />
+                </>
+              )}
             </button>
 
             {/* Bildirim */}

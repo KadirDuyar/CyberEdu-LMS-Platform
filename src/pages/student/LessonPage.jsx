@@ -24,14 +24,14 @@ function SafeMarkdown({ content }) {
       {lines.map((line, i) => {
         if (line.startsWith('## ')) {
           return (
-            <h2 key={i} className="font-display font-bold text-lg text-white mt-5 mb-2 first:mt-0">
+            <h2 key={i} className="font-display font-bold text-lg text-slate-900 dark:text-white mt-5 mb-2 first:mt-0">
               {line.slice(3)}
             </h2>
           );
         }
         if (line.startsWith('### ')) {
           return (
-            <h3 key={i} className="font-semibold text-base text-violet-300 mt-4 mb-1">
+            <h3 key={i} className="font-semibold text-base text-violet-700 dark:text-violet-300 mt-4 mb-1">
               {line.slice(4)}
             </h3>
           );
@@ -40,8 +40,8 @@ function SafeMarkdown({ content }) {
         if (line.startsWith('- ') || line.startsWith('* ')) {
           return (
             <div key={i} className="flex items-start gap-2">
-              <span className="text-violet-400 mt-1 shrink-0">•</span>
-              <span className="text-slate-300 text-sm leading-relaxed">
+              <span className="text-violet-600 dark:text-violet-400 mt-1 shrink-0">•</span>
+              <span className="text-slate-800 dark:text-slate-300 text-sm leading-relaxed">
                 {renderInline(line.slice(2))}
               </span>
             </div>
@@ -51,8 +51,8 @@ function SafeMarkdown({ content }) {
           const num = line.match(/^(\d+)\./)[1];
           return (
             <div key={i} className="flex items-start gap-2">
-              <span className="text-violet-400 text-sm font-bold shrink-0 w-5">{num}.</span>
-              <span className="text-slate-300 text-sm leading-relaxed">
+              <span className="text-violet-600 dark:text-violet-400 text-sm font-bold shrink-0 w-5">{num}.</span>
+              <span className="text-slate-800 dark:text-slate-300 text-sm leading-relaxed">
                 {renderInline(line.replace(/^\d+\.\s/, ''))}
               </span>
             </div>
@@ -60,8 +60,8 @@ function SafeMarkdown({ content }) {
         }
         if (line.startsWith('> ')) {
           return (
-            <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-violet-500/10 border-l-2 border-violet-400">
-              <span className="text-sm text-slate-300 leading-relaxed">{renderInline(line.slice(2))}</span>
+            <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-violet-50 dark:bg-violet-500/10 border-l-2 border-violet-500 dark:border-violet-400">
+              <span className="text-sm text-slate-800 dark:text-slate-300 leading-relaxed">{renderInline(line.slice(2))}</span>
             </div>
           );
         }
@@ -69,9 +69,9 @@ function SafeMarkdown({ content }) {
           const cells = line.slice(1, -1).split('|').map((c) => c.trim());
           const isHeader = cells.every((c) => c && !c.includes('-'));
           return (
-            <div key={i} className={`flex gap-2 ${isHeader ? 'font-bold text-white' : 'text-slate-300'}`}>
+            <div key={i} className={`flex gap-2 ${isHeader ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-800 dark:text-slate-300'}`}>
               {cells.map((cell, j) => (
-                <div key={j} className="flex-1 text-sm py-1.5 px-2 border-b border-white/10">{cell}</div>
+                <div key={j} className="flex-1 text-sm py-1.5 px-2 border-b border-slate-200 dark:border-white/10">{cell}</div>
               ))}
             </div>
           );
@@ -79,7 +79,7 @@ function SafeMarkdown({ content }) {
         if (/^\|?[-|: ]+\|?$/.test(line) && line.includes('-')) return null;
         if (!line.trim()) return <div key={i} className="h-1" />;
         return (
-          <p key={i} className="text-slate-300 text-sm leading-relaxed">
+          <p key={i} className="text-slate-800 dark:text-slate-300 text-sm leading-relaxed">
             {renderInline(line)}
           </p>
         );

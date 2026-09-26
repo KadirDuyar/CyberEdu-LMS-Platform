@@ -381,10 +381,10 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
       </div>
 
       {/* Özel CyberEdu Video İlerleme ve Kontrol Çubuğu */}
-      <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 shadow-lg space-y-3">
+      <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-white/10 shadow-md dark:shadow-lg space-y-3">
         {/* İlerleme Çubuğu & Zaman */}
         <div className="flex items-center gap-3">
-          <span className="text-xs font-mono font-bold text-violet-400 min-w-[42px] text-right select-none">
+          <span className="text-xs font-mono font-bold text-violet-600 dark:text-violet-400 min-w-[42px] text-right select-none">
             {formatTime(currentTime)}
           </span>
           <div className="relative flex-1 flex items-center">
@@ -395,25 +395,25 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
               step="1"
               value={currentTime}
               onChange={handleSeekChange}
-              className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-violet-500 hover:accent-violet-400 transition-all"
+              className="w-full h-2 bg-slate-300 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-violet-600 dark:accent-violet-500 hover:accent-violet-500 transition-all"
             />
           </div>
-          <span className="text-xs font-mono font-bold text-slate-400 min-w-[42px] select-none">
+          <span className="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 min-w-[42px] select-none">
             {formatTime(duration)}
           </span>
         </div>
 
         {/* Hızlı Kontrol Butonları */}
-        <div className="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-white/5">
+        <div className="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-slate-200 dark:border-white/5">
           <div className="flex items-center gap-2">
             {/* -10 Saniye Geri */}
             <button
               type="button"
               onClick={() => seekRelative(-10)}
-              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 border border-white/5 hover:border-violet-500/30 cursor-pointer"
+              className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 border border-slate-200 dark:border-white/5 hover:border-violet-500/30 shadow-sm cursor-pointer"
               title="10 Saniye Geri Sar"
             >
-              <RotateCcw size={14} className="text-violet-400" />
+              <RotateCcw size={14} className="text-violet-600 dark:text-violet-400" />
               <span>-10sn</span>
             </button>
 
@@ -431,18 +431,18 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
             <button
               type="button"
               onClick={() => seekRelative(10)}
-              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 border border-white/5 hover:border-violet-500/30 cursor-pointer"
+              className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 border border-slate-200 dark:border-white/5 hover:border-violet-500/30 shadow-sm cursor-pointer"
               title="10 Saniye İleri Sar"
             >
               <span>+10sn</span>
-              <RotateCw size={14} className="text-violet-400" />
+              <RotateCw size={14} className="text-violet-600 dark:text-violet-400" />
             </button>
 
             {/* Başa Sar */}
             <button
               type="button"
               onClick={restart}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all border border-white/5 cursor-pointer hover:text-white"
+              className="p-2 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all border border-slate-200 dark:border-white/5 shadow-sm cursor-pointer"
               title="Videoyu Başa Al"
             >
               <RotateCcw size={15} />
@@ -450,7 +450,7 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
           </div>
 
           <div className="flex items-center gap-2.5">
-            <span className="text-[11px] text-slate-400 font-mono px-2.5 py-1 rounded-lg bg-slate-800/80 border border-white/5 hidden sm:inline-block">
+            <span className="text-[11px] text-slate-600 dark:text-slate-400 font-mono font-medium px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-white/5 shadow-sm hidden sm:inline-block">
               {isRequireCompletion ? '🎯 İzleme Kontrolü Aktif' : '✨ Serbest İzleme'}
             </span>
 
@@ -458,10 +458,10 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
             <button
               type="button"
               onClick={toggleFullscreen}
-              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all flex items-center gap-1.5 text-xs font-bold border border-white/5 hover:border-violet-500/30 active:scale-95 cursor-pointer"
+              className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all flex items-center gap-1.5 text-xs font-bold border border-slate-200 dark:border-white/5 hover:border-violet-500/30 active:scale-95 shadow-sm cursor-pointer"
               title={isFullscreen ? 'Tam Ekrandan Çık' : 'Tam Ekran Modu'}
             >
-              {isFullscreen ? <Minimize size={15} className="text-violet-400" /> : <Maximize size={15} className="text-violet-400" />}
+              {isFullscreen ? <Minimize size={15} className="text-violet-600 dark:text-violet-400" /> : <Maximize size={15} className="text-violet-600 dark:text-violet-400" />}
               <span className="hidden sm:inline">{isFullscreen ? 'Küçült' : 'Tam Ekran'}</span>
             </button>
           </div>
@@ -875,33 +875,33 @@ function PhishingDetectorActivity({ activity, onSubmit, submitted, result }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="font-bold text-sm text-slate-200">{activity.question}</p>
-        <span className="text-xs text-amber-400 font-bold">Riskli alanlara tıklayın</span>
+        <p className="font-bold text-sm text-slate-900 dark:text-slate-200">{activity.question}</p>
+        <span className="text-xs text-amber-600 dark:text-amber-400 font-bold">Riskli alanlara tıklayın</span>
       </div>
 
-      <div className="bg-slate-950 border border-slate-700 rounded-2xl overflow-hidden shadow-2xl font-sans">
-        <div className="p-4 border-b border-slate-800 bg-slate-900/60 space-y-2">
+      <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-md dark:shadow-2xl font-sans">
+        <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400">Kimden:</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Kimden:</span>
             <button
               onClick={() => toggleThreat('sender')}
               className={`text-xs px-2.5 py-1 rounded-md border font-mono transition-all ${
                 selectedThreats.includes('sender')
-                  ? 'border-rose-500 bg-rose-950/60 text-rose-300 font-bold'
-                  : 'border-slate-700 hover:border-slate-500 text-slate-300'
+                  ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold'
+                  : 'border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 text-slate-700 dark:text-slate-300 bg-white dark:bg-transparent'
               }`}
             >
               {emailData?.senderDisplay} &lt;{emailData?.sender}&gt;
             </button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400">Konu:</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Konu:</span>
             <button
               onClick={() => toggleThreat('urgency')}
               className={`text-xs px-2.5 py-1 rounded-md border font-bold transition-all ${
                 selectedThreats.includes('urgency')
-                  ? 'border-rose-500 bg-rose-950/60 text-rose-300'
-                  : 'border-transparent text-slate-200'
+                  ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300'
+                  : 'border-transparent text-slate-900 dark:text-slate-200'
               }`}
             >
               {emailData?.subject}
@@ -909,15 +909,15 @@ function PhishingDetectorActivity({ activity, onSubmit, submitted, result }) {
           </div>
         </div>
 
-        <div className="p-6 space-y-4 text-xs md:text-sm text-slate-300 leading-relaxed">
+        <div className="p-6 space-y-4 text-xs md:text-sm text-slate-800 dark:text-slate-300 leading-relaxed">
           <p>{emailData?.body}</p>
           <div className="pt-2">
             <button
               onClick={() => toggleThreat('link')}
               className={`px-4 py-2 rounded-lg border text-xs font-mono transition-all ${
                 selectedThreats.includes('link')
-                  ? 'border-rose-500 bg-rose-950/60 text-rose-300 font-bold'
-                  : 'border-violet-500/40 bg-violet-950/20 text-violet-300 hover:border-violet-400'
+                  ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold'
+                  : 'border-violet-300 dark:border-violet-500/40 bg-violet-50 dark:bg-violet-950/20 text-violet-700 dark:text-violet-300 hover:border-violet-500'
               }`}
             >
               🔗 {emailData?.linkText}
@@ -930,14 +930,14 @@ function PhishingDetectorActivity({ activity, onSubmit, submitted, result }) {
         <button
           onClick={handleVerify}
           disabled={selectedThreats.length === 0}
-          className="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white font-bold text-xs md:text-sm shadow-md transition-all"
+          className="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white font-bold text-xs md:text-sm shadow-md transition-all cursor-pointer"
         >
           Şüpheli Unsurları Onayla ({selectedThreats.length} Seçildi)
         </button>
       )}
 
       {submitted && (
-        <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/60 text-emerald-200 text-xs leading-relaxed">
+        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-500/60 text-emerald-900 dark:text-emerald-200 text-xs leading-relaxed">
           <span className="font-bold block mb-1">Analiz Tamamlandı:</span>
           {activity.explanation}
         </div>
