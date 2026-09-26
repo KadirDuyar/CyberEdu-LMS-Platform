@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, LogOut, ChevronLeft, ChevronRight,
   Star, Zap, Bell, Map, Trophy, Award, Bot, BookOpen,
@@ -54,6 +54,7 @@ const NAV_SECTIONS = [
         icon: PlusCircle,
         href: '/teacher/courses/new',
         roles: ['teacher'],
+        end: true,
       },
       {
         label: 'Haftalık Programlar',
@@ -158,18 +159,23 @@ const ROLE_LABELS = {
 };
 
 function SidebarItem({ item, collapsed, userRole }) {
+  const location = useLocation();
   const href = item.hrefMap ? item.hrefMap[userRole] : item.href;
   if (!href) return null;
 
-  const isExactRoot = href === '/student' || href === '/teacher' || href === '/admin';
+  const isExactRoot = href === '/student' || href === '/teacher' || href === '/admin' || item.end;
+  
+  // '/teacher/courses' rotası, spesifik '/teacher/courses/new' sayfası açıkken aktifleşmemelidir
+  const isExcluded = href === '/teacher/courses' && location.pathname === '/teacher/courses/new';
 
   return (
     <NavLink
       to={href}
       end={isExactRoot}
-      className={({ isActive }) =>
-        `sidebar-link ${isActive ? 'active' : ''} ${collapsed ? 'justify-center px-3' : ''}`
-      }
+      className={({ isActive }) => {
+        const active = isActive && !isExcluded;
+        return `sidebar-link ${active ? 'active' : ''} ${collapsed ? 'justify-center px-3' : ''}`;
+      }}
       title={collapsed ? item.label : undefined}
     >
       <item.icon size={19} className="shrink-0" />
