@@ -106,13 +106,17 @@ BEGIN
   -- 4. Yapılan tüm kurs yorumları ve beğenileri
   DELETE FROM public.course_feedbacks WHERE user_id = target_user_id;
 
-  -- 5. Takipçi ve takip edilen ilişkileri
+  -- 5. Sınıf / Haftalık Program üyelikleri ve haftalık ilerlemeler
+  DELETE FROM public.cohort_progress WHERE student_id = target_user_id;
+  DELETE FROM public.cohort_members WHERE student_id = target_user_id;
+
+  -- 6. Takipçi ve takip edilen ilişkileri
   DELETE FROM public.user_follows WHERE follower_id = target_user_id OR following_id = target_user_id;
 
-  -- 6. Bildirimler (hem kullanıcıya gelen hem kullanıcının oluşturduğu)
+  -- 7. Bildirimler (hem kullanıcıya gelen hem kullanıcının oluşturduğu)
   DELETE FROM public.notifications WHERE user_id = target_user_id OR actor_id = target_user_id;
 
-  -- 7. Kazanılan rozetler ve başarılar
+  -- 8. Kazanılan rozetler ve başarılar
   DELETE FROM public.user_badges WHERE user_id = target_user_id;
 
   -- 8. Profili sıfırla: E-posta ve şifre auth tablosunda korunur; full_name ve role korunur.

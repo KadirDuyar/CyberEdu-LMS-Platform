@@ -132,6 +132,8 @@ BEGIN
   DELETE FROM public.lesson_progress WHERE user_id = target_user_id;
   DELETE FROM public.enrollments WHERE user_id = target_user_id;
   DELETE FROM public.course_feedbacks WHERE user_id = target_user_id;
+  DELETE FROM public.cohort_progress WHERE student_id = target_user_id;
+  DELETE FROM public.cohort_members WHERE student_id = target_user_id;
   DELETE FROM public.user_follows WHERE follower_id = target_user_id OR following_id = target_user_id;
   DELETE FROM public.notifications WHERE user_id = target_user_id OR actor_id = target_user_id;
   DELETE FROM public.user_badges WHERE user_id = target_user_id;
@@ -142,7 +144,8 @@ BEGIN
       learning_area = NULL,
       skill_level = NULL,
       onboarding_completed = FALSE,
-      avatar_emoji = '🛡️',
+      tour_completed = FALSE,
+      avatar_emoji = '🚀',
       updated_at = NOW()
   WHERE id = target_user_id;
 

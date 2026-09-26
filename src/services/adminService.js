@@ -36,6 +36,8 @@ export async function resetStudentProgress(userId) {
       supabase.from('lesson_progress').delete().eq('user_id', userId),
       supabase.from('enrollments').delete().eq('user_id', userId),
       supabase.from('course_feedbacks').delete().eq('user_id', userId),
+      supabase.from('cohort_progress').delete().eq('student_id', userId),
+      supabase.from('cohort_members').delete().eq('student_id', userId),
       supabase.from('user_follows').delete().eq('follower_id', userId),
       supabase.from('user_follows').delete().eq('following_id', userId),
       supabase.from('notifications').delete().eq('user_id', userId),
@@ -50,7 +52,7 @@ export async function resetStudentProgress(userId) {
       onboarding_completed: false,
       xp: 0,
       level: 1,
-      avatar_emoji: '🛡️',
+      avatar_emoji: '🚀',
       updated_at: new Date().toISOString()
     };
 

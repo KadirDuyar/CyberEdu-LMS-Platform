@@ -269,7 +269,7 @@ export default function App() {
             path="/admin/users"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <ComingSoon title="Kullanıcı Yönetimi" emoji="👥" />
+                <AdminDashboard />
               </ProtectedRoute>
             }
           />
