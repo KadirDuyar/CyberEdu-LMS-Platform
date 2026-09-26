@@ -69,6 +69,7 @@ CREATE POLICY "cohorts_select" ON public.cohorts
   FOR SELECT TO authenticated 
   USING (
     teacher_id = auth.uid() 
+    OR is_active = true
     OR public.check_is_cohort_member(id, auth.uid())
     OR public.check_is_admin(auth.uid())
   );
@@ -176,3 +177,55 @@ CREATE POLICY "cohort_progress_all" ON public.cohort_progress
     )
     OR public.check_is_admin(auth.uid())
   );
+
+-- ─── 4. KODLA KATILMA İŞLEMİNİ GÜVENLE YAPAN RPC FONKSİYONU ───────────
+CREATE OR REPLACE FUNCTION public.join_cohort_by_code(p_join_code text)
+RETURNS json
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_student_id uuid;
+  v_cohort record;
+  v_already_member boolean;
+BEGIN
+  v_student_id := auth.uid();
+  IF v_student_id IS NULL THEN
+    RETURN json_build_object('success', false, 'message', 'Oturum açmanız gerekiyor.');
+  END IF;
+
+  p_join_code := UPPER(TRIM(p_join_code));
+
+  -- Aktif programı bul
+  SELECT id, title, description, is_active, teacher_id
+  INTO v_cohort
+  FROM public.cohorts
+  WHERE UPPER(TRIM(join_code)) = p_join_code;
+
+  IF NOT FOUND THEN
+    RETURN json_build_object('success', false, 'message', 'Bu koda ait bir program bulunamadı. Lütfen kodu kontrol edin.');
+  END IF;
+
+  IF NOT v_cohort.is_active THEN
+    RETURN json_build_object('success', false, 'message', 'Bu program şu anda aktif değil veya duraklatılmış.');
+  END IF;
+
+  -- Daha önce katılmış mı kontrol et
+  SELECT EXISTS (
+    SELECT 1 FROM public.cohort_members
+    WHERE cohort_id = v_cohort.id AND student_id = v_student_id
+  ) INTO v_already_member;
+
+  IF v_already_member THEN
+    RETURN json_build_object('success', false, 'message', 'Zaten bu programa kayıtlısınız!', 'cohort', row_to_json(v_cohort));
+  END IF;
+
+  -- Öğrenciyi programa kaydet
+  INSERT INTO public.cohort_members (cohort_id, student_id)
+  VALUES (v_cohort.id, v_student_id);
+
+  RETURN json_build_object('success', true, 'message', 'Programa başarıyla katıldınız!', 'cohort', row_to_json(v_cohort));
+END;
+$$;
+

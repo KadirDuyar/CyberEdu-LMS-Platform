@@ -380,12 +380,26 @@ export async function joinCohortByCode(joinCode, studentId) {
     return { data: null, error: new Error('Geçersiz katılım kodu veya kullanıcı.') };
   }
   const cleanCode = joinCode.trim().toUpperCase();
+
   try {
-    // 1. Koda ait aktif kohortu bul
+    // 1. Önce RPC fonksiyonunu dene (RLS kısıtlamalarını aşan en kararlı yöntem)
+    const { data: rpcRes, error: rpcErr } = await supabase.rpc('join_cohort_by_code', {
+      p_join_code: cleanCode,
+    });
+
+    if (!rpcErr && rpcRes) {
+      if (!rpcRes.success) {
+        return { data: rpcRes.cohort || null, error: new Error(rpcRes.message) };
+      }
+      await syncStudentCohortProgress(studentId);
+      return { data: rpcRes.cohort, error: null };
+    }
+
+    // 2. RPC mevcut değilse doğrudan veritabanı tablolarıyla devam et
     const { data: cohort, error: cohortErr } = await supabase
       .from('cohorts')
-      .select('id, title, description, is_active, teacher_id, profiles:teacher_id(full_name)')
-      .eq('join_code', cleanCode)
+      .select('id, title, description, is_active, teacher_id')
+      .ilike('join_code', cleanCode)
       .maybeSingle();
 
     if (cohortErr) throw cohortErr;
@@ -396,7 +410,7 @@ export async function joinCohortByCode(joinCode, studentId) {
       return { data: null, error: new Error('Bu program şu anda aktif değil veya duraklatılmış.') };
     }
 
-    // 2. Öğrenci zaten üye mi?
+    // 3. Öğrenci zaten üye mi?
     const { data: existingMember } = await supabase
       .from('cohort_members')
       .select('id')
@@ -408,7 +422,7 @@ export async function joinCohortByCode(joinCode, studentId) {
       return { data: cohort, error: new Error('Zaten bu programa kayıtlısınız!') };
     }
 
-    // 3. Üye olarak ekle
+    // 4. Üye olarak ekle
     const { error: insertErr } = await supabase
       .from('cohort_members')
       .insert({
@@ -418,7 +432,7 @@ export async function joinCohortByCode(joinCode, studentId) {
 
     if (insertErr) throw insertErr;
 
-    // 4. İlerlemeleri senkronize et
+    // 5. İlerlemeleri senkronize et
     await syncStudentCohortProgress(studentId);
 
     return { data: cohort, error: null };
