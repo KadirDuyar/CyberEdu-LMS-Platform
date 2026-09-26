@@ -294,7 +294,7 @@ export default function AdminDashboard() {
 
         {/* Toast Bildirimi */}
         {toast && (
-          <div className="fixed bottom-6 right-6 z-50 animate-bounce">
+          <div className="fixed top-20 right-6 z-[100] animate-bounce">
             <div className={`px-5 py-3 rounded-2xl shadow-2xl border text-sm font-bold flex items-center gap-2 ${
               toast.type === 'success'
                 ? 'bg-emerald-950/90 text-emerald-200 border-emerald-500/50'

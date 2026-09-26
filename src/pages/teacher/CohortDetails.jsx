@@ -482,7 +482,7 @@ export default function CohortDetails() {
         {/* Toast Bildirim (AI asistan ile çakışmaması için sağ üstte) */}
         {toast && (
           <div
-            className={`fixed top-6 right-6 z-[100] max-w-md px-5 py-3.5 rounded-2xl shadow-2xl font-bold text-sm flex items-center gap-3 animate-fade-in ${
+            className={`fixed top-20 right-6 z-[100] max-w-md px-5 py-3.5 rounded-2xl shadow-2xl font-bold text-sm flex items-center gap-3 animate-fade-in ${
               toast.type === 'error' ? 'bg-rose-500 text-white shadow-rose-500/20' : 'bg-emerald-500 text-white shadow-emerald-500/20'
             }`}
           >
