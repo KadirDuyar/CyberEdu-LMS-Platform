@@ -146,17 +146,17 @@ export default function TeacherCohorts() {
     <DashboardLayout>
       <div className="max-w-6xl mx-auto space-y-6 pb-12">
 
-        {/* Toast Bildirim */}
+        {/* Toast Bildirim (AI asistan ile çakışmaması için sağ üstte) */}
         {toast && (
           <div
-            className={`fixed bottom-6 right-6 z-50 px-5 py-3 rounded-2xl shadow-2xl font-bold text-sm flex items-center gap-3 animate-fade-in ${
+            className={`fixed top-6 right-6 z-[100] max-w-md px-5 py-3.5 rounded-2xl shadow-2xl font-bold text-sm flex items-center gap-3 animate-fade-in ${
               toast.type === 'error'
-                ? 'bg-rose-500 text-white'
-                : 'bg-emerald-500 text-white'
+                ? 'bg-rose-500 text-white shadow-rose-500/20'
+                : 'bg-emerald-500 text-white shadow-emerald-500/20'
             }`}
           >
-            {toast.type === 'error' ? <AlertCircle size={18} /> : <Check size={18} />}
-            <span>{toast.message}</span>
+            {toast.type === 'error' ? <AlertCircle size={18} className="shrink-0" /> : <Check size={18} className="shrink-0" />}
+            <span className="leading-snug">{toast.message}</span>
           </div>
         )}
 
