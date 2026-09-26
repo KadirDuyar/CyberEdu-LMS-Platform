@@ -495,12 +495,12 @@ export default function CohortDetails() {
         <div className="space-y-4">
           <button
             onClick={() => navigate('/teacher/cohorts')}
-            className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
           >
             <ArrowLeft size={16} /> Programlara Geri Dön
           </button>
 
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-950/70 via-blue-950/50 to-slate-900 border border-cyan-500/30 p-6 md:p-8 shadow-2xl">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-50 via-blue-50 to-white dark:from-cyan-950/70 dark:via-blue-950/50 dark:to-slate-900 border border-cyan-200 dark:border-cyan-500/30 p-6 md:p-8 shadow-sm">
             <div className="absolute -top-12 -right-12 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -509,55 +509,55 @@ export default function CohortDetails() {
                   <span
                     className={`text-[11px] font-bold px-3 py-1 rounded-full border ${
                       cohort.is_active
-                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                        : 'bg-slate-500/20 text-slate-300 border-slate-500/30'
+                        ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/30'
+                        : 'bg-slate-100 dark:bg-slate-500/20 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-500/30'
                     }`}
                   >
                     {cohort.is_active ? '● Aktif Program' : '○ Duraklatıldı'}
                   </span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     Oluşturulma: {new Date(cohort.created_at).toLocaleDateString('tr-TR')}
                   </span>
                 </div>
 
-                <h1 className="font-display font-black text-2xl md:text-3xl text-white">
+                <h1 className="font-display font-black text-2xl md:text-3xl text-slate-900 dark:text-white">
                   {cohort.title}
                 </h1>
-                <p className="text-slate-300 text-sm max-w-2xl">
+                <p className="text-slate-600 dark:text-slate-300 text-sm max-w-2xl">
                   {cohort.description || 'Bu program için henüz bir açıklama eklenmedi.'}
                 </p>
               </div>
 
               {/* Katılım Kodu & Aksiyonlar */}
               <div className="flex flex-col sm:flex-row md:flex-col items-stretch gap-3 shrink-0">
-                <div className="p-3.5 rounded-2xl bg-black/40 border border-cyan-500/40 flex items-center justify-between gap-4">
+                <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-black/40 border border-cyan-300 dark:border-cyan-500/40 flex items-center justify-between gap-4 shadow-sm">
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-cyan-400 block">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-cyan-700 dark:text-cyan-400 block">
                       Öğrenci Katılım Kodu
                     </span>
-                    <span className="font-mono font-black text-2xl text-white tracking-widest">
+                    <span className="font-mono font-black text-2xl text-slate-900 dark:text-white tracking-widest">
                       {cohort.join_code}
                     </span>
                   </div>
                   <button
                     onClick={handleCopyCode}
-                    className="p-2.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 transition-colors"
+                    className="p-2.5 rounded-xl bg-cyan-100 hover:bg-cyan-200 dark:bg-cyan-500/20 dark:hover:bg-cyan-500/30 text-cyan-700 dark:text-cyan-300 transition-colors"
                     title="Kodu Kopyala"
                   >
-                    {copiedCode ? <Check size={18} className="text-emerald-400" /> : <Copy size={18} />}
+                    {copiedCode ? <Check size={18} className="text-emerald-600 dark:text-emerald-400" /> : <Copy size={18} />}
                   </button>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setEditCohortModalOpen(true)}
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 text-xs font-bold transition-colors inline-flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors inline-flex items-center justify-center gap-2 shadow-sm"
                   >
                     <Edit2 size={14} /> Programı Düzenle
                   </button>
                   <button
                     onClick={handleRegenerateCode}
-                    className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white transition-colors"
+                    className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors shadow-sm"
                     title="Yeni Kod Üret"
                   >
                     <RefreshCw size={14} />
@@ -569,13 +569,13 @@ export default function CohortDetails() {
         </div>
 
         {/* Sekmeler (Tabs) */}
-        <div className="flex items-center gap-2 border-b border-white/10 pb-2 overflow-x-auto scrollbar-thin">
+        <div className="flex items-center gap-2 border-b border-slate-200 dark:border-white/10 pb-2 overflow-x-auto scrollbar-thin">
           <button
             onClick={() => setActiveTab('weeks')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shrink-0 ${
               activeTab === 'weeks'
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-lg shadow-cyan-500/10'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                ? 'bg-cyan-50 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
             <Calendar size={18} />
@@ -589,8 +589,8 @@ export default function CohortDetails() {
             }}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shrink-0 ${
               activeTab === 'progress'
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-lg shadow-cyan-500/10'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                ? 'bg-cyan-50 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
             <BarChart3 size={18} />
@@ -601,8 +601,8 @@ export default function CohortDetails() {
             onClick={() => setActiveTab('members')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all shrink-0 ${
               activeTab === 'members'
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-lg shadow-cyan-500/10'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                ? 'bg-cyan-50 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30 shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
             <Users size={18} />
@@ -615,8 +615,8 @@ export default function CohortDetails() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="font-display font-black text-xl text-white">Müfredat Takvimi</h2>
-                <p className="text-xs text-slate-400">
+                <h2 className="font-display font-black text-xl text-slate-900 dark:text-white">Müfredat Takvimi</h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   Öğrencilerin tamamlaması gereken haftalık kursları ve teslim sürelerini yönetin.
                 </p>
               </div>
@@ -646,22 +646,22 @@ export default function CohortDetails() {
                   return (
                     <div
                       key={week.id}
-                      className="group relative rounded-2xl glass border border-white/10 hover:border-cyan-500/30 p-5 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                      className="group relative rounded-2xl bg-white dark:glass border border-slate-200 dark:border-white/10 hover:border-cyan-500/40 p-5 transition-all shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
                     >
                       {/* Sol: Hafta Rozeti & Detay */}
                       <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex flex-col items-center justify-center text-cyan-300 shrink-0">
+                        <div className="w-12 h-12 rounded-2xl bg-cyan-50 dark:bg-cyan-500/20 border border-cyan-200 dark:border-cyan-500/30 flex flex-col items-center justify-center text-cyan-700 dark:text-cyan-300 shrink-0">
                           <span className="text-[10px] uppercase font-bold">Hafta</span>
                           <span className="text-lg font-black leading-none">{week.week_number}</span>
                         </div>
 
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="font-display font-black text-base text-white">
+                            <h3 className="font-display font-black text-base text-slate-900 dark:text-white">
                               {week.title}
                             </h3>
                             {week.is_locked && (
-                              <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                              <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                 <Lock size={10} /> Kilitli
                               </span>
                             )}
@@ -669,13 +669,13 @@ export default function CohortDetails() {
 
                           {/* Kurs ve Opsiyonel Ders Bilgisi */}
                           <div className="flex flex-wrap items-center gap-2 mt-1.5">
-                            <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-200">
+                            <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-slate-200">
                               <span>{week.courses?.thumbnail_emoji || '📚'}</span>
                               <span>{week.courses?.title || 'Kurs seçilmemiş'}</span>
                             </span>
 
                             {week.lessons && (
-                              <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-violet-500/10 text-violet-300 border border-violet-500/20">
+                              <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-500/10 dark:text-violet-300 dark:border-violet-500/20">
                                 🎯 Ders: {week.lessons.title}
                               </span>
                             )}
@@ -684,10 +684,10 @@ export default function CohortDetails() {
                       </div>
 
                       {/* Sağ: Tarihler & Aksiyonlar */}
-                      <div className="flex flex-wrap items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-t-0 border-white/5">
+                      <div className="flex flex-wrap items-center justify-between md:justify-end gap-4 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-white/5">
                         <div className="text-left md:text-right">
-                          <div className="flex items-center md:justify-end gap-1.5 text-xs text-slate-300 font-semibold">
-                            <Clock size={14} className={isPast ? 'text-rose-400' : 'text-cyan-400'} />
+                          <div className="flex items-center md:justify-end gap-1.5 text-xs text-slate-700 dark:text-slate-300 font-semibold">
+                            <Clock size={14} className={isPast ? 'text-rose-500 dark:text-rose-400' : 'text-cyan-600 dark:text-cyan-400'} />
                             <span>Son Teslim: {dueDateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
                           <span className="text-[10px] text-slate-500 block mt-0.5">
@@ -698,21 +698,21 @@ export default function CohortDetails() {
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => handleSendWeekNotification(week)}
-                            className="p-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 transition-colors"
+                            className="p-2 rounded-xl bg-cyan-50 dark:bg-cyan-500/10 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 transition-colors"
                             title="Öğrencilere Hatırlatma Bildirimi Gönder"
                           >
                             <Bell size={16} />
                           </button>
                           <button
                             onClick={() => openWeekModal(week)}
-                            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
+                            className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
                             title="Haftayı Düzenle"
                           >
                             <Edit2 size={16} />
                           </button>
                           <button
                             onClick={() => handleDeleteWeek(week.id, week.title)}
-                            className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors"
+                            className="p-2 rounded-xl bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors"
                             title="Haftayı Sil"
                           >
                             <Trash2 size={16} />
@@ -732,8 +732,8 @@ export default function CohortDetails() {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="font-display font-black text-xl text-white">Grup Üyeleri</h2>
-                <p className="text-xs text-slate-400">
+                <h2 className="font-display font-black text-xl text-slate-900 dark:text-white">Grup Üyeleri</h2>
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   Bu programa dahil edilen ve haftalık görevleri takip eden öğrenciler.
                 </p>
               </div>
@@ -751,21 +751,21 @@ export default function CohortDetails() {
             </div>
 
             {/* Katılım Kodu Hatırlatma Kartı */}
-            <div className="p-4 rounded-2xl bg-cyan-950/30 border border-cyan-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-4 rounded-2xl bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">📢</span>
                 <div>
-                  <h4 className="text-sm font-bold text-white">Öğrencilerinizi Kendi Başlarına Katın</h4>
-                  <p className="text-xs text-slate-300">
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">Öğrencilerinizi Kendi Başlarına Katın</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
                     Öğrencileriniz ana sayfalarındaki "Koda Göre Gruba Katıl" alanına{' '}
-                    <strong className="text-cyan-300 font-mono tracking-wider">{cohort.join_code}</strong>{' '}
+                    <strong className="text-cyan-700 dark:text-cyan-300 font-mono tracking-wider">{cohort.join_code}</strong>{' '}
                     kodunu girerek anında bu gruba dahil olabilir.
                   </p>
                 </div>
               </div>
               <button
                 onClick={handleCopyCode}
-                className="px-4 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 text-xs font-bold transition-colors shrink-0 flex items-center justify-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-cyan-100 hover:bg-cyan-200 dark:bg-cyan-500/20 dark:hover:bg-cyan-500/30 text-cyan-800 dark:text-cyan-300 text-xs font-bold transition-colors shrink-0 flex items-center justify-center gap-1.5"
               >
                 <Copy size={14} /> Kodu Kopyala
               </button>
@@ -786,16 +786,16 @@ export default function CohortDetails() {
                 {members.map((member) => (
                   <div
                     key={member.membershipId}
-                    className="p-4 rounded-2xl glass border border-white/10 hover:border-white/20 transition-all flex items-center justify-between gap-3"
+                    className="p-4 rounded-2xl bg-white dark:glass border border-slate-200 dark:border-white/10 hover:border-cyan-400 dark:hover:border-white/20 shadow-sm transition-all flex items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-11 h-11 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl shrink-0">
+                      <div className="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-2xl shrink-0">
                         {member.avatar_emoji || '👤'}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold text-sm text-white truncate">{member.full_name}</p>
-                        <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
-                          <span className="font-semibold text-cyan-400">Lv.{member.level || 1}</span>
+                        <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{member.full_name}</p>
+                        <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                          <span className="font-semibold text-cyan-600 dark:text-cyan-400">Lv.{member.level || 1}</span>
                           <span>•</span>
                           <span>{member.xp || 0} XP</span>
                         </div>
@@ -804,7 +804,7 @@ export default function CohortDetails() {
 
                     <button
                       onClick={() => handleRemoveStudent(member.studentId, member.full_name)}
-                      className="p-2 rounded-xl hover:bg-rose-500/10 text-slate-500 hover:text-rose-400 transition-colors"
+                      className="p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-500/10 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
                       title="Gruptan Çıkar"
                     >
                       <Trash2 size={16} />
@@ -822,10 +822,10 @@ export default function CohortDetails() {
             {/* Üst Başlık & Aksiyonlar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="font-display font-black text-xl text-white">
+                <h2 className="font-display font-black text-xl text-slate-900 dark:text-white">
                   Öğrenci İlerleme & Not Takibi
                 </h2>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600 dark:text-slate-400">
                   Öğrencilerin haftalık görev tamamlama durumları, kazandıkları XP'ler ve gecikme raporu.
                 </p>
               </div>
@@ -834,7 +834,7 @@ export default function CohortDetails() {
                 <button
                   onClick={loadProgressData}
                   disabled={loadingProgress}
-                  className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-bold transition-colors inline-flex items-center gap-1.5"
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors inline-flex items-center gap-1.5"
                   title="Verileri Yenile"
                 >
                   <RefreshCw size={14} className={loadingProgress ? 'animate-spin' : ''} />
@@ -853,54 +853,54 @@ export default function CohortDetails() {
             {/* İstatistik Özet Kartları */}
             {progressData.stats && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className="p-4 rounded-2xl glass border border-cyan-500/20 bg-cyan-950/20">
+                <div className="p-4 rounded-2xl bg-cyan-50 dark:bg-cyan-950/20 border border-cyan-200 dark:border-cyan-500/20">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-cyan-300 font-bold">Kayıtlı Öğrenci</span>
-                    <Users size={18} className="text-cyan-400" />
+                    <span className="text-xs text-cyan-800 dark:text-cyan-300 font-bold">Kayıtlı Öğrenci</span>
+                    <Users size={18} className="text-cyan-600 dark:text-cyan-400" />
                   </div>
-                  <p className="font-display font-black text-2xl text-white mt-2">
+                  <p className="font-display font-black text-2xl text-slate-900 dark:text-white mt-2">
                     {progressData.stats.totalStudents}
                   </p>
-                  <span className="text-[10px] text-slate-400">Grupta aktif</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Grupta aktif</span>
                 </div>
 
-                <div className="p-4 rounded-2xl glass border border-emerald-500/20 bg-emerald-950/20">
+                <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-500/20">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-emerald-300 font-bold">Sınıf Başarısı</span>
-                    <TrendingUp size={18} className="text-emerald-400" />
+                    <span className="text-xs text-emerald-800 dark:text-emerald-300 font-bold">Sınıf Başarısı</span>
+                    <TrendingUp size={18} className="text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <p className="font-display font-black text-2xl text-emerald-400 mt-2">
+                  <p className="font-display font-black text-2xl text-emerald-600 dark:text-emerald-400 mt-2">
                     %{progressData.stats.avgCompletionRate}
                   </p>
-                  <span className="text-[10px] text-slate-400">Ortalama tamamlama</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Ortalama tamamlama</span>
                 </div>
 
-                <div className="p-4 rounded-2xl glass border border-amber-500/20 bg-amber-950/20">
+                <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-500/20">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-amber-300 font-bold">Dağıtılan Grup XP</span>
-                    <Award size={18} className="text-amber-400" />
+                    <span className="text-xs text-amber-800 dark:text-amber-300 font-bold">Dağıtılan Grup XP</span>
+                    <Award size={18} className="text-amber-600 dark:text-amber-400" />
                   </div>
-                  <p className="font-display font-black text-2xl text-amber-400 mt-2">
+                  <p className="font-display font-black text-2xl text-amber-600 dark:text-amber-400 mt-2">
                     {progressData.stats.totalXpEarned.toLocaleString('tr-TR')}
                   </p>
-                  <span className="text-[10px] text-slate-400">Haftalık görev ödülleri</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Haftalık görev ödülleri</span>
                 </div>
 
-                <div className="p-4 rounded-2xl glass border border-rose-500/20 bg-rose-950/20">
+                <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-500/20">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-rose-300 font-bold">Geciken Görevler</span>
-                    <AlertTriangle size={18} className="text-rose-400" />
+                    <span className="text-xs text-rose-800 dark:text-rose-300 font-bold">Geciken Görevler</span>
+                    <AlertTriangle size={18} className="text-rose-600 dark:text-rose-400" />
                   </div>
-                  <p className="font-display font-black text-2xl text-rose-400 mt-2">
+                  <p className="font-display font-black text-2xl text-rose-600 dark:text-rose-400 mt-2">
                     {progressData.stats.overdueCount}
                   </p>
-                  <span className="text-[10px] text-slate-400">Süresi geçmiş teslimler</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">Süresi geçmiş teslimler</span>
                 </div>
               </div>
             )}
 
             {/* Arama & Durum Filtre Çubuğu */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-2xl glass border border-white/10">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 rounded-2xl bg-white dark:glass border border-slate-200 dark:border-white/10 shadow-sm">
               <div className="relative w-full sm:w-72">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
@@ -908,7 +908,7 @@ export default function CohortDetails() {
                   placeholder="Öğrenci adı ara..."
                   value={progressSearchQuery}
                   onChange={(e) => setProgressSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white text-xs placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-cyan-500"
                 />
               </div>
 
@@ -918,7 +918,7 @@ export default function CohortDetails() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     progressFilter === 'all'
                       ? 'bg-cyan-600 text-white'
-                      : 'text-slate-400 hover:text-white bg-white/5'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-white/5'
                   }`}
                 >
                   Tümü ({progressData.students.length})
@@ -928,7 +928,7 @@ export default function CohortDetails() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     progressFilter === 'completed'
                       ? 'bg-emerald-600 text-white'
-                      : 'text-slate-400 hover:text-white bg-white/5'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-white/5'
                   }`}
                 >
                   Tümü Tamam (%100)
@@ -938,7 +938,7 @@ export default function CohortDetails() {
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     progressFilter === 'incomplete'
                       ? 'bg-amber-600 text-white'
-                      : 'text-slate-400 hover:text-white bg-white/5'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-white/5'
                   }`}
                 >
                   Eksik / Gecikenler
@@ -958,11 +958,11 @@ export default function CohortDetails() {
                 desc="Arama kriterlerine uygun öğrenci kaydı bulunamadı."
               />
             ) : (
-              <div className="overflow-x-auto rounded-2xl glass border border-white/10 shadow-2xl">
+              <div className="overflow-x-auto rounded-2xl bg-white dark:glass border border-slate-200 dark:border-white/10 shadow-sm">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-900/90 text-slate-300 font-bold uppercase tracking-wider border-b border-white/10">
+                  <thead className="bg-slate-100 dark:bg-slate-900/90 text-slate-700 dark:text-slate-300 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-white/10">
                     <tr>
-                      <th className="py-3.5 px-4 sticky left-0 bg-slate-900 z-10 min-w-[200px]">
+                      <th className="py-3.5 px-4 sticky left-0 bg-slate-100 dark:bg-slate-900 z-10 min-w-[200px]">
                         Öğrenci
                       </th>
                       <th className="py-3.5 px-3 min-w-[130px]">İlerleme</th>
@@ -970,13 +970,13 @@ export default function CohortDetails() {
                       {progressData.weeks.map((week) => (
                         <th key={week.id} className="py-3.5 px-3 text-center min-w-[140px]">
                           <div className="flex flex-col items-center">
-                            <span className="font-bold text-white">{week.week_number}. Hafta</span>
-                            <span className="text-[10px] text-slate-400 font-normal truncate max-w-[120px]">
+                            <span className="font-bold text-slate-900 dark:text-white">{week.week_number}. Hafta</span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal truncate max-w-[120px]">
                               {week.title}
                             </span>
                             <button
                               onClick={() => handleNotifyWeekIncomplete(week)}
-                              className="mt-1 px-2 py-0.5 rounded bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-[9px] font-bold border border-cyan-500/20 flex items-center gap-1"
+                              className="mt-1 px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-500/10 hover:bg-cyan-200 dark:hover:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 text-[9px] font-bold border border-cyan-300 dark:border-cyan-500/20 flex items-center gap-1"
                               title="Bu haftayı bitirmemiş öğrencilere hatırlatma gönder"
                             >
                               <Bell size={10} /> Eksiklere Bildir
@@ -986,18 +986,18 @@ export default function CohortDetails() {
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                     {filteredStudentsMatrix.map((st) => (
-                      <tr key={st.id} className="hover:bg-white/5 transition-colors">
+                      <tr key={st.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                         {/* Öğrenci Bilgisi */}
-                        <td className="py-3 px-4 sticky left-0 bg-slate-900/95 z-10 border-r border-white/5">
+                        <td className="py-3 px-4 sticky left-0 bg-white dark:bg-slate-900/95 z-10 border-r border-slate-200 dark:border-white/5">
                           <div className="flex items-center gap-2.5">
                             <span className="text-xl shrink-0">{st.avatar_emoji || '👤'}</span>
                             <div className="min-w-0">
-                              <p className="font-bold text-white truncate max-w-[150px]">
+                              <p className="font-bold text-slate-900 dark:text-white truncate max-w-[150px]">
                                 {st.full_name}
                               </p>
-                              <p className="text-[10px] text-slate-400">
+                              <p className="text-[10px] text-slate-500 dark:text-slate-400">
                                 Lv.{st.level || 1} • {st.xp || 0} Genel XP
                               </p>
                             </div>
@@ -1008,14 +1008,14 @@ export default function CohortDetails() {
                         <td className="py-3 px-3">
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-[11px] font-bold">
-                              <span className={st.completionRate === 100 ? 'text-emerald-400' : 'text-slate-300'}>
+                              <span className={st.completionRate === 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'}>
                                 %{st.completionRate}
                               </span>
-                              <span className="text-slate-500 text-[10px]">
+                              <span className="text-slate-400 dark:text-slate-500 text-[10px]">
                                 {st.completedCount}/{progressData.weeks.length}
                               </span>
                             </div>
-                            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                            <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                               <div
                                 className={`h-full rounded-full ${
                                   st.completionRate === 100 ? 'bg-emerald-500' : 'bg-cyan-500'
@@ -1028,7 +1028,7 @@ export default function CohortDetails() {
 
                         {/* Grup İçi XP */}
                         <td className="py-3 px-3">
-                          <span className="font-mono font-bold text-amber-400 text-xs">
+                          <span className="font-mono font-bold text-amber-600 dark:text-amber-400 text-xs">
                             +{st.totalCohortXp} XP
                           </span>
                         </td>
@@ -1039,35 +1039,35 @@ export default function CohortDetails() {
                             <td key={ws.weekId} className="py-3 px-3 text-center">
                               {ws.status === 'completed' ? (
                                 <span
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/30 text-[11px] font-bold"
                                   title={`Tamamlandı: ${ws.completedAt ? new Date(ws.completedAt).toLocaleDateString('tr-TR') : ''}`}
                                 >
                                   <CheckCircle2 size={12} /> {ws.earnedXp} XP
                                 </span>
                               ) : ws.status === 'completed_overdue' ? (
                                 <span
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 border border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30 text-[11px] font-bold"
                                   title={`Gecikmeli Tamamlandı: ${ws.completedAt ? new Date(ws.completedAt).toLocaleDateString('tr-TR') : ''}`}
                                 >
                                   <AlertCircle size={12} /> {ws.earnedXp} XP
                                 </span>
                               ) : ws.status === 'overdue' ? (
                                 <span
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-500/20 dark:text-rose-300 dark:border-rose-500/30 text-[10px] font-bold"
                                   title="Teslim tarihi doldu, henüz tamamlanmadı"
                                 >
                                   <Clock size={11} /> Gecikti
                                 </span>
                               ) : ws.status === 'pending' ? (
                                 <span
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-[10px] font-semibold"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cyan-100 text-cyan-800 border border-cyan-300 dark:bg-cyan-500/10 dark:text-cyan-300 dark:border-cyan-500/20 text-[10px] font-semibold"
                                   title="Görev aktif, devam ediyor"
                                 >
                                   ⏳ Devam
                                 </span>
                               ) : (
                                 <span
-                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-800 text-slate-500 text-[10px]"
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-500 text-[10px]"
                                   title="Kilitli veya gelecek hafta"
                                 >
                                   <Lock size={10} /> Kilitli
@@ -1084,22 +1084,22 @@ export default function CohortDetails() {
             )}
 
             {/* Renk ve Durum Rehberi */}
-            <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/5 flex flex-wrap items-center gap-4 text-xs text-slate-400">
-              <span className="font-bold text-slate-300">Açıklamalar:</span>
-              <span className="flex items-center gap-1.5 text-emerald-300">
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-400">
+              <span className="font-bold text-slate-800 dark:text-slate-300">Açıklamalar:</span>
+              <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Zamanında Tamamlandı (100 XP)
               </span>
-              <span className="flex items-center gap-1.5 text-amber-300">
+              <span className="flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Gecikmeli Tamamlandı (80 XP)
               </span>
-              <span className="flex items-center gap-1.5 text-cyan-300">
+              <span className="flex items-center gap-1.5 text-cyan-700 dark:text-cyan-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-cyan-500" /> Devam Ediyor
               </span>
-              <span className="flex items-center gap-1.5 text-rose-300">
+              <span className="flex items-center gap-1.5 text-rose-700 dark:text-rose-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-500" /> Süresi Geçti
               </span>
               <span className="flex items-center gap-1.5 text-slate-500">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-700" /> Kilitli
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-400 dark:bg-slate-700" /> Kilitli
               </span>
             </div>
           </div>
@@ -1108,30 +1108,30 @@ export default function CohortDetails() {
         {/* ─── MODAL: HAFTA EKLE / DÜZENLE ─── */}
         {weekModalOpen && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-            <div className="relative w-full max-w-lg rounded-3xl glass border border-white/15 p-6 md:p-8 bg-slate-900/95 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/15 p-6 md:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
               <button
                 onClick={() => setWeekModalOpen(false)}
-                className="absolute top-5 right-5 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
+                className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-400 dark:hover:text-white"
               >
                 <X size={18} />
               </button>
 
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <div className="w-12 h-12 rounded-2xl bg-cyan-50 dark:bg-cyan-500/20 border border-cyan-200 dark:border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
                   <Calendar size={24} />
                 </div>
                 <div>
-                  <h3 className="font-display font-black text-xl text-white">
+                  <h3 className="font-display font-black text-xl text-slate-900 dark:text-white">
                     {editingWeek ? 'Haftalık Görevi Düzenle' : 'Yeni Hafta Tanımla'}
                   </h3>
-                  <p className="text-xs text-slate-400">Öğrenciler için görev kursu ve zamanlama</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">Öğrenciler için görev kursu ve zamanlama</p>
                 </div>
               </div>
 
               <form onSubmit={handleSaveWeek} className="space-y-4">
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                       Hafta No *
                     </label>
                     <input
@@ -1141,12 +1141,12 @@ export default function CohortDetails() {
                       required
                       value={weekForm.week_number}
                       onChange={(e) => setWeekForm({ ...weekForm, week_number: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-cyan-500 text-sm font-bold"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white text-sm font-bold"
                     />
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                       Hafta Başlığı *
                     </label>
                     <input
@@ -1155,21 +1155,21 @@ export default function CohortDetails() {
                       placeholder="Örn: Ağ Güvenliği & Paket Analizi"
                       value={weekForm.title}
                       onChange={(e) => setWeekForm({ ...weekForm, title: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-500 text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Kurs Seçimi */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                     Dahil Edilecek Kurs *
                   </label>
                   <select
                     required
                     value={weekForm.course_id}
                     onChange={(e) => handleCourseChange(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-white/10 text-white focus:outline-none focus:border-cyan-500 text-sm"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-cyan-500 dark:bg-slate-800 dark:border-white/10 dark:text-white text-sm"
                   >
                     <option value="" disabled>Kurs seçin...</option>
                     {courses.map((c) => (
@@ -1183,7 +1183,7 @@ export default function CohortDetails() {
                 {/* Spesifik Ders Seçimi (Opsiyonel) */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                       Spesifik Ders Seçimi (Opsiyonel)
                     </label>
                     {loadingLessons && <LoadingSpinner size="sm" />}
@@ -1191,7 +1191,7 @@ export default function CohortDetails() {
                   <select
                     value={weekForm.lesson_id}
                     onChange={(e) => setWeekForm({ ...weekForm, lesson_id: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-800 border border-white/10 text-white focus:outline-none focus:border-cyan-500 text-sm"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 focus:outline-none focus:border-cyan-500 dark:bg-slate-800 dark:border-white/10 dark:text-white text-sm"
                   >
                     <option value="">🎯 Tüm Kursu Kapsasın (Önerilen)</option>
                     {courseLessons.map((l, idx) => (
@@ -1200,7 +1200,7 @@ export default function CohortDetails() {
                       </option>
                     ))}
                   </select>
-                  <p className="text-[11px] text-slate-500 mt-1">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                     Boş bırakırsanız öğrencinin haftalık görevi tamamlaması için kursun tamamını bitirmesi beklenir.
                   </p>
                 </div>
@@ -1208,19 +1208,19 @@ export default function CohortDetails() {
                 {/* Tarih Tanımlamaları */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                       Başlangıç Tarihi
                     </label>
                     <input
                       type="datetime-local"
                       value={weekForm.unlock_date}
                       onChange={(e) => setWeekForm({ ...weekForm, unlock_date: e.target.value })}
-                      className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-500"
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-cyan-500 dark:bg-slate-800 dark:border-white/10 dark:text-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                       Son Teslim Tarihi *
                     </label>
                     <input
@@ -1228,21 +1228,21 @@ export default function CohortDetails() {
                       required
                       value={weekForm.due_date}
                       onChange={(e) => setWeekForm({ ...weekForm, due_date: e.target.value })}
-                      className="w-full px-3 py-2.5 rounded-xl bg-slate-800 border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-500"
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-xs focus:outline-none focus:border-cyan-500 dark:bg-slate-800 dark:border-white/10 dark:text-white"
                     />
                   </div>
                 </div>
 
                 {/* Bildirim Onayı */}
                 {!editingWeek && (
-                  <label className="flex items-center gap-3 p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20 cursor-pointer">
+                  <label className="flex items-center gap-3 p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-500/20 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={weekForm.notify}
                       onChange={(e) => setWeekForm({ ...weekForm, notify: e.target.checked })}
                       className="w-4 h-4 rounded text-cyan-500 focus:ring-cyan-500"
                     />
-                    <span className="text-xs text-slate-300">
+                    <span className="text-xs text-slate-700 dark:text-slate-300">
                       Kayıtlı öğrencilere panel üzerinden anında haftalık görev bildirimi gönder 🔔
                     </span>
                   </label>
@@ -1252,7 +1252,7 @@ export default function CohortDetails() {
                   <button
                     type="button"
                     onClick={() => setWeekModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-bold"
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 text-sm font-bold"
                   >
                     İptal
                   </button>
@@ -1273,21 +1273,21 @@ export default function CohortDetails() {
         {/* ─── MODAL: ÖĞRENCİ ARAMA VE EKLEME ─── */}
         {memberModalOpen && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-            <div className="relative w-full max-w-md rounded-3xl glass border border-white/15 p-6 md:p-8 bg-slate-900/95 shadow-2xl">
+            <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/15 p-6 md:p-8 shadow-2xl">
               <button
                 onClick={() => setMemberModalOpen(false)}
-                className="absolute top-5 right-5 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
+                className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-400 dark:hover:text-white"
               >
                 <X size={18} />
               </button>
 
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <div className="w-12 h-12 rounded-2xl bg-cyan-50 dark:bg-cyan-500/20 border border-cyan-200 dark:border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
                   <UserPlus size={24} />
                 </div>
                 <div>
-                  <h3 className="font-display font-black text-xl text-white">Öğrenci Ekle</h3>
-                  <p className="text-xs text-slate-400">İsme göre arayarak doğrudan gruba dahil edin</p>
+                  <h3 className="font-display font-black text-xl text-slate-900 dark:text-white">Öğrenci Ekle</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">İsme göre arayarak doğrudan gruba dahil edin</p>
                 </div>
               </div>
 
@@ -1298,7 +1298,7 @@ export default function CohortDetails() {
                   placeholder="Öğrenci adı yazın..."
                   value={studentSearchQuery}
                   onChange={(e) => handleSearchStudents(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-500 text-sm"
                   autoFocus
                 />
               </div>
@@ -1318,13 +1318,13 @@ export default function CohortDetails() {
                   searchResults.map((st) => (
                     <div
                       key={st.id}
-                      className="p-3 rounded-xl glass border border-white/5 hover:border-cyan-500/30 flex items-center justify-between gap-3"
+                      className="p-3 rounded-xl bg-slate-50 dark:glass border border-slate-200 dark:border-white/5 hover:border-cyan-400 dark:hover:border-cyan-500/30 flex items-center justify-between gap-3"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <span className="text-xl">{st.avatar_emoji || '👤'}</span>
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-white truncate">{st.full_name}</p>
-                          <p className="text-[10px] text-slate-400">Lv.{st.level} • {st.xp} XP</p>
+                          <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{st.full_name}</p>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">Lv.{st.level} • {st.xp} XP</p>
                         </div>
                       </div>
 
@@ -1340,10 +1340,10 @@ export default function CohortDetails() {
                 )}
               </div>
 
-              <div className="mt-4 pt-3 border-t border-white/10 flex justify-end">
+              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-white/10 flex justify-end">
                 <button
                   onClick={() => setMemberModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold"
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 text-xs font-bold"
                 >
                   Kapat
                 </button>
@@ -1355,19 +1355,19 @@ export default function CohortDetails() {
         {/* ─── MODAL: PROGRAM BİLGİLERİNİ DÜZENLE ─── */}
         {editCohortModalOpen && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-            <div className="relative w-full max-w-md rounded-3xl glass border border-white/15 p-6 md:p-8 bg-slate-900/95 shadow-2xl">
+            <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/15 p-6 md:p-8 shadow-2xl">
               <button
                 onClick={() => setEditCohortModalOpen(false)}
-                className="absolute top-5 right-5 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
+                className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-400 dark:hover:text-white"
               >
                 <X size={18} />
               </button>
 
-              <h3 className="font-display font-black text-xl text-white mb-4">Programı Düzenle</h3>
+              <h3 className="font-display font-black text-xl text-slate-900 dark:text-white mb-4">Programı Düzenle</h3>
 
               <form onSubmit={handleUpdateCohort} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                     Program Adı *
                   </label>
                   <input
@@ -1375,30 +1375,30 @@ export default function CohortDetails() {
                     required
                     value={editCohortForm.title}
                     onChange={(e) => setEditCohortForm({ ...editCohortForm, title: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:outline-none focus:border-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                     Açıklama
                   </label>
                   <textarea
                     rows={3}
                     value={editCohortForm.description}
                     onChange={(e) => setEditCohortForm({ ...editCohortForm, description: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-500 resize-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900 text-sm focus:outline-none focus:border-cyan-500 dark:bg-white/5 dark:border-white/10 dark:text-white resize-none"
                   />
                 </div>
 
-                <label className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10 cursor-pointer">
+                <label className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={editCohortForm.is_active}
                     onChange={(e) => setEditCohortForm({ ...editCohortForm, is_active: e.target.checked })}
                     className="w-4 h-4 rounded text-cyan-500 focus:ring-cyan-500"
                   />
-                  <span className="text-xs text-slate-300">
+                  <span className="text-xs text-slate-700 dark:text-slate-300">
                     Program aktif ve öğrenciler tarafından erişilebilir olsun
                   </span>
                 </label>
@@ -1407,7 +1407,7 @@ export default function CohortDetails() {
                   <button
                     type="button"
                     onClick={() => setEditCohortModalOpen(false)}
-                    className="px-4 py-2 rounded-xl bg-white/5 text-slate-300 text-xs font-bold"
+                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/5 dark:text-slate-300 text-xs font-bold"
                   >
                     İptal
                   </button>

@@ -170,7 +170,7 @@ export default function LoginPage() {
                 className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-gradient-to-b ${acc.color} ${acc.border} hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50`}
               >
                 <span className="text-2xl">{acc.icon}</span>
-                <span className="text-xs font-bold text-white leading-tight text-center">{acc.label}</span>
+                <span className="text-xs font-bold text-slate-800 dark:text-white leading-tight text-center">{acc.label}</span>
               </button>
             ))}
           </div>
@@ -181,7 +181,7 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleLogin}
           disabled={oauthLoading || loading}
-          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-sm border border-white/10 transition-all hover:scale-[1.01] shadow-lg disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl bg-white hover:bg-slate-50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-800 dark:text-white font-bold text-sm border border-slate-200 dark:border-white/10 transition-all hover:scale-[1.01] shadow-sm dark:shadow-lg disabled:opacity-50"
         >
           <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -194,16 +194,16 @@ export default function LoginPage() {
 
         {/* Divider */}
         <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-white/10" />
+          <div className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
           <span className="text-xs text-slate-500 font-medium">veya e-posta ile giriş</span>
-          <div className="flex-1 h-px bg-white/10" />
+          <div className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
         </div>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           {/* E-posta */}
           <div className="space-y-1.5">
-            <label htmlFor="login-email" className="text-sm font-semibold text-slate-300">
+            <label htmlFor="login-email" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
               E-posta Adresi
             </label>
             <div className="relative">
@@ -229,7 +229,7 @@ export default function LoginPage() {
 
           {/* Şifre */}
           <div className="space-y-1.5">
-            <label htmlFor="login-password" className="text-sm font-semibold text-slate-300">
+            <label htmlFor="login-password" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
               Şifre
             </label>
             <div className="relative">

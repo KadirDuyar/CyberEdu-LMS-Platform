@@ -164,14 +164,14 @@ export default function TeacherCohorts() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <span className="p-2 rounded-xl bg-cyan-100 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-500/20">
                 <Calendar size={20} />
               </span>
-              <h1 className="font-display font-black text-2xl md:text-3xl text-white">
+              <h1 className="font-display font-black text-2xl md:text-3xl text-slate-900 dark:text-white">
                 Haftalık Programlar & Gruplar
               </h1>
             </div>
-            <p className="text-slate-400 text-sm mt-1">
+            <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
               Öğrenci grupları oluşturun, 4-5 haftalık ders programları tanımlayın ve teslim sürelerini yönetin.
             </p>
           </div>
@@ -200,7 +200,7 @@ export default function TeacherCohorts() {
               <div
                 key={cohort.id}
                 onClick={() => navigate(`/teacher/cohorts/${cohort.id}`)}
-                className="group relative cursor-pointer rounded-2xl glass border border-white/10 hover:border-cyan-500/40 p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-cyan-500/5 flex flex-col justify-between"
+                className="group relative cursor-pointer rounded-2xl bg-white dark:glass border border-slate-200 dark:border-white/10 hover:border-cyan-400 dark:hover:border-cyan-500/40 p-5 transition-all duration-200 hover:-translate-y-1 shadow-sm hover:shadow-xl hover:shadow-cyan-500/5 flex flex-col justify-between"
               >
                 {/* Üst Kısım: Başlık & Durum */}
                 <div>
@@ -208,8 +208,8 @@ export default function TeacherCohorts() {
                     <span
                       className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
                         cohort.is_active
-                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                          : 'bg-slate-500/10 text-slate-400 border-slate-500/30'
+                          ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-500/30'
+                          : 'bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-500/30'
                       }`}
                     >
                       {cohort.is_active ? '● Aktif Program' : '○ Duraklatıldı'}
@@ -218,14 +218,14 @@ export default function TeacherCohorts() {
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => handleToggleStatus(cohort, e)}
-                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+                        className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
                         title={cohort.is_active ? 'Programı Duraklat' : 'Programı Aktifleştir'}
                       >
                         <Clock size={14} />
                       </button>
                       <button
                         onClick={(e) => handleDeleteCohort(cohort.id, cohort.title, e)}
-                        className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors"
+                        className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-colors"
                         title="Programı Sil"
                       >
                         <Trash2 size={14} />
@@ -233,10 +233,10 @@ export default function TeacherCohorts() {
                     </div>
                   </div>
 
-                  <h3 className="font-display font-black text-lg text-white group-hover:text-cyan-400 transition-colors line-clamp-1">
+                  <h3 className="font-display font-black text-lg text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors line-clamp-1">
                     {cohort.title}
                   </h3>
-                  <p className="text-slate-400 text-xs mt-1 line-clamp-2 min-h-[32px]">
+                  <p className="text-slate-600 dark:text-slate-400 text-xs mt-1 line-clamp-2 min-h-[32px]">
                     {cohort.description || 'Açıklama belirtilmedi.'}
                   </p>
                 </div>
@@ -244,18 +244,18 @@ export default function TeacherCohorts() {
                 {/* Orta Kısım: Katılım Kodu Kutusu */}
                 <div
                   onClick={(e) => handleCopyCode(cohort.join_code, e)}
-                  className="mt-4 p-3 rounded-xl bg-slate-900/60 border border-white/5 hover:border-cyan-500/30 flex items-center justify-between transition-colors"
+                  className="mt-4 p-3 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-white/5 hover:border-cyan-400 dark:hover:border-cyan-500/30 flex items-center justify-between transition-colors shadow-sm"
                   title="Katılım kodunu kopyala"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-400 font-medium">Katılım Kodu:</span>
-                    <span className="font-mono font-black text-cyan-300 text-sm tracking-wider">
+                    <span className="text-[11px] text-slate-600 dark:text-slate-400 font-medium">Katılım Kodu:</span>
+                    <span className="font-mono font-black text-cyan-700 dark:text-cyan-300 text-sm tracking-wider">
                       {cohort.join_code}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     {copiedCode === cohort.join_code ? (
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400">
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
                         <Check size={13} /> Kopyalandı
                       </span>
                     ) : (
@@ -296,27 +296,27 @@ export default function TeacherCohorts() {
         {/* Yeni Program Oluşturma Modalı */}
         {modalOpen && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-            <div className="relative w-full max-w-md rounded-3xl glass border border-white/15 p-6 md:p-8 bg-slate-900/95 shadow-2xl">
+            <div className="relative w-full max-w-md rounded-3xl bg-white dark:glass border border-slate-200 dark:border-white/15 p-6 md:p-8 dark:bg-slate-900/95 shadow-2xl">
               <button
                 onClick={() => setModalOpen(false)}
-                className="absolute top-5 right-5 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
+                className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
               >
                 <X size={18} />
               </button>
 
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                <div className="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-500/20 border border-cyan-200 dark:border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
                   <Calendar size={24} />
                 </div>
                 <div>
-                  <h3 className="font-display font-black text-xl text-white">Yeni Program Oluştur</h3>
-                  <p className="text-xs text-slate-400">Sınıf veya grup için haftalık takvim planı</p>
+                  <h3 className="font-display font-black text-xl text-slate-900 dark:text-white">Yeni Program Oluştur</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Sınıf veya grup için haftalık takvim planı</p>
                 </div>
               </div>
 
               <form onSubmit={handleCreateCohort} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                     Program / Grup Adı *
                   </label>
                   <input
@@ -325,12 +325,12 @@ export default function TeacherCohorts() {
                     placeholder="Örn: 2026 Bahar - Siber Savunma Grubu A"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm shadow-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
                     Açıklama (Opsiyonel)
                   </label>
                   <textarea
@@ -338,12 +338,12 @@ export default function TeacherCohorts() {
                     placeholder="Programın hedefi, kapsadığı konular veya öğrencilere notlar..."
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm resize-none"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-sm resize-none shadow-sm"
                   />
                 </div>
 
-                <div className="p-3 rounded-xl bg-cyan-950/40 border border-cyan-500/20 text-xs text-cyan-300 flex items-start gap-2.5">
-                  <Sparkles size={16} className="shrink-0 mt-0.5 text-cyan-400" />
+                <div className="p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-500/20 text-xs text-cyan-800 dark:text-cyan-300 flex items-start gap-2.5">
+                  <Sparkles size={16} className="shrink-0 mt-0.5 text-cyan-600 dark:text-cyan-400" />
                   <span>
                     Program oluşturulduğunda öğrencilerin kendi başlarına katılabileceği 6 haneli bir <strong>Katılım Kodu</strong> otomatik üretilir.
                   </span>
@@ -353,7 +353,7 @@ export default function TeacherCohorts() {
                   <button
                     type="button"
                     onClick={() => setModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-bold transition-colors"
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-sm font-bold transition-colors"
                   >
                     İptal
                   </button>

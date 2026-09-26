@@ -17,9 +17,9 @@ export default function EmptyState({
     <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
       <div className="text-6xl animate-float">{emoji}</div>
       <div className="space-y-1">
-        <h3 className="font-display font-bold text-lg text-white">{title}</h3>
+        <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white">{title}</h3>
         {desc && (
-          <p className="text-slate-400 text-sm max-w-xs mx-auto">{desc}</p>
+          <p className="text-slate-600 dark:text-slate-400 text-sm max-w-xs mx-auto">{desc}</p>
         )}
       </div>
       {action && (

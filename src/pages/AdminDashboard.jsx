@@ -11,9 +11,9 @@ import Card from '../components/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const ROLE_COLORS = {
-  student: 'text-violet-400 bg-violet-500/10 border-violet-500/30',
-  teacher: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30',
-  admin:   'text-amber-400 bg-amber-500/10 border-amber-500/30',
+  student: 'text-violet-700 bg-violet-100 border-violet-300 dark:text-violet-400 dark:bg-violet-500/10 dark:border-violet-500/30',
+  teacher: 'text-cyan-700 bg-cyan-100 border-cyan-300 dark:text-cyan-400 dark:bg-cyan-500/10 dark:border-cyan-500/30',
+  admin:   'text-amber-700 bg-amber-100 border-amber-300 dark:text-amber-400 dark:bg-amber-500/10 dark:border-amber-500/30',
 };
 
 const ROLE_LABELS = {
@@ -123,16 +123,16 @@ export default function AdminDashboard() {
       <div className="space-y-6 max-w-5xl mx-auto pb-12">
 
         {/* Hoş Geldin & Sistem Durumu Banner */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/70 via-orange-950/50 to-slate-900/60 border border-amber-500/30 p-6 md:p-8 shadow-2xl">
-          <div className="absolute -top-10 -right-10 w-48 h-48 bg-amber-500/20 rounded-full blur-3xl" />
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-50 via-orange-50 to-slate-100 dark:from-amber-950/70 dark:via-orange-950/50 dark:to-slate-900/60 border border-amber-200 dark:border-amber-500/30 p-6 md:p-8 shadow-sm dark:shadow-2xl">
+          <div className="absolute -top-10 -right-10 w-48 h-48 bg-amber-500/10 dark:bg-amber-500/20 rounded-full blur-3xl" />
           <div className="relative z-10">
-            <span className="text-xs font-black uppercase tracking-wider text-amber-300 bg-amber-950/60 px-3 py-1 rounded-full border border-amber-400/30 inline-block mb-2">
+            <span className="text-xs font-black uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-300 dark:border-amber-400/30 inline-block mb-2">
               Sistem Denetim Merkezi
             </span>
-            <h2 className="font-display font-black text-2xl md:text-3xl text-white mt-1">
-              Yönetici Paneli: <span className="text-emerald-400 font-mono">Çevrimiçi</span>
+            <h2 className="font-display font-black text-2xl md:text-3xl text-slate-900 dark:text-white mt-1">
+              Yönetici Paneli: <span className="text-emerald-600 dark:text-emerald-400 font-mono">Çevrimiçi</span>
             </h2>
-            <p className="text-slate-300 text-sm mt-2">
+            <p className="text-slate-600 dark:text-slate-300 text-sm mt-2">
               Platform kullanıcıları, içerik bütünlüğü ve rol tabanlı yetkilendirme (RBAC) kontrolleri aktif.
             </p>
           </div>
@@ -141,33 +141,33 @@ export default function AdminDashboard() {
         {/* Dinamik Sistem İstatistikleri */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Card hover className="border-violet-500/20">
-            <Users size={22} className="text-violet-400" />
-            <p className="font-display font-black text-2xl mt-2 text-violet-400">
+            <Users size={22} className="text-violet-600 dark:text-violet-400" />
+            <p className="font-display font-black text-2xl mt-2 text-violet-600 dark:text-violet-400">
               {loading ? '—' : users.length}
             </p>
-            <p className="text-xs text-slate-400 font-bold mt-0.5">Toplam Kullanıcı</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">Toplam Kullanıcı</p>
           </Card>
 
           <Card hover className="border-cyan-500/20">
-            <BookOpen size={22} className="text-cyan-400" />
-            <p className="font-display font-black text-2xl mt-2 text-cyan-400">
+            <BookOpen size={22} className="text-cyan-600 dark:text-cyan-400" />
+            <p className="font-display font-black text-2xl mt-2 text-cyan-600 dark:text-cyan-400">
               {loading ? '—' : totalCourses}
             </p>
-            <p className="text-xs text-slate-400 font-bold mt-0.5">Kayıtlı Kurs</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">Kayıtlı Kurs</p>
           </Card>
 
           <Card hover className="border-emerald-500/20">
-            <ShieldCheck size={22} className="text-emerald-400" />
-            <p className="font-display font-black text-2xl mt-2 text-emerald-400">RLS Aktif</p>
-            <p className="text-xs text-slate-400 font-bold mt-0.5">Veri Güvenliği</p>
+            <ShieldCheck size={22} className="text-emerald-600 dark:text-emerald-400" />
+            <p className="font-display font-black text-2xl mt-2 text-emerald-600 dark:text-emerald-400">RLS Aktif</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">Veri Güvenliği</p>
           </Card>
 
           <Card hover className="border-amber-500/20">
-            <Activity size={22} className="text-amber-400" />
-            <p className="font-display font-black text-2xl mt-2 text-amber-400">
+            <Activity size={22} className="text-amber-600 dark:text-amber-400" />
+            <p className="font-display font-black text-2xl mt-2 text-amber-600 dark:text-amber-400">
               {studentCount} Ö / {teacherCount} E
             </p>
-            <p className="text-xs text-slate-400 font-bold mt-0.5">Rol Dağılımı</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">Rol Dağılımı</p>
           </Card>
         </div>
 
@@ -175,12 +175,12 @@ export default function AdminDashboard() {
         <Card>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-display font-bold text-lg text-white">Platform Kullanıcıları</h3>
-              <p className="text-xs text-slate-400">Rolleri yönetebilir veya öğrenci ilerlemelerini sıfırlayabilirsiniz.</p>
+              <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white">Platform Kullanıcıları</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400">Rolleri yönetebilir veya öğrenci ilerlemelerini sıfırlayabilirsiniz.</p>
             </div>
             <button
               onClick={loadDashboardData}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold transition-colors border border-white/10"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors border border-slate-200 dark:border-white/10"
             >
               <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Yenile
             </button>
@@ -193,19 +193,19 @@ export default function AdminDashboard() {
               users.map((u) => (
                 <div
                   key={u.id}
-                  className="flex items-center gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5 hover:border-amber-500/30 transition-all group"
+                  className="flex items-center gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:border-amber-400 dark:hover:border-amber-500/30 transition-all group"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white truncate">
+                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
                       {u.full_name || u.masked_email || 'Kullanıcı'}
                     </p>
-                    <p className="text-xs text-slate-400 font-mono mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
                       Kayıt: {new Date(u.created_at).toLocaleDateString('tr-TR')} | XP: {u.xp || 0}
                     </p>
                   </div>
 
                   {u.learning_area && (
-                    <span className="text-[10px] font-bold text-violet-300 bg-violet-950/60 border border-violet-700/40 px-2 py-0.5 rounded-md">
+                    <span className="text-[10px] font-bold text-violet-700 bg-violet-100 border border-violet-300 dark:text-violet-300 dark:bg-violet-950/60 dark:border-violet-700/40 px-2 py-0.5 rounded-md">
                       {u.learning_area === 'awareness' ? 'Farkındalık' : 'Teknik'}
                     </span>
                   )}
@@ -219,7 +219,7 @@ export default function AdminDashboard() {
                     {u.role !== 'admin' && (
                       <button
                         onClick={() => handleRoleChange(u.id, u.role)}
-                        className="p-1.5 px-2.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/25 text-cyan-300 text-xs font-bold border border-cyan-500/30 transition-all hover:scale-105"
+                        className="p-1.5 px-2.5 rounded-lg bg-cyan-50 hover:bg-cyan-100 dark:bg-cyan-500/10 dark:hover:bg-cyan-500/25 text-cyan-800 dark:text-cyan-300 text-xs font-bold border border-cyan-300 dark:border-cyan-500/30 transition-all hover:scale-105"
                         title="Rolü Öğrenci/Eğitmen olarak değiştir"
                       >
                         <UserCheck size={14} className="inline mr-1" />
@@ -231,7 +231,7 @@ export default function AdminDashboard() {
                     {u.role === 'student' && (
                       <button
                         onClick={() => handleResetProgress(u.id, u.full_name || 'Öğrenci')}
-                        className="p-1.5 px-2.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 text-xs font-bold border border-rose-500/30 transition-all hover:scale-105"
+                        className="p-1.5 px-2.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/15 dark:hover:bg-rose-500/30 text-rose-800 dark:text-rose-300 text-xs font-bold border border-rose-300 dark:border-rose-500/30 transition-all hover:scale-105"
                         title="Ders ilerlemesini sıfırla"
                       >
                         <RotateCcw size={14} className="inline mr-1" /> Sıfırla
@@ -251,20 +251,20 @@ export default function AdminDashboard() {
         {/* Özel Onay Modalı (window.confirm yerine) */}
         {confirmModal.isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
-            <div className="bg-slate-900 border border-white/15 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl space-y-5">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/15 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl space-y-5">
               <div className="flex items-center gap-3">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                  confirmModal.isDanger ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-violet-500/20 text-violet-400 border border-violet-500/30'
+                  confirmModal.isDanger ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30' : 'bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-300 dark:border-violet-500/30'
                 }`}>
                   {confirmModal.isDanger ? <RotateCcw size={22} /> : <UserCheck size={22} />}
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">{confirmModal.title}</h3>
-                  <p className="text-xs text-slate-400">Yönetici İşlem Onayı</p>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">{confirmModal.title}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Yönetici İşlem Onayı</p>
                 </div>
               </div>
 
-              <p className="text-sm text-slate-300 leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                 {confirmModal.message}
               </p>
 
@@ -272,7 +272,7 @@ export default function AdminDashboard() {
                 <button
                   type="button"
                   onClick={() => setConfirmModal((m) => ({ ...m, isOpen: false }))}
-                  className="flex-1 py-3 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 font-bold text-sm transition-all"
+                  className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all"
                 >
                   İptal
                 </button>
@@ -297,8 +297,8 @@ export default function AdminDashboard() {
           <div className="fixed top-20 right-6 z-[100] animate-bounce">
             <div className={`px-5 py-3 rounded-2xl shadow-2xl border text-sm font-bold flex items-center gap-2 ${
               toast.type === 'success'
-                ? 'bg-emerald-950/90 text-emerald-200 border-emerald-500/50'
-                : 'bg-rose-950/90 text-rose-200 border-rose-500/50'
+                ? 'bg-emerald-100 dark:bg-emerald-950/90 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-500/50'
+                : 'bg-rose-100 dark:bg-rose-950/90 text-rose-900 dark:text-rose-200 border-rose-300 dark:border-rose-500/50'
             }`}>
               {toast.type === 'success' ? '✅' : '⚠️'} {toast.text}
             </div>
@@ -306,12 +306,12 @@ export default function AdminDashboard() {
         )}
 
         {/* Siber Güvenlik Altyapı Notu */}
-        <Card className="border-emerald-500/20 bg-emerald-950/10">
+        <Card className="border-emerald-200 dark:border-emerald-500/20 bg-emerald-50/70 dark:bg-emerald-950/10">
           <div className="flex items-start gap-3">
-            <ShieldAlert size={20} className="text-emerald-400 shrink-0 mt-0.5" />
+            <ShieldAlert size={20} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-bold text-emerald-400 text-sm mb-1.5">Altyapı Güvenlik Mimarisi</h4>
-              <ul className="space-y-1 text-xs text-slate-400">
+              <h4 className="font-bold text-emerald-800 dark:text-emerald-400 text-sm mb-1.5">Altyapı Güvenlik Mimarisi</h4>
+              <ul className="space-y-1 text-xs text-slate-600 dark:text-slate-400">
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                   Supabase PostgreSQL Row Level Security (RLS) kuralları uygulanmaktadır.

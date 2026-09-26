@@ -38,13 +38,13 @@ function ComingSoon({ title, emoji = '🚧' }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 text-center">
       <div className="text-6xl animate-float">{emoji}</div>
-      <h2 className="font-display font-black text-2xl text-white">{title}</h2>
-      <p className="text-slate-400 text-sm max-w-xs">
+      <h2 className="font-display font-black text-2xl text-slate-900 dark:text-white">{title}</h2>
+      <p className="text-slate-600 dark:text-slate-400 text-sm max-w-xs">
         Bu sayfa geliştirme aşamasında. Yakında hazır olacak!
       </p>
-      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/20 border border-violet-500/30">
-        <span className="w-2 h-2 bg-violet-400 rounded-full animate-pulse" />
-        <span className="text-violet-300 text-xs font-medium">Geliştirme devam ediyor</span>
+      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-violet-100 dark:bg-violet-500/20 border border-violet-300 dark:border-violet-500/30">
+        <span className="w-2 h-2 bg-violet-600 dark:bg-violet-400 rounded-full animate-pulse" />
+        <span className="text-violet-700 dark:text-violet-300 text-xs font-medium">Geliştirme devam ediyor</span>
       </div>
     </div>
   );
