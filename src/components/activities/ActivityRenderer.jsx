@@ -570,6 +570,8 @@ function ScenarioActivity({ activity, onSubmit, submitted, result, initialAnswer
 }
 
 function OrderingActivity({ activity, onSubmit, submitted, result, initialAnswer }) {
+  const [items, setItems] = useState(initialAnswer || []);
+
   // options düz array olarak gelir ama null-safe olalım
   const optionItems = Array.isArray(activity.options) ? activity.options : [];
 
