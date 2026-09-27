@@ -79,9 +79,17 @@ function ResultBanner({ correct, explanation, points, correctAnswer }) {
 function MultipleChoiceActivity({ activity, onSubmit, submitted, result, initialAnswer }) {
   const [selected, setSelected] = useState(initialAnswer || null);
 
+  const opts = Array.isArray(activity.options) ? activity.options : [];
+
+  // correct_answer "0","1","2","3" (index) veya gerçek metin olabilir
+  const correctIdx = parseInt(activity.correct_answer, 10);
+  const correctText = !isNaN(correctIdx) && opts[correctIdx] !== undefined
+    ? opts[correctIdx]                  // index → metni çevir
+    : activity.correct_answer;         // zaten metin olarak gelmiş
+
   const handleSubmit = (opt) => {
     setSelected(opt);
-    const correct = checkAnswer(activity, opt);
+    const correct = opt === correctText;
     onSubmit({ userAnswer: opt, isCorrect: correct });
   };
 
@@ -91,9 +99,9 @@ function MultipleChoiceActivity({ activity, onSubmit, submitted, result, initial
         {activity.question}
       </p>
       <div className="grid gap-3">
-        {(activity.options || []).map((opt, idx) => {
+        {opts.map((opt, idx) => {
           const isSelected = selected === opt;
-          const isCorrectAnswer = submitted && activity.correct_answer === opt;
+          const isCorrectAnswer = submitted && opt === correctText;
           const isWrongSelection = submitted && isSelected && !result?.isCorrect;
 
           let btnClass = 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:border-violet-500 hover:bg-violet-50/50 dark:hover:bg-slate-800';
@@ -130,7 +138,7 @@ function MultipleChoiceActivity({ activity, onSubmit, submitted, result, initial
           correct={result.isCorrect}
           explanation={activity.explanation}
           points={activity.points}
-          correctAnswer={activity.correct_answer}
+          correctAnswer={correctText}
         />
       )}
     </div>
@@ -149,9 +157,17 @@ function TrueFalseActivity(props) {
 function FillBlankActivity({ activity, onSubmit, submitted, result, initialAnswer }) {
   const [val, setVal] = useState(initialAnswer || '');
 
+  // correct_answer ["firewall", "güvenlik duvarı"] gibi array veya string olabilir
+  const acceptedAnswers = Array.isArray(activity.correct_answer)
+    ? activity.correct_answer
+    : [String(activity.correct_answer)];
+
+  const correctDisplayText = acceptedAnswers.join(' veya ');
+
   const handleSubmit = () => {
     if (!val.trim()) return;
-    const isCorrect = checkAnswer(activity, val.trim());
+    const userVal = val.trim().toLowerCase();
+    const isCorrect = acceptedAnswers.some((a) => String(a).toLowerCase() === userVal);
     onSubmit({ userAnswer: val.trim(), isCorrect });
   };
 
@@ -184,7 +200,7 @@ function FillBlankActivity({ activity, onSubmit, submitted, result, initialAnswe
           correct={result.isCorrect}
           explanation={activity.explanation}
           points={activity.points}
-          correctAnswer={activity.correct_answer}
+          correctAnswer={correctDisplayText}
         />
       )}
     </div>
