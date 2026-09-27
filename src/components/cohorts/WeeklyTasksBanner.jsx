@@ -23,7 +23,7 @@ import {
 } from '../../services/cohortService';
 import LoadingSpinner from '../ui/LoadingSpinner';
 
-export default function WeeklyTasksBanner({ userId, onProgressUpdated }) {
+export default function WeeklyTasksBanner({ userId, onProgressUpdated, isDashboard = false }) {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -31,6 +31,7 @@ export default function WeeklyTasksBanner({ userId, onProgressUpdated }) {
   const [tasks, setTasks] = useState([]);
   const [activeTask, setActiveTask] = useState(null);
   const [selectedWeekByCohort, setSelectedWeekByCohort] = useState({});
+  const [activeCohortIndex, setActiveCohortIndex] = useState(0);
 
   // Koda göre katılma modalı / inputu
   const [joinCodeInput, setJoinCodeInput] = useState('');
@@ -131,16 +132,106 @@ export default function WeeklyTasksBanner({ userId, onProgressUpdated }) {
     }
   };
 
+  const renderJoinModal = () => (
+    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+      <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/15 p-6 md:p-8 shadow-2xl">
+        <button
+          onClick={() => setJoinModalOpen(false)}
+          className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+        >
+          <X size={18} />
+        </button>
+
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-500/20 border border-cyan-200 dark:border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shadow-sm">
+            <Calendar size={24} />
+          </div>
+          <div>
+            <h3 className="font-display font-black text-xl text-slate-900 dark:text-white">Yeni Gruba Katıl</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Öğretmeninin verdiği 6 haneli kod</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleJoinCohort} className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+              Katılım Kodu *
+            </label>
+            <input
+              type="text"
+              maxLength={6}
+              required
+              placeholder="Örn: X8K2M9"
+              value={joinCodeInput}
+              onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-white/10 text-center font-mono font-black text-xl text-slate-900 dark:text-cyan-300 focus:outline-none focus:border-cyan-500 uppercase tracking-widest shadow-sm"
+              autoFocus
+            />
+          </div>
+
+          <div className="pt-2 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => setJoinModalOpen(false)}
+              className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-xs font-bold cursor-pointer"
+            >
+              İptal
+            </button>
+            <button
+              type="submit"
+              disabled={joining}
+              className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/20 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+            >
+              {joining ? <LoadingSpinner size="sm" /> : <Sparkles size={16} />}
+              Katıl
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="p-6 rounded-3xl glass border border-white/10 flex items-center justify-center min-h-[140px]">
-        <LoadingSpinner size="md" />
+      <div className={`rounded-3xl glass border border-white/10 flex items-center justify-center ${
+        isDashboard ? 'p-4 min-h-[80px]' : 'p-6 min-h-[140px]'
+      }`}>
+        <LoadingSpinner size="sm" />
       </div>
     );
   }
 
   // 1. ÖĞRENCİ HENÜZ BİR GRUBA KAYITLI DEĞİLSE
   if (cohorts.length === 0) {
+    if (isDashboard) {
+      return (
+        <div className="relative overflow-hidden rounded-2xl p-4 md:p-4.5 border border-slate-200 dark:border-cyan-500/25 bg-white dark:bg-slate-900/60 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="p-2.5 rounded-xl bg-cyan-100 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 shrink-0">
+                <Calendar size={18} />
+              </span>
+              <div>
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                  Sınıf & Grup Programları
+                </h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Öğretmeninin verdiği 6 haneli katılım kodu ile haftalık görev planına dahil olabilirsin.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setJoinModalOpen(true)}
+              className="text-xs font-bold px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white transition-all shadow-md shadow-cyan-600/20 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+            >
+              <Plus size={14} /> Koda Katıl
+            </button>
+          </div>
+          {joinModalOpen && renderJoinModal()}
+        </div>
+      );
+    }
+
     return (
       <div className="relative overflow-hidden rounded-3xl glass border border-slate-200 dark:border-cyan-500/30 p-6 md:p-7 shadow-xl bg-white dark:bg-gradient-to-r dark:from-slate-900/90 dark:via-slate-900/60 dark:to-cyan-950/40">
         <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -198,6 +289,141 @@ export default function WeeklyTasksBanner({ userId, onProgressUpdated }) {
             <span>{feedback.message}</span>
           </div>
         )}
+
+        {joinModalOpen && renderJoinModal()}
+      </div>
+    );
+  }
+
+  // 2. DASHBOARD ÖZEL GÖRÜNÜMÜ: Yığın yerine kompakt, sekmeli widget (Aşağı kaydırmayı tamamen önler)
+  if (isDashboard) {
+    const currentCohort = cohorts[activeCohortIndex] || cohorts[0];
+    const cohortTasks = tasks.filter((t) => t.cohort_id === currentCohort?.id);
+    const selectedId = selectedWeekByCohort[currentCohort?.id];
+    const cohortActiveTask = cohortTasks.find((t) => !t.isCompleted && !t.isLocked) || cohortTasks[0];
+    const displayedTask = cohortTasks.find((t) => t.id === selectedId) || cohortActiveTask || cohortTasks[0];
+    const remaining = displayedTask ? getRemainingTime(displayedTask.due_date) : null;
+    const completedCount = cohortTasks.filter((t) => t.isCompleted).length;
+
+    return (
+      <div className="relative overflow-hidden rounded-3xl glass border border-slate-200 dark:border-cyan-500/30 p-5 md:p-6 bg-white dark:bg-gradient-to-r dark:from-slate-900/90 dark:via-cyan-950/30 dark:to-slate-900 shadow-md">
+        {/* Üst Bar: Başlık & Aksiyonlar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-white/10">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 rounded-lg bg-cyan-100 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400">
+              <Calendar size={16} />
+            </span>
+            <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              Haftalık Görev Planlarım
+            </span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30">
+              {cohorts.length} Program
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setJoinModalOpen(true)}
+              className="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-300 transition-colors px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center gap-1 cursor-pointer"
+            >
+              <Plus size={12} /> Koda Katıl
+            </button>
+            <button
+              onClick={() => navigate('/student/cohorts')}
+              className="text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer ml-1"
+            >
+              Tüm Takvimi Aç <ArrowRight size={13} />
+            </button>
+          </div>
+        </div>
+
+        {/* Çoklu Program Varsa Program Sekmeleri (Pills) */}
+        {cohorts.length > 1 && (
+          <div className="flex items-center gap-2 pt-3 overflow-x-auto pb-1 scrollbar-none">
+            {cohorts.map((c, i) => (
+              <button
+                key={c.id}
+                onClick={() => setActiveCohortIndex(i)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 border cursor-pointer ${
+                  activeCohortIndex === i
+                    ? 'bg-cyan-50 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-400 dark:border-cyan-500/60 shadow-sm'
+                    : 'bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-white/10 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {i + 1}. {c.title}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Aktif Program İçeriği */}
+        {currentCohort && (
+          <div className="pt-3.5 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-slate-900 dark:text-white">
+                  {currentCohort.title}
+                </span>
+                {currentCohort.profiles?.full_name && (
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    • 👨‍🏫 Eğitmen: {currentCohort.profiles.full_name}
+                  </span>
+                )}
+              </div>
+              {cohortTasks.length > 0 && (
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                  {completedCount} / {cohortTasks.length} Hafta Tamamlandı
+                </span>
+              )}
+            </div>
+
+            {/* Görev Varsa Görev Kutusu */}
+            {displayedTask ? (
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-cyan-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[11px] font-black px-2 py-0.5 rounded-md bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300">
+                      {displayedTask.week_number}. Hafta
+                    </span>
+                    {displayedTask.isCompleted ? (
+                      <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                        <CheckCircle2 size={13} /> Tamamlandı (+{displayedTask.earned_xp || 100} XP)
+                      </span>
+                    ) : remaining?.isExpired ? (
+                      <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                        <AlertCircle size={13} /> Süresi Geçti
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                        <Clock size={13} /> {remaining?.text}
+                      </span>
+                    )}
+                  </div>
+                  <h5 className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                    {displayedTask.title}
+                  </h5>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                    {displayedTask.courses?.title || 'Atanan Kurs Görevi'}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => handleStartTask(displayedTask)}
+                  disabled={displayedTask.isLocked}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold transition-all shadow-md shrink-0 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {displayedTask.isCompleted ? 'Tekrar İncele' : 'Haftalık Göreve Başla'} <ArrowRight size={14} />
+                </button>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500 dark:text-slate-400 py-2">
+                Bu programa henüz haftalık görev atanmadı.
+              </p>
+            )}
+          </div>
+        )}
+
+        {joinModalOpen && renderJoinModal()}
       </div>
     );
   }
@@ -413,64 +639,7 @@ export default function WeeklyTasksBanner({ userId, onProgressUpdated }) {
       </div>
 
       {/* Koda Katılma Açılır Modalı */}
-      {joinModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-          <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/15 p-6 md:p-8 shadow-2xl">
-            <button
-              onClick={() => setJoinModalOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
-            >
-              <X size={18} />
-            </button>
-
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-500/20 border border-cyan-200 dark:border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shadow-sm">
-                <Calendar size={24} />
-              </div>
-              <div>
-                <h3 className="font-display font-black text-xl text-slate-900 dark:text-white">Yeni Gruba Katıl</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Öğretmeninin verdiği 6 haneli kod</p>
-              </div>
-            </div>
-
-            <form onSubmit={handleJoinCohort} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-                  Katılım Kodu *
-                </label>
-                <input
-                  type="text"
-                  maxLength={6}
-                  required
-                  placeholder="Örn: X8K2M9"
-                  value={joinCodeInput}
-                  onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-white/10 text-center font-mono font-black text-xl text-slate-900 dark:text-cyan-300 focus:outline-none focus:border-cyan-500 uppercase tracking-widest shadow-sm"
-                  autoFocus
-                />
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setJoinModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-xs font-bold cursor-pointer"
-                >
-                  İptal
-                </button>
-                <button
-                  type="submit"
-                  disabled={joining}
-                  className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/20 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
-                >
-                  {joining ? <LoadingSpinner size="sm" /> : <Sparkles size={16} />}
-                  Katıl
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {joinModalOpen && renderJoinModal()}
     </div>
   );
 }

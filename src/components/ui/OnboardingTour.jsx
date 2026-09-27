@@ -124,7 +124,11 @@ export default function OnboardingTour() {
     if (el) {
       const isFixed = step.target.includes('sidebar') || step.target.includes('profile') || step.target.includes('ai-widget');
       if (!isFixed) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (targetIndex === 0) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       }
     }
 
@@ -134,7 +138,7 @@ export default function OnboardingTour() {
     // Kaydırma bittiğinde bir kez daha tam yerini doğrula
     setTimeout(() => {
       updateStepTarget(targetIndex);
-    }, 280);
+    }, 300);
   }, [updateStepTarget]);
 
   // Sayfa yüklendiğinde kontrol et (Farklı tarayıcılar dahil tek seferlik çalışır)
@@ -156,6 +160,7 @@ export default function OnboardingTour() {
     }
 
     const timer = setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
       // İlk adım (Hoş Geldin & Ders Takibi) koordinatını alıp aç
       const initialRect = getStepTargetRect(0);
       if (initialRect) {

@@ -274,13 +274,7 @@ export default function StudentDashboard() {
     <DashboardLayout>
       <div className="space-y-6 max-w-5xl mx-auto pb-12">
 
-        {/* ── Haftalık Görevler & Grup Programı Bannerı ─────────────────── */}
-        <WeeklyTasksBanner
-          userId={user?.id}
-          onProgressUpdated={() => loadDashboardData(false)}
-        />
-
-        {/* ── Banner: Kurs Tamamlandı vs Yeni Öğrenci vs Devam Et ──────────────────────── */}
+        {/* ── 1. Ana Karşılama & Ders Takip Kartı (Hero) ──────────────────────── */}
         <div id="tour-resume-card">
           {isCourseFinished ? (
             <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-100 via-teal-50 to-white dark:from-emerald-950/90 dark:via-teal-950/70 dark:to-slate-900 border border-emerald-400/50 dark:border-emerald-500/40 p-6 md:p-8 shadow-2xl">
@@ -384,7 +378,7 @@ export default function StudentDashboard() {
           )}
         </div>
 
-        {/* ── Dinamik İstatistik Metrikleri ────────────────────────────── */}
+        {/* ── 2. Dinamik İstatistik Metrikleri (KPI Kartları) ──────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Card hover className="border-cyan-500/20">
             <div className="flex items-center gap-3">
@@ -422,6 +416,13 @@ export default function StudentDashboard() {
             </div>
           </Card>
         </div>
+
+        {/* ── 3. Haftalık Görevler & Sınıf Programları (Kompakt Dashboard Modu) ─── */}
+        <WeeklyTasksBanner
+          userId={user?.id}
+          isDashboard={true}
+          onProgressUpdated={() => loadDashboardData(false)}
+        />
 
         {/* ── Ders Akışı & Liderlik Tablosu ────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

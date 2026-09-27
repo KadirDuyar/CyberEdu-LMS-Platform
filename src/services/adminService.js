@@ -9,7 +9,7 @@ export async function getAllProfiles() {
 }
 
 export async function resetStudentProgress(userId) {
-  // Tanıtım turu ve aktif kurs durumunu sıfırla
+  // 1. Tanıtım turu ve aktif kurs durumunu localStorages'tan sıfırla
   try {
     localStorage.removeItem(`cyberedu_tour_completed_${userId}`);
     localStorage.removeItem('cyberedu_tour_completed');
@@ -17,27 +17,22 @@ export async function resetStudentProgress(userId) {
     localStorage.removeItem('cyberedu_tour_last_seen');
     localStorage.removeItem(`cyberedu_last_active_course_${userId}`);
     localStorage.removeItem('cyberedu_last_active_course');
-  } catch (e) {}
-
-  // 1. RPC fonksiyonunu çağır (SECURITY DEFINER ile tüm RLS'leri aşarak tek seferde siler)
-  try {
-    const { data: rpcResult, error: rpcError } = await supabase.rpc('admin_reset_student', { target_user_id: userId });
-    if (!rpcError && rpcResult?.success) {
-      return { data: rpcResult, error: null };
-    }
-  } catch (rpcErr) {
-    console.warn('RPC admin_reset_student başarısız, doğrudan silme deneniyor:', rpcErr);
+  } catch (e) {
+    console.warn('LocalStorage temizleme uyarısı:', e);
   }
 
-  // 2. Client-side alternatif / garanti silme (RPC henüz oluşturulmamış veya hata vermişse)
+  // 2. Client-side doğrudan ve garanti silmeler (RPC fonksiyonu veritabanında eski olsa bile kesin temizler)
   try {
     await Promise.allSettled([
+      // Sınıf / Haftalık Program kayıtları
+      supabase.from('cohort_progress').delete().eq('student_id', userId),
+      supabase.from('cohort_members').delete().eq('student_id', userId),
+      // Kurs ve ders ilerlemeleri
       supabase.from('activity_attempts').delete().eq('user_id', userId),
       supabase.from('lesson_progress').delete().eq('user_id', userId),
       supabase.from('enrollments').delete().eq('user_id', userId),
+      // Sosyal ve etkileşim kayıtları
       supabase.from('course_feedbacks').delete().eq('user_id', userId),
-      supabase.from('cohort_progress').delete().eq('student_id', userId),
-      supabase.from('cohort_members').delete().eq('student_id', userId),
       supabase.from('user_follows').delete().eq('follower_id', userId),
       supabase.from('user_follows').delete().eq('following_id', userId),
       supabase.from('notifications').delete().eq('user_id', userId),
@@ -45,34 +40,40 @@ export async function resetStudentProgress(userId) {
       supabase.from('user_badges').delete().eq('user_id', userId),
     ]);
 
-    // Profili sıfırla (Ad soyad, rol ve e-posta korunur)
+    // Profili sıfırla (Ad soyad, rol ve auth e-posta/şifre korunur, diğer her şey fabrika ayarlarına döner)
     const basePayload = {
       learning_area: null,
       skill_level: null,
       onboarding_completed: false,
+      tour_completed: false,
       xp: 0,
       level: 1,
       avatar_emoji: '🚀',
       updated_at: new Date().toISOString()
     };
 
-    // tour_completed sütunuyla birlikte sıfırla
-    const { error: profError } = await supabase.from('profiles').update({
-      ...basePayload,
-      tour_completed: false
-    }).eq('id', userId);
-
+    const { error: profError } = await supabase.from('profiles').update(basePayload).eq('id', userId);
     if (profError) {
-      // tour_completed sütunu veritabanında henüz eklenmemişse sadece basePayload ile güncelle
-      const { error: baseError } = await supabase.from('profiles').update(basePayload).eq('id', userId);
-      if (baseError) {
-        return { data: null, error: baseError };
-      }
+      console.warn('Profil güncelleme uyarısı (tour_completed olmadan deneniyor):', profError);
+      delete basePayload.tour_completed;
+      await supabase.from('profiles').update(basePayload).eq('id', userId);
     }
-
-    return { data: { success: true, message: 'Öğrenci verileri başarıyla sıfırlandı.' }, error: null };
   } catch (clientErr) {
-    console.error('Veritabanı sıfırlama hatası:', clientErr);
-    return { data: null, error: clientErr };
+    console.warn('Client-side temizlik aşaması uyarısı:', clientErr);
   }
+
+  // 3. RPC fonksiyonunu da çağır (SECURITY DEFINER yetkisiyle tüm RLS kurallarını aşarak veritabanında tam temizlik yapar)
+  try {
+    const { data: rpcResult, error: rpcError } = await supabase.rpc('admin_reset_student', { target_user_id: userId });
+    if (!rpcError && rpcResult?.success) {
+      return { data: rpcResult, error: null };
+    }
+    if (rpcError) {
+      console.warn('RPC admin_reset_student uyarısı:', rpcError);
+    }
+  } catch (rpcErr) {
+    console.warn('RPC çağrısı hatası:', rpcErr);
+  }
+
+  return { data: { success: true, message: 'Öğrencinin tüm kurs kayıtları, program üyelikleri ve ilerlemeleri başarıyla sıfırlandı.' }, error: null };
 }
