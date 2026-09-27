@@ -20,11 +20,12 @@ const STUDENT_TYPES = [
     subtitle: 'Farkındalık & Korunma',
     desc: 'Phishing, güçlü parola, MFA, sosyal mühendislik gibi konuları öğrenerek günlük dijital hayatımı güvenli hale getirmek istiyorum.',
     topics: ['Phishing Tespiti', 'Güçlü Parola Kullanımı', 'MFA & 2FA', 'Sosyal Mühendislik', 'Güvenli İnternet'],
-    color: 'border-cyan-400 bg-cyan-500/15 shadow-[0_0_25px_rgba(6,182,212,0.2)]',
-    hoverColor: 'hover:border-cyan-400/70 hover:bg-cyan-500/10',
-    inactiveColor: 'border-white/10 bg-white/5',
-    textColor: 'text-cyan-300',
-    badgeColor: 'bg-cyan-500/20 text-cyan-300',
+    color: 'border-cyan-500 bg-cyan-50/90 dark:bg-cyan-500/15 shadow-md dark:shadow-[0_0_25px_rgba(6,182,212,0.2)]',
+    hoverColor: 'hover:border-cyan-400 hover:bg-cyan-50/60 dark:hover:bg-cyan-500/10',
+    inactiveColor: 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5',
+    textColor: 'text-cyan-800 dark:text-cyan-300',
+    badgeColor: 'bg-cyan-100 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-500/30',
+    topicBadge: 'bg-cyan-100/90 dark:bg-cyan-500/20 text-cyan-900 dark:text-cyan-200 border-cyan-300/80 dark:border-cyan-500/30',
     icon: Shield,
   },
   {
@@ -34,11 +35,12 @@ const STUDENT_TYPES = [
     subtitle: 'Web Güvenliği & Teknik',
     desc: 'HTTP, SQL Injection, XSS gibi teknik konuları anlayarak yazılım güvenliğini öğrenmek ve zafiyet tespiti yapmak istiyorum.',
     topics: ['HTTP & HTTPS Temelleri', 'SQL Injection', 'XSS Saldırıları', 'Güvenli Kod Yazımı', 'Web Zafiyetleri'],
-    color: 'border-orange-400 bg-orange-500/15 shadow-[0_0_25px_rgba(249,115,22,0.2)]',
-    hoverColor: 'hover:border-orange-400/70 hover:bg-orange-500/10',
-    inactiveColor: 'border-white/10 bg-white/5',
-    textColor: 'text-orange-300',
-    badgeColor: 'bg-orange-500/20 text-orange-300',
+    color: 'border-orange-500 bg-orange-50/90 dark:bg-orange-500/15 shadow-md dark:shadow-[0_0_25px_rgba(249,115,22,0.2)]',
+    hoverColor: 'hover:border-orange-400 hover:bg-orange-50/60 dark:hover:bg-orange-500/10',
+    inactiveColor: 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/5',
+    textColor: 'text-orange-800 dark:text-orange-300',
+    badgeColor: 'bg-orange-100 dark:bg-orange-500/20 text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-orange-500/30',
+    topicBadge: 'bg-orange-100/90 dark:bg-orange-500/20 text-orange-900 dark:text-orange-200 border-orange-300/80 dark:border-orange-500/30',
     icon: Code2,
   },
 ];
@@ -50,27 +52,27 @@ const SKILL_LEVELS = [
     label: 'Yeni Başlıyorum',
     emoji: '🌱',
     desc: 'Siber güvenlik hakkında çok az bilgim var, sıfırdan başlamak istiyorum.',
-    color: 'border-emerald-500/50 hover:border-emerald-400 hover:bg-emerald-500/10',
-    activeColor: 'border-emerald-400 bg-emerald-500/15',
-    textColor: 'text-emerald-400',
+    color: 'border-slate-200 dark:border-emerald-500/50 bg-white dark:bg-white/5 hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10',
+    activeColor: 'border-emerald-500 bg-emerald-50/90 dark:bg-emerald-500/15 shadow-sm',
+    textColor: 'text-emerald-700 dark:text-emerald-400',
   },
   {
     value: 'intermediate',
     label: 'Temel Bilgim Var',
     emoji: '🔥',
     desc: 'Bazı temel kavramları biliyorum, daha derine inmek istiyorum.',
-    color: 'border-amber-500/50 hover:border-amber-400 hover:bg-amber-500/10',
-    activeColor: 'border-amber-400 bg-amber-500/15',
-    textColor: 'text-amber-400',
+    color: 'border-slate-200 dark:border-amber-500/50 bg-white dark:bg-white/5 hover:border-amber-400 hover:bg-amber-50/50 dark:hover:bg-amber-500/10',
+    activeColor: 'border-amber-500 bg-amber-50/90 dark:bg-amber-500/15 shadow-sm',
+    textColor: 'text-amber-700 dark:text-amber-400',
   },
   {
     value: 'advanced',
     label: 'Deneyimliyim',
     emoji: '⚡',
     desc: 'Siber güvenlik konularında bilgi sahibiyim, ileri seviyeye geçmek istiyorum.',
-    color: 'border-violet-500/50 hover:border-violet-400 hover:bg-violet-500/10',
-    activeColor: 'border-violet-400 bg-violet-500/15',
-    textColor: 'text-violet-400',
+    color: 'border-slate-200 dark:border-violet-500/50 bg-white dark:bg-white/5 hover:border-violet-400 hover:bg-violet-50/50 dark:hover:bg-violet-500/10',
+    activeColor: 'border-violet-500 bg-violet-50/90 dark:bg-violet-500/15 shadow-sm',
+    textColor: 'text-violet-700 dark:text-violet-400',
   },
 ];
 
@@ -80,7 +82,7 @@ function getRecommendedPath(learningArea) {
     return {
       title: 'Siber Güvenlik Farkındalığı Yolu',
       emoji: '🛡️',
-      color: 'from-cyan-900/40 to-blue-900/30 border-cyan-500/20',
+      color: 'bg-gradient-to-br from-cyan-50 via-blue-50/80 to-white dark:from-cyan-950/60 dark:via-blue-950/40 dark:to-slate-900 border-cyan-200 dark:border-cyan-500/30',
       steps: [
         { title: 'Siber Güvenliğe Giriş', icon: '🔐' },
         { title: 'Phishing Nedir?', icon: '🎣' },
@@ -94,7 +96,7 @@ function getRecommendedPath(learningArea) {
   return {
     title: 'Web Güvenliği Teknik Yolu',
     emoji: '⚔️',
-    color: 'from-orange-900/40 to-red-900/30 border-orange-500/20',
+    color: 'bg-gradient-to-br from-orange-50 via-amber-50/80 to-white dark:from-orange-950/60 dark:via-red-950/40 dark:to-slate-900 border-orange-200 dark:border-orange-500/30',
     steps: [
       { title: 'Web Uygulama Mimarisi', icon: '🏗️' },
       { title: 'Güvenli Kod Yazımı', icon: '🛡️' },
@@ -175,10 +177,10 @@ export default function Navigator() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-pink-500 text-2xl mb-3 shadow-xl shadow-violet-500/30 animate-float">
             🧭
           </div>
-          <h1 className="font-display font-black text-3xl text-white">
+          <h1 className="font-display font-black text-3xl text-slate-900 dark:text-white">
             Öğrenme Navigatörü
           </h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
             Sana özel bir öğrenme yolu oluşturalım
           </p>
         </div>
@@ -191,36 +193,36 @@ export default function Navigator() {
                 'w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-300',
                 step > i ? 'bg-emerald-500 text-white' :
                 step === i ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/40 scale-110' :
-                'bg-white/10 text-slate-500',
+                'bg-slate-200 dark:bg-white/10 text-slate-500',
               ].join(' ')}>
                 {step > i ? <CheckCircle size={14} /> : i + 1}
               </div>
-              <span className={`text-xs font-medium hidden sm:block ${step >= i ? 'text-slate-300' : 'text-slate-600'}`}>
+              <span className={`text-xs font-medium hidden sm:block ${step >= i ? 'text-slate-900 dark:text-slate-300 font-bold' : 'text-slate-400 dark:text-slate-600'}`}>
                 {s}
               </span>
               {i < STEPS.length - 1 && (
-                <div className={`w-6 h-px mx-1 ${step > i ? 'bg-emerald-500/60' : 'bg-white/10'}`} />
+                <div className={`w-6 h-px mx-1 ${step > i ? 'bg-emerald-500/60' : 'bg-slate-300 dark:bg-white/10'}`} />
               )}
             </div>
           ))}
         </div>
 
         {/* Kart */}
-        <div className="glass rounded-3xl border border-white/10 overflow-hidden">
+        <div className="glass rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white/95 dark:bg-slate-900/80 shadow-2xl">
 
           {/* ── ADIM 0: Hoş geldin ──────────────────────────────── */}
           {step === 0 && (
             <div className="p-8 text-center space-y-6">
               <div className="space-y-3">
                 <div className="text-5xl">🔐</div>
-                <h2 className="font-display font-black text-2xl text-white">
+                <h2 className="font-display font-black text-2xl text-slate-900 dark:text-white">
                   CyberEdu'ya Hoş Geldin!
                 </h2>
-                <p className="text-slate-400 max-w-md mx-auto leading-relaxed">
+                <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
                   Siber güvenlik öğrenme yolculuğuna başlamak üzeresin.
                   Sana özel bir plan hazırlamak için birkaç soru soracağız.
                   Bu{' '}
-                  <span className="text-violet-300 font-semibold">sadece 2 adım</span>{' '}
+                  <span className="text-violet-600 dark:text-violet-300 font-semibold">sadece 2 adım</span>{' '}
                   sürecek!
                 </p>
               </div>
@@ -232,16 +234,16 @@ export default function Navigator() {
                   { emoji: '🏆', text: 'XP ve rozetler kazan' },
                   { emoji: '🤖', text: 'AI Mentor desteği' },
                 ].map((item) => (
-                  <div key={item.text} className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/10">
+                  <div key={item.text} className="flex items-center gap-2 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
                     <span className="text-xl">{item.emoji}</span>
-                    <span className="text-xs text-slate-300 font-medium">{item.text}</span>
+                    <span className="text-xs text-slate-800 dark:text-slate-300 font-medium">{item.text}</span>
                   </div>
                 ))}
               </div>
 
               <button
                 onClick={goNext}
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-pink-500 text-white font-bold shadow-lg shadow-violet-500/30 hover:-translate-y-0.5 transition-all duration-200"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-pink-500 text-white font-bold shadow-lg shadow-violet-500/30 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
               >
                 Hadi Başlayalım! <ChevronRight size={18} />
               </button>
@@ -252,10 +254,10 @@ export default function Navigator() {
           {step === 1 && (
             <div className="p-8 space-y-6">
               <div className="text-center space-y-1">
-                <h2 className="font-display font-black text-xl text-white">
+                <h2 className="font-display font-black text-xl text-slate-900 dark:text-white">
                   Nasıl bir öğrenci olduğunu anlat
                 </h2>
-                <p className="text-slate-400 text-sm">
+                <p className="text-slate-600 dark:text-slate-400 text-sm">
                   Bu seçim, göreceğin içerikleri belirler
                 </p>
               </div>
@@ -268,28 +270,28 @@ export default function Navigator() {
                       key={type.value}
                       onClick={() => setLearningArea(type.value)}
                       className={[
-                        'w-full text-left p-5 rounded-2xl border transition-all duration-200',
+                        'w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer',
                         isSelected ? type.color : `${type.inactiveColor} ${type.hoverColor}`,
                       ].join(' ')}
                     >
                       <div className="flex items-start gap-4">
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0 ${isSelected ? type.badgeColor : 'bg-white/10'}`}>
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0 ${isSelected ? type.badgeColor : 'bg-slate-100 dark:bg-white/10'}`}>
                           {type.emoji}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className={`font-bold text-lg ${isSelected ? type.textColor : 'text-white'}`}>
+                            <h3 className={`font-bold text-lg ${isSelected ? type.textColor : 'text-slate-900 dark:text-white'}`}>
                               {type.label}
                             </h3>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isSelected ? type.badgeColor : 'bg-white/10 text-slate-400'}`}>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isSelected ? type.badgeColor : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400'}`}>
                               {type.subtitle}
                             </span>
                             {isSelected && <CheckCircle size={16} className={type.textColor} />}
                           </div>
-                          <p className="text-sm text-slate-400 mt-1 leading-relaxed">{type.desc}</p>
+                          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">{type.desc}</p>
                           <div className="flex flex-wrap gap-1.5 mt-3">
                             {type.topics.map((topic) => (
-                              <span key={topic} className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${isSelected ? type.badgeColor + ' border-current/30' : 'bg-white/5 text-slate-500 border-white/10'}`}>
+                              <span key={topic} className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${isSelected ? type.topicBadge : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-500 border-slate-200 dark:border-white/10'}`}>
                                 {topic}
                               </span>
                             ))}
@@ -307,13 +309,13 @@ export default function Navigator() {
               </p>
 
               <div className="flex gap-3">
-                <button onClick={goPrev} className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-slate-300 font-semibold hover:bg-white/20 transition-colors">
+                <button onClick={goPrev} className="flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 font-semibold border border-slate-200 dark:border-white/10 transition-colors cursor-pointer">
                   <ChevronLeft size={16} /> Geri
                 </button>
                 <button
                   onClick={goNext}
                   disabled={!learningArea}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-pink-500 text-white font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5 transition-all duration-200 shadow-lg shadow-violet-500/20"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-pink-500 text-white font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:-translate-y-0.5 transition-all duration-200 shadow-lg shadow-violet-500/20 cursor-pointer"
                 >
                   Devam Et <ChevronRight size={18} />
                 </button>
@@ -325,10 +327,10 @@ export default function Navigator() {
           {step === 2 && (
             <div className="p-8 space-y-6">
               <div className="text-center space-y-1">
-                <h2 className="font-display font-black text-xl text-white">
+                <h2 className="font-display font-black text-xl text-slate-900 dark:text-white">
                   Siber güvenlik bilgin ne kadar?
                 </h2>
-                <p className="text-slate-400 text-sm">
+                <p className="text-slate-600 dark:text-slate-400 text-sm">
                   İçerikler seviyene göre sıralanacak
                 </p>
               </div>
@@ -348,12 +350,12 @@ export default function Navigator() {
                       <span className="text-3xl shrink-0">{level.emoji}</span>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <p className={`font-bold ${isSelected ? level.textColor : 'text-white'}`}>
+                          <p className={`font-bold ${isSelected ? level.textColor : 'text-slate-900 dark:text-white'}`}>
                             {level.label}
                           </p>
                           {isSelected && <CheckCircle size={15} className={level.textColor} />}
                         </div>
-                        <p className="text-xs text-slate-400 mt-0.5">{level.desc}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{level.desc}</p>
                       </div>
                     </button>
                   );
@@ -361,7 +363,10 @@ export default function Navigator() {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={goPrev} className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-slate-300 font-semibold hover:bg-white/20 transition-colors">
+                <button
+                  onClick={goPrev}
+                  className="flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 font-semibold border border-slate-200 dark:border-transparent transition-colors"
+                >
                   <ChevronLeft size={16} /> Geri
                 </button>
                 <button
@@ -380,10 +385,10 @@ export default function Navigator() {
             <div className="p-8 space-y-6">
               <div className="text-center space-y-1">
                 <div className="text-4xl mb-2">{path.emoji}</div>
-                <h2 className="font-display font-black text-xl text-white">
+                <h2 className="font-display font-black text-xl text-slate-900 dark:text-white">
                   Senin için önerilen yol hazır!
                 </h2>
-                <p className="text-slate-400 text-sm">
+                <p className="text-slate-600 dark:text-slate-400 text-sm">
                   <span className={selectedType?.textColor + ' font-semibold'}>{selectedType?.label}</span>
                   {' '}·{' '}
                   <span className={selectedLevel?.textColor + ' font-semibold'}>{selectedLevel?.label}</span>
@@ -392,21 +397,21 @@ export default function Navigator() {
 
               {/* Yol kartı */}
               <div className={`rounded-2xl bg-gradient-to-br ${path.color} border p-5 space-y-4`}>
-                <p className="font-bold text-white text-sm">{path.title}</p>
+                <p className="font-bold text-slate-900 dark:text-white text-sm">{path.title}</p>
                 <div className="space-y-2">
                   {path.steps.map((s, i) => (
                     <div key={s.title} className="flex items-center gap-3">
                       {/* Bağlantı çizgisi */}
                       <div className="relative flex flex-col items-center">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-base shrink-0 ${i === 0 ? 'bg-violet-500/40 ring-2 ring-violet-400' : 'bg-white/10'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-base shrink-0 ${i === 0 ? 'bg-violet-500/20 text-violet-700 dark:text-white dark:bg-violet-500/40 ring-2 ring-violet-400' : 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white'}`}>
                           {s.icon}
                         </div>
                         {i < path.steps.length - 1 && (
-                          <div className="w-px h-3 bg-white/20 mt-0.5" />
+                          <div className="w-px h-3 bg-slate-300 dark:bg-white/20 mt-0.5" />
                         )}
                       </div>
                       <div className="flex-1 pb-1">
-                        <p className="text-sm font-medium text-white">{s.title}</p>
+                        <p className="text-sm font-medium text-slate-800 dark:text-white">{s.title}</p>
                       </div>
                     </div>
                   ))}
@@ -437,7 +442,7 @@ export default function Navigator() {
                 <button
                   onClick={goPrev}
                   disabled={saving}
-                  className="w-full py-2 text-sm text-slate-500 hover:text-slate-300 transition-colors"
+                  className="w-full py-2 text-sm text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
                 >
                   Geri dön, değiştirmek istiyorum
                 </button>
@@ -447,7 +452,7 @@ export default function Navigator() {
         </div>
 
         {/* Alt not */}
-        <p className="text-center text-xs text-slate-600 mt-4">
+        <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-4">
           Bu seçimler daha sonra profil ayarlarından değiştirilebilir
         </p>
       </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
@@ -132,64 +133,70 @@ export default function WeeklyTasksBanner({ userId, onProgressUpdated, isDashboa
     }
   };
 
-  const renderJoinModal = () => (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-      <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-slate-900/95 border border-slate-200 dark:border-white/15 p-6 md:p-8 shadow-2xl">
-        <button
-          onClick={() => setJoinModalOpen(false)}
-          className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
-        >
-          <X size={18} />
-        </button>
+  const handleStartTask = handleGoToTask;
 
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-500/20 border border-cyan-200 dark:border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shadow-sm">
-            <Calendar size={24} />
+  const renderJoinModal = () => {
+    if (typeof document === 'undefined') return null;
+    return createPortal(
+      <div className="fixed inset-0 z-[999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+        <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/15 p-6 md:p-8 shadow-2xl">
+          <button
+            onClick={() => setJoinModalOpen(false)}
+            className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+          >
+            <X size={18} />
+          </button>
+
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-500/20 border border-cyan-200 dark:border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shadow-sm">
+              <Calendar size={24} />
+            </div>
+            <div>
+              <h3 className="font-display font-black text-xl text-slate-900 dark:text-white">Yeni Gruba Katıl</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Öğretmeninin verdiği 6 haneli kod</p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-display font-black text-xl text-slate-900 dark:text-white">Yeni Gruba Katıl</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Öğretmeninin verdiği 6 haneli kod</p>
-          </div>
+
+          <form onSubmit={handleJoinCohort} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                Katılım Kodu *
+              </label>
+              <input
+                type="text"
+                maxLength={6}
+                required
+                placeholder="Örn: X8K2M9"
+                value={joinCodeInput}
+                onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-white/10 text-center font-mono font-black text-xl text-slate-900 dark:text-cyan-300 focus:outline-none focus:border-cyan-500 uppercase tracking-widest shadow-sm"
+                autoFocus
+              />
+            </div>
+
+            <div className="pt-2 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setJoinModalOpen(false)}
+                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-xs font-bold cursor-pointer"
+              >
+                İptal
+              </button>
+              <button
+                type="submit"
+                disabled={joining}
+                className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/20 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+              >
+                {joining ? <LoadingSpinner size="sm" /> : <Sparkles size={16} />}
+                Katıl
+              </button>
+            </div>
+          </form>
         </div>
-
-        <form onSubmit={handleJoinCohort} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
-              Katılım Kodu *
-            </label>
-            <input
-              type="text"
-              maxLength={6}
-              required
-              placeholder="Örn: X8K2M9"
-              value={joinCodeInput}
-              onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-white/10 text-center font-mono font-black text-xl text-slate-900 dark:text-cyan-300 focus:outline-none focus:border-cyan-500 uppercase tracking-widest shadow-sm"
-              autoFocus
-            />
-          </div>
-
-          <div className="pt-2 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setJoinModalOpen(false)}
-              className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-xs font-bold cursor-pointer"
-            >
-              İptal
-            </button>
-            <button
-              type="submit"
-              disabled={joining}
-              className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/20 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
-            >
-              {joining ? <LoadingSpinner size="sm" /> : <Sparkles size={16} />}
-              Katıl
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+      </div>,
+      document.body
+    );
+  };
 
   if (loading) {
     return (
