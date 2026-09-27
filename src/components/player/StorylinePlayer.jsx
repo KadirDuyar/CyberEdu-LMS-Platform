@@ -286,7 +286,7 @@ export default function StorylinePlayer({
         {/* Tamamla Butonu */}
         {onSubmit && !isCompleted && !submitted && (
           <div className={`p-3 flex items-center justify-between border-t
-            ${isTheatre || isBrowserFullscreen
+            ${isBrowserFullscreen
               ? 'bg-black/80 border-white/10'
               : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
             {capturedScore !== null && (
