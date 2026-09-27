@@ -180,7 +180,7 @@ export default function LessonPage() {
     return () => { cancelled = true; };
   }, [lessonId, user]);
 
-  const interactiveActivities = lesson?.activities?.filter((a) => !['heading', 'text'].includes(a.type)) || [];
+  const interactiveActivities = lesson?.activities?.filter((a) => !['heading', 'text', 'storyline'].includes(a.type)) || [];
   const allActivitiesDone = interactiveActivities.length > 0
     ? interactiveActivities.every((a) => activityStates[a.id]?.submitted)
     : true;
@@ -493,60 +493,9 @@ export default function LessonPage() {
 
   const activities = [...(lesson.activities ?? [])].sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
 
-  // ─── Storyline TAM DERS MODU ─────────────────────────────────────────────
-  if (lesson.content_type === 'storyline' && lesson.storyline_url) {
-    return (
-      <DashboardLayout forceCollapsed={sidebarCollapsed}>
-        <div className="space-y-4 pb-6">
-          {/* Geri Dön + Başlık */}
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium cursor-pointer"
-          >
-            <ArrowLeft size={16}/> Geri Dön
-          </button>
-
-          <div className="flex items-start gap-4 p-5 rounded-2xl glass border border-slate-200 dark:border-white/10">
-            <div className="w-11 h-11 rounded-xl bg-violet-500/20 flex items-center justify-center shrink-0">
-              <BookOpen className="text-violet-600 dark:text-violet-400" size={20}/>
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="font-display font-black text-xl text-slate-900 dark:text-white">{lesson.title}</h1>
-                {alreadyCompleted && (
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30">
-                    Daha Önce Tamamlandı
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-3 mt-1">
-                <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-semibold">
-                  <Zap size={12}/>
-                  <span>+{lesson.xp_reward || 0} XP</span>
-                </div>
-                <span className="text-xs text-violet-600 dark:text-violet-400 font-bold bg-violet-50 dark:bg-violet-500/10 px-2 py-0.5 rounded-full border border-violet-200 dark:border-violet-500/30">
-                  🎬 Storyline Modülü
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* StorylinePlayer — Full Mod */}
-          <StorylinePlayer
-            url={lesson.storyline_url}
-            mode="full"
-            title={lesson.title}
-            allowFullscreen={true}
-            onCollapseSidebar={setSidebarCollapsed}
-            submitted={alreadyCompleted}
-            onSubmit={alreadyCompleted ? undefined : async () => {
-              await handleComplete();
-            }}
-          />
-        </div>
-      </DashboardLayout>
-    );
-  }
+  // ─── Storyline dersleri artık normal ders akışına dahil ─────────────────
+  // content_type === 'storyline' ise StorylinePlayer ilk blok olarak gösterilir,
+  // ardından tüm aktiviteler (sorular vb.) aşağıda normal şekilde listelenir.
 
   return (
     <DashboardLayout>
@@ -582,9 +531,35 @@ export default function LessonPage() {
                   <span>{activities.length} içerik / etkinlik</span>
                 </div>
               )}
+              {lesson.content_type === 'storyline' && (
+                <span className="text-xs text-violet-600 dark:text-violet-400 font-bold bg-violet-50 dark:bg-violet-500/10 px-2 py-0.5 rounded-full border border-violet-200 dark:border-violet-500/30">
+                  🎬 Storyline Modülü
+                </span>
+              )}
             </div>
           </div>
         </div>
+
+        {/* ─── Storyline dersi ise player inline olarak burada gösterilir ─── */}
+        {lesson.content_type === 'storyline' && lesson.storyline_url && (
+          <div className="rounded-2xl overflow-hidden border border-violet-200 dark:border-violet-500/30 shadow-lg">
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-violet-50 dark:bg-violet-950/40 border-b border-violet-200 dark:border-violet-500/20">
+              <span className="text-sm font-bold text-violet-700 dark:text-violet-300">🎬 Storyline Modülü</span>
+              {activities.length > 0 && (
+                <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">— Modülü tamamladıktan sonra aşağı kaydırarak devam edin</span>
+              )}
+            </div>
+            <StorylinePlayer
+              url={lesson.storyline_url}
+              mode="inline"
+              height="520px"
+              title={lesson.title}
+              allowFullscreen={true}
+              onCollapseSidebar={setSidebarCollapsed}
+              submitted={alreadyCompleted}
+            />
+          </div>
+        )}
 
         {activities.length > 0 && (
           <div className="space-y-6">
@@ -595,10 +570,12 @@ export default function LessonPage() {
 
             {activities.map((activity, idx) => {
               const isText = activity.type === 'heading' || activity.type === 'text';
+              // storyline aktiviteleri soru değildir; kilit zincirini engellemesin
+              const isPassthrough = ['heading', 'text', 'storyline'].includes(activity.type);
               const state = activityStates[activity.id];
 
               const isUnlocked = idx === 0 || activities.slice(0, idx).every((a) =>
-                ['heading', 'text'].includes(a.type) ? true : activityStates[a.id]?.submitted
+                ['heading', 'text', 'storyline'].includes(a.type) ? true : activityStates[a.id]?.submitted
               );
 
               if (isText) {
@@ -614,6 +591,25 @@ export default function LessonPage() {
                         <SafeMarkdown content={activity.question}/>
                       </div>
                     )}
+                  </div>
+                );
+              }
+
+              // Storyline aktiviteleri: inline iframe kartı olarak göster, kilitleme yapılmaz
+              if (activity.type === 'storyline') {
+                if (!isUnlocked) return null;
+                return (
+                  <div key={activity.id} className="rounded-2xl overflow-hidden border border-violet-200 dark:border-violet-500/30 shadow-lg animate-in fade-in slide-in-from-bottom-4">
+                    <div className="flex items-center gap-2 px-4 py-2.5 bg-violet-50 dark:bg-violet-950/40 border-b border-violet-200 dark:border-violet-500/20">
+                      <span className="text-xs font-bold text-violet-700 dark:text-violet-300 uppercase tracking-wider">🎬 Storyline Modülü</span>
+                    </div>
+                    <ActivityRenderer
+                      key={`${activity.id}-${retryCount}`}
+                      activity={activity}
+                      onSubmit={(res) => handleActivitySubmit(activity, res)}
+                      submitted={state?.submitted ?? false}
+                      result={state?.result}
+                    />
                   </div>
                 );
               }
