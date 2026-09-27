@@ -200,8 +200,8 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
   const iframeRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Öğretmenin seçimine göre tamamlama zorunluluğu (varsayılan: true)
-  const isRequireCompletion = activity.options?.require_completion ?? true;
+  // Öğretmenin seçimine göre tamamlama zorunluluğu (varsayılan: false — serbest izleme)
+  const isRequireCompletion = activity.options?.require_completion ?? false;
 
   const getYoutubeId = (url) => {
     const match = url?.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
@@ -495,10 +495,15 @@ function YoutubeActivity({ activity, onSubmit, submitted }) {
 function ScenarioActivity({ activity, onSubmit, submitted, result, initialAnswer }) {
   const [selectedIdx, setSelectedIdx] = useState(initialAnswer !== undefined ? initialAnswer : null);
 
+  // options veritabanından { choices: [...] } formatında ya da düz array olarak gelebilir
+  const choices = Array.isArray(activity.options)
+    ? activity.options
+    : (activity.options?.choices ?? []);
+
   const handleSubmit = (idx) => {
     setSelectedIdx(idx);
-    const opt = activity.options[idx];
-    onSubmit({ userAnswer: idx, isCorrect: opt.isCorrect });
+    const opt = choices[idx];
+    onSubmit({ userAnswer: idx, isCorrect: opt?.isCorrect ?? false });
   };
 
   return (
@@ -507,7 +512,7 @@ function ScenarioActivity({ activity, onSubmit, submitted, result, initialAnswer
         {activity.question}
       </div>
       <div className="grid gap-3">
-        {(activity.options || []).map((opt, idx) => {
+        {choices.map((opt, idx) => {
           const isSelected = selectedIdx === idx;
           let btnClass = 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200';
 
@@ -528,9 +533,9 @@ function ScenarioActivity({ activity, onSubmit, submitted, result, initialAnswer
               >
                 {opt.text}
               </button>
-              {submitted && isSelected && opt.consequence && (
+              {submitted && isSelected && (opt.outcome || opt.consequence) && (
                 <div className={`mt-2 p-3 rounded-xl text-xs font-bold border-l-4 ${opt.isCorrect ? 'bg-emerald-50 border-emerald-500 text-emerald-800' : 'bg-rose-50 border-rose-500 text-rose-800'}`}>
-                  {opt.consequence}
+                  {opt.outcome || opt.consequence}
                 </div>
               )}
             </div>
@@ -617,7 +622,10 @@ function MatchingActivity({ activity, onSubmit, submitted, result, initialAnswer
   const [selectedLeft, setSelectedLeft] = useState(null);
   const [matches, setMatches] = useState(initialAnswer || {});
 
-  const pairs = activity.options || [];
+  // options veritabanından { pairs: [...] } formatında ya da düz array olarak gelebilir
+  const pairs = Array.isArray(activity.options)
+    ? activity.options
+    : (activity.options?.pairs ?? []);
 
   const handleRightClick = (rightVal) => {
     if (submitted || selectedLeft === null) return;
