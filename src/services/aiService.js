@@ -398,7 +398,8 @@ KESİN KURALLAR:
    - Kademe 1: Hangi güvenlik prensibi veya kavramının düşünüleceğini hatırlat (Genel ipucu).
    - Kademe 2: Seçenekleri nasıl eleyebileceğine veya hangi detaya dikkat etmesi gerektiğine odaklan (Kavramsal).
    - Kademe 3: İki temel durum arasındaki farkı kıyaslamasını sağla ama son adımı öğrenciye bırak.
-4. Maksimum 2-3 cümle, samimi, teşvik edici ve net Türkçe konuş.`;
+4. Maksimum 2-3 cümle, samimi, teşvik edici ve net Türkçe konuş.
+5. Asla dikey çizgi (|), tablo veya gereksiz yıldız (*) kullanma; temiz ve doğrudan metin yaz.`;
 
   const prompt = `Öğrencinin çözmeye çalıştığı soru:
 Soru Türü: ${type}
@@ -450,7 +451,12 @@ DAVRANIŞ VE YANIT KURALLARI:
 1. Bağlamsal Farkındalık: Kullanıcı "bu soru", "buradaki hata", "bu ders" dediğinde, yukarıda verilen sayfa ve ders detaylarını referans alarak nokta atışı yanıt ver.
 2. Sokratik Yaklaşım: Eğer bir ders/soru ekranındaysa ve öğrenci doğrudan bir sorunun cevabını istiyorsa ("cevap ne", "hangi şık"), cevabı doğrudan söylemek yerine düşünmeye sevk eden 1-2 cümlelik kavramsal ipucu ver.
 3. Genel Amaçlı Destek: Kullanıcı ders dışı genel bir soru sorarsa (örneğin "Phishing nedir?", "Kariyer tavsiyesi", "Platform nasıl çalışır?"), doğrudan, net, kapsamlı ve eğitici şekilde yanıtla.
-4. Üslup: Kibar, motive edici, siber güvenlikte uzman ve net Türkçe konuş. Kod ve önemli terimleri Markdown (\`kod\`, **vurgu**) ile biçimlendir.`;
+4. METİN VE OKUNURLUK FORMATI (ÇOK ÖNEMLİ):
+   - KESİNLİKLE MARKDOWN TABLOSU VEYA DİKEY ÇİZGİ (|) KULLANMA. Sohbet pencerelerinde tablolar bozulduğu için asla "| Kolon 1 | Kolon 2 |" veya "|---|---|" şeklinde tablo üretme.
+   - Tablo yerine daima numaralı liste (1., 2.), madde imleri (- veya •) ve kalın başlıklar (**Başlık:**) kullan.
+   - GEREKSİZ YILDIZ (*) KULLANMA. İtalik yapmak için tek yıldız (*) kullanma. Tırnak içlerine veya kelimelerin etrafına anlamsız yıldızlar koyma (örneğin "*kelime*" veya *kelime* yazma). Yalnızca önemli kavramları çift yıldız ile kalın yap (**Önemli Kavram**).
+   - Kod parçaları için \`kod\` veya blok için \`\`\`kod\`\`\` kullan.
+   - Yanıtlarını ferah, net paragraflar ve okunması kolay maddeler halinde oluştur.`;
 
   return await fetchGemini(message, systemInstruction, history);
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CheckCircle2, XCircle, Play, Pause, RotateCcw, RotateCw, ArrowUp, ArrowDown, Maximize, Minimize } from 'lucide-react';
 import StorylinePlayer from '../player/StorylinePlayer';
+import FormattedAiMessage from '../ui/FormattedAiMessage';
 
 const formatAnswer = (ans) => {
   if (ans === undefined || ans === null) return '';
@@ -1077,7 +1078,7 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
                     Kademe {h.level}
                   </span>
                 </div>
-                <p className="text-slate-800 dark:text-slate-200 font-medium whitespace-pre-wrap">{h.text}</p>
+                <FormattedAiMessage text={h.text} />
               </div>
             ))}
 
@@ -1091,10 +1092,10 @@ export default function ActivityRenderer({ activity, onSubmit, submitted, result
                     : 'bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100 mr-4 shadow-sm'
                 }`}
               >
-                <span className={`font-bold text-[10px] uppercase tracking-wider block mb-0.5 ${d.role === 'user' ? 'text-violet-100' : 'text-violet-700 dark:text-violet-300'}`}>
+                <span className={`font-bold text-[10px] uppercase tracking-wider block mb-1 ${d.role === 'user' ? 'text-violet-100' : 'text-violet-700 dark:text-violet-300'}`}>
                   {d.role === 'user' ? 'Sen:' : '🤖 YZ Yanıtı:'}
                 </span>
-                <p className="whitespace-pre-wrap font-medium">{d.text}</p>
+                <FormattedAiMessage text={d.text} />
               </div>
             ))}
 

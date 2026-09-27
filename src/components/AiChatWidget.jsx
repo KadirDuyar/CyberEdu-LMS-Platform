@@ -3,80 +3,9 @@ import { useLocation } from 'react-router-dom';
 import { Bot, Sparkles, X, Send, Trash2, Minimize2, Maximize2, RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { chatWithMentor } from '../services/aiService';
+import FormattedAiMessage from './ui/FormattedAiMessage';
 
-// Basit Markdown & Metin Biçimlendirici
-function FormattedMessage({ text }) {
-  if (!text) return null;
-
-  // Kod bloklarını ve paragrafları ayıkla
-  const parts = text.split(/(```[\s\S]*?```)/g);
-
-  return (
-    <div className="space-y-2 text-sm leading-relaxed break-words">
-      {parts.map((part, idx) => {
-        if (part.startsWith('```') && part.endsWith('```')) {
-          const content = part.slice(3, -3).replace(/^[a-z]+\n/i, '');
-          return (
-            <pre key={idx} className="p-3 my-2 rounded-xl bg-slate-900/90 text-emerald-400 text-xs font-mono overflow-x-auto border border-white/10">
-              <code>{content.trim()}</code>
-            </pre>
-          );
-        }
-
-        const lines = part.split('\n');
-        return (
-          <div key={idx} className="space-y-1">
-            {lines.map((line, lIdx) => {
-              if (!line.trim()) return null;
-
-              // Liste elemanı
-              if (line.trim().startsWith('* ') || line.trim().startsWith('- ')) {
-                const itemText = line.trim().slice(2);
-                return (
-                  <div key={lIdx} className="flex items-start gap-2 pl-2">
-                    <span className="text-violet-600 dark:text-violet-400 mt-1 font-bold">•</span>
-                    <span>{renderInlineStyles(itemText)}</span>
-                  </div>
-                );
-              }
-
-              // Sayılı liste
-              const numMatch = line.trim().match(/^(\d+)\.\s+(.*)/);
-              if (numMatch) {
-                return (
-                  <div key={lIdx} className="flex items-start gap-2 pl-2">
-                    <span className="text-violet-700 dark:text-violet-400 font-bold text-xs mt-0.5">{numMatch[1]}.</span>
-                    <span>{renderInlineStyles(numMatch[2])}</span>
-                  </div>
-                );
-              }
-
-              return <p key={lIdx}>{renderInlineStyles(line)}</p>;
-            })}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function renderInlineStyles(text) {
-  // Kalın (**bold**) ve satır içi kod (`code`) ayrımı
-  const tokens = text.split(/(\*\*.*?\*\*|`.*?`)/g);
-  return tokens.map((token, i) => {
-    if (token.startsWith('**') && token.endsWith('**')) {
-      return <strong key={i} className="font-bold text-violet-900 dark:text-violet-200">{token.slice(2, -2)}</strong>;
-    }
-    if (token.startsWith('`') && token.endsWith('`')) {
-      return (
-        <code key={i} className="px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-950/60 text-violet-800 dark:text-violet-300 font-mono text-xs border border-violet-200 dark:border-violet-800/40">
-          {token.slice(1, -1)}
-        </code>
-      );
-    }
-    return token;
-  });
-}
+const FormattedMessage = FormattedAiMessage;
 
 export default function AiChatWidget() {
   const { role, user } = useAuth();
