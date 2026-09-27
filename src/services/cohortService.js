@@ -472,7 +472,7 @@ export async function syncStudentCohortProgress(studentId) {
 
     const completedLessonIds = new Set((progressRows || []).map((p) => p.lesson_id));
 
-    // Tamamlanan kurslar
+    // Tamamlanan kurslar (enrollments tablosu)
     const { data: enrollments } = await supabase
       .from('enrollments')
       .select('course_id, status, completed_at')
@@ -481,6 +481,24 @@ export async function syncStudentCohortProgress(studentId) {
     const completedCourseIds = new Set(
       (enrollments || []).filter((e) => e.status === 'completed').map((e) => e.course_id)
     );
+
+    // Haftalık görevlerdeki kursların yayınlanmış derslerini çek
+    const courseIds = [...new Set(weeks.map((w) => w.course_id).filter(Boolean))];
+    const courseLessonsMap = new Map();
+    if (courseIds.length > 0) {
+      const { data: cLessons } = await supabase
+        .from('lessons')
+        .select('id, course_id')
+        .in('course_id', courseIds)
+        .eq('is_published', true);
+
+      (cLessons || []).forEach((l) => {
+        if (!courseLessonsMap.has(l.course_id)) {
+          courseLessonsMap.set(l.course_id, []);
+        }
+        courseLessonsMap.get(l.course_id).push(l.id);
+      });
+    }
 
     // Her hafta kontrolü
     for (const week of weeks) {
@@ -494,10 +512,41 @@ export async function syncStudentCohortProgress(studentId) {
           completedAt = p?.completed_at || new Date().toISOString();
         }
       } else if (week.course_id) {
-        if (completedCourseIds.has(week.course_id)) {
+        const pubLessonIds = courseLessonsMap.get(week.course_id) || [];
+        const allCourseLessonsDone = pubLessonIds.length > 0 && pubLessonIds.every((lid) => completedLessonIds.has(lid));
+
+        if (completedCourseIds.has(week.course_id) || allCourseLessonsDone) {
           isCompleted = true;
-          const e = enrollments.find((x) => x.course_id === week.course_id);
-          completedAt = e?.completed_at || new Date().toISOString();
+          const e = (enrollments || []).find((x) => x.course_id === week.course_id);
+
+          if (e?.completed_at) {
+            completedAt = e.completed_at;
+          } else {
+            const doneCourseRows = (progressRows || []).filter((p) => pubLessonIds.includes(p.lesson_id));
+            const latestLessonCompletedAt = doneCourseRows.reduce((latest, r) => {
+              if (!r.completed_at) return latest;
+              return !latest || new Date(r.completed_at) > new Date(latest) ? r.completed_at : latest;
+            }, null);
+            completedAt = latestLessonCompletedAt || new Date().toISOString();
+          }
+
+          // Enrollments tablosunda da tamamlandı olarak güvenceye al
+          try {
+            await supabase
+              .from('enrollments')
+              .upsert(
+                {
+                  user_id: studentId,
+                  course_id: week.course_id,
+                  status: 'completed',
+                  progress_percent: 100,
+                  completed_at: completedAt,
+                },
+                { onConflict: 'user_id,course_id' }
+              );
+          } catch (enrErr) {
+            console.warn('Enrollment upsert error:', enrErr);
+          }
         }
       }
 
@@ -579,9 +628,47 @@ export async function getStudentCohortData(studentId) {
     const progressMap = new Map((progressList || []).map((p) => [p.cohort_week_id, p]));
     const now = new Date();
 
+    // Gerçek zamanlı fallback: lesson_progress tablosundaki tamamlanan dersleri de kontrol et
+    const { data: progLessons } = await supabase
+      .from('lesson_progress')
+      .select('lesson_id')
+      .eq('user_id', studentId)
+      .eq('status', 'completed');
+    const doneLessonIds = new Set((progLessons || []).map((p) => p.lesson_id));
+
+    const courseIds = [...new Set((weeks || []).map((w) => w.course_id).filter(Boolean))];
+    const courseLessonsMap = new Map();
+    if (courseIds.length > 0) {
+      const { data: cLessons } = await supabase
+        .from('lessons')
+        .select('id, course_id')
+        .in('course_id', courseIds)
+        .eq('is_published', true);
+
+      (cLessons || []).forEach((l) => {
+        if (!courseLessonsMap.has(l.course_id)) {
+          courseLessonsMap.set(l.course_id, []);
+        }
+        courseLessonsMap.get(l.course_id).push(l.id);
+      });
+    }
+
     const tasks = (weeks || []).map((w) => {
       const prog = progressMap.get(w.id);
-      const isCompleted = prog?.status === 'completed' || prog?.status === 'overdue';
+      let isCompleted = prog?.status === 'completed' || prog?.status === 'overdue';
+
+      // Fallback: cohort_progress henüz yazılmadıysa veya gecikme varsa doğrudan derslerin bitip bitmediğini doğrula
+      if (!isCompleted) {
+        if (w.lesson_id && doneLessonIds.has(w.lesson_id)) {
+          isCompleted = true;
+        } else if (w.course_id) {
+          const pubLessons = courseLessonsMap.get(w.course_id) || [];
+          if (pubLessons.length > 0 && pubLessons.every((id) => doneLessonIds.has(id))) {
+            isCompleted = true;
+          }
+        }
+      }
+
       const dueDate = new Date(w.due_date);
       const unlockDate = new Date(w.unlock_date);
       const isLocked = w.is_locked || unlockDate > now;
@@ -594,7 +681,7 @@ export async function getStudentCohortData(studentId) {
         isLocked,
         isPastDue,
         status: isCompleted ? (prog?.status === 'overdue' ? 'overdue' : 'completed') : (isPastDue ? 'expired' : 'active'),
-        earned_xp: prog?.earned_xp || 0,
+        earned_xp: prog?.earned_xp || (isCompleted ? 100 : 0),
       };
     });
 

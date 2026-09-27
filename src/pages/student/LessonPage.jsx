@@ -229,9 +229,23 @@ export default function LessonPage() {
           setIsCourseFinished(true);
           await supabase
             .from('enrollments')
-            .update({ status: 'completed', completed_at: new Date().toISOString() })
-            .eq('user_id', user.id)
-            .eq('course_id', lesson.course_id);
+            .upsert(
+              {
+                user_id: user.id,
+                course_id: lesson.course_id,
+                status: 'completed',
+                progress_percent: 100,
+                completed_at: new Date().toISOString(),
+              },
+              { onConflict: 'user_id,course_id' }
+            );
+
+          try {
+            const { syncStudentCohortProgress } = await import('../../services/cohortService');
+            await syncStudentCohortProgress(user.id);
+          } catch (syncErr) {
+            console.warn('Cohort sync failed on course finish:', syncErr);
+          }
 
           // Takipçilere arkadaşın kursu tamamladı bildirimi gönder
           try {
