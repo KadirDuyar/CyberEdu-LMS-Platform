@@ -180,6 +180,14 @@ export default function LessonPage() {
     return () => { cancelled = true; };
   }, [lessonId, user]);
 
+  const hasStoryline = lesson?.content_type === 'storyline' || lesson?.activities?.some((a) => a.type === 'storyline');
+
+  useEffect(() => {
+    if (hasStoryline) {
+      setSidebarCollapsed(true);
+    }
+  }, [hasStoryline]);
+
   const interactiveActivities = lesson?.activities?.filter((a) => !['heading', 'text', 'storyline'].includes(a.type)) || [];
   const allActivitiesDone = interactiveActivities.length > 0
     ? interactiveActivities.every((a) => activityStates[a.id]?.submitted)
@@ -496,14 +504,6 @@ export default function LessonPage() {
   // ─── Storyline dersleri artık normal ders akışına dahil ─────────────────
   // content_type === 'storyline' ise StorylinePlayer ilk blok olarak gösterilir,
   // ardından tüm aktiviteler (sorular vb.) aşağıda normal şekilde listelenir.
-
-  const hasStoryline = lesson?.content_type === 'storyline' || activities.some((a) => a.type === 'storyline');
-
-  useEffect(() => {
-    if (hasStoryline) {
-      setSidebarCollapsed(true);
-    }
-  }, [hasStoryline]);
 
   return (
     <DashboardLayout forceCollapsed={sidebarCollapsed}>
