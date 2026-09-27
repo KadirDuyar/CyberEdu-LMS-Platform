@@ -497,9 +497,17 @@ export default function LessonPage() {
   // content_type === 'storyline' ise StorylinePlayer ilk blok olarak gösterilir,
   // ardından tüm aktiviteler (sorular vb.) aşağıda normal şekilde listelenir.
 
+  const hasStoryline = lesson?.content_type === 'storyline' || activities.some((a) => a.type === 'storyline');
+
+  useEffect(() => {
+    if (hasStoryline) {
+      setSidebarCollapsed(true);
+    }
+  }, [hasStoryline]);
+
   return (
-    <DashboardLayout>
-      <div className="max-w-3xl mx-auto space-y-6 pb-16">
+    <DashboardLayout forceCollapsed={sidebarCollapsed}>
+      <div className={`${hasStoryline ? 'max-w-5xl xl:max-w-6xl' : 'max-w-3xl'} mx-auto space-y-6 pb-16 transition-all duration-300`}>
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium cursor-pointer"
