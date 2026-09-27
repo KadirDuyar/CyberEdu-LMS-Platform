@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Maximize, Minimize, ExternalLink, MonitorPlay, AlertTriangle, Loader2, Expand, Shrink } from 'lucide-react';
+import { Maximize, Minimize, ExternalLink, MonitorPlay, AlertTriangle, Loader2 } from 'lucide-react';
 
 /**
  * StorylinePlayer — Articulate Storyline HTML5 / SCORM web çıktısı oynatıcı
@@ -44,7 +44,6 @@ export default function StorylinePlayer({
 
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
-  const [isTheatre, setIsTheatre] = useState(false);
   const [isBrowserFullscreen, setIsBrowserFullscreen] = useState(false);
   const [isCompleted, setIsCompleted] = useState(submitted);
   const [capturedScore, setCapturedScore] = useState(null);
@@ -169,7 +168,6 @@ export default function StorylinePlayer({
     }
   };
 
-  const toggleTheatre = () => setIsTheatre((prev) => !prev);
 
   if (!url) {
     return (
@@ -188,27 +186,26 @@ export default function StorylinePlayer({
       <div
         ref={containerRef}
         className={`
-          relative transition-all duration-300 overflow-hidden rounded-2xl border
-          ${isTheatre
-            ? 'fixed inset-0 z-[200] rounded-none border-0 bg-black'
+          relative overflow-hidden rounded-2xl border
+          ${isBrowserFullscreen
+            ? 'fixed inset-0 z-[200] border-0 rounded-none bg-black'
             : 'border-slate-200 dark:border-white/10 bg-black/5 dark:bg-slate-900/60'}
-          ${isBrowserFullscreen ? 'border-0 rounded-none' : ''}
         `}
       >
         {/* Üst Araç Çubuğu */}
         <div className={`
           flex items-center justify-between px-4 py-2.5
-          ${isTheatre || isBrowserFullscreen
+          ${isBrowserFullscreen
             ? 'bg-black/80 text-white'
             : 'bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800'}
         `}>
           <div className="flex items-center gap-2">
             <MonitorPlay
               size={16}
-              className={isTheatre || isBrowserFullscreen ? 'text-violet-400' : 'text-violet-600 dark:text-violet-400'}
+              className={isBrowserFullscreen ? 'text-violet-400' : 'text-violet-600 dark:text-violet-400'}
             />
             <span className={`text-xs font-bold truncate max-w-[200px] sm:max-w-sm
-              ${isTheatre || isBrowserFullscreen ? 'text-slate-200' : 'text-slate-700 dark:text-slate-300'}`}>
+              ${isBrowserFullscreen ? 'text-slate-200' : 'text-slate-700 dark:text-slate-300'}`}>
               {title || 'Storyline İçeriği'}
             </span>
           </div>
@@ -221,32 +218,20 @@ export default function StorylinePlayer({
               rel="noopener noreferrer"
               title="Yeni sekmede aç"
               className={`p-1.5 rounded-lg transition-colors
-                ${isTheatre || isBrowserFullscreen
+                ${isBrowserFullscreen
                   ? 'text-slate-300 hover:text-white hover:bg-white/10'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700'}`}
             >
               <ExternalLink size={15} />
             </a>
 
-            {/* Theatre Mode — Expand/Shrink (Fullscreen'dan FARKLI ikon) */}
-            <button
-              onClick={toggleTheatre}
-              title={isTheatre ? 'Küçült (Geniş Görünümden Çık)' : 'Geniş Görünüm'}
-              className={`p-1.5 rounded-lg transition-colors
-                ${isTheatre || isBrowserFullscreen
-                  ? 'text-slate-300 hover:text-white hover:bg-white/10'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-            >
-              {isTheatre ? <Shrink size={15} /> : <Expand size={15} />}
-            </button>
-
-            {/* Tarayıcı Tam Ekran — Maximize/Minimize (farklı ikon) */}
+            {/* Tarayıcı Tam Ekran */}
             {allowFullscreen && (
               <button
                 onClick={toggleBrowserFullscreen}
                 title={isBrowserFullscreen ? 'Tam Ekrandan Çık' : 'Tam Ekran'}
                 className={`p-1.5 rounded-lg transition-colors
-                  ${isTheatre || isBrowserFullscreen
+                  ${isBrowserFullscreen
                     ? 'text-slate-300 hover:text-white hover:bg-white/10'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700'}`}
               >
@@ -259,11 +244,7 @@ export default function StorylinePlayer({
         {/* iframe Kapsayıcı — 16:9 oran */}
         <div
           className="relative w-full bg-black"
-          style={
-            isTheatre || isBrowserFullscreen
-              ? { height: 'calc(100% - 44px)' }
-              : { paddingTop: '56.25%' }
-          }
+          style={isBrowserFullscreen ? { height: 'calc(100% - 44px)' } : { paddingTop: '56.25%' }}
         >
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-slate-900 z-10">
@@ -294,12 +275,7 @@ export default function StorylinePlayer({
             ref={iframeRef}
             src={url}
             title={title || 'Storyline Player'}
-            className={`
-              ${isTheatre || isBrowserFullscreen
-                ? 'w-full h-full'
-                : 'absolute inset-0 w-full h-full'}
-              border-0 bg-black
-            `}
+            className="absolute inset-0 w-full h-full border-0 bg-black"
             allow="fullscreen; autoplay; accelerometer; gyroscope"
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation allow-downloads"
             onLoad={() => setLoading(false)}
