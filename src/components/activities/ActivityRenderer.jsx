@@ -554,11 +554,12 @@ function ScenarioActivity({ activity, onSubmit, submitted, result, initialAnswer
 }
 
 function OrderingActivity({ activity, onSubmit, submitted, result, initialAnswer }) {
-  const [items, setItems] = useState(initialAnswer || []);
+  // options düz array olarak gelir ama null-safe olalım
+  const optionItems = Array.isArray(activity.options) ? activity.options : [];
 
   useEffect(() => {
-    if (activity.options && !submitted && items.length === 0) {
-      setItems([...activity.options].sort(() => Math.random() - 0.5));
+    if (optionItems.length > 0 && !submitted && items.length === 0) {
+      setItems([...optionItems].sort(() => Math.random() - 0.5));
     }
   }, [activity.options, submitted]);
 
@@ -572,7 +573,7 @@ function OrderingActivity({ activity, onSubmit, submitted, result, initialAnswer
   };
 
   const handleSubmit = () => {
-    const isCorrect = JSON.stringify(items) === JSON.stringify(activity.options);
+    const isCorrect = JSON.stringify(items) === JSON.stringify(optionItems);
     onSubmit({ userAnswer: items, isCorrect });
   };
 
@@ -611,11 +612,12 @@ function OrderingActivity({ activity, onSubmit, submitted, result, initialAnswer
           correct={result.isCorrect}
           explanation={activity.explanation}
           points={activity.points}
-          correctAnswer={(activity.options || []).map((o, i) => `${i + 1}. ${o}`).join(' → ')}
+          correctAnswer={optionItems.map((o, i) => `${i + 1}. ${o}`).join(' → ')}
         />
       )}
     </div>
   );
+
 }
 
 function MatchingActivity({ activity, onSubmit, submitted, result, initialAnswer }) {
@@ -723,10 +725,18 @@ function MemoryCardActivity({ activity, onSubmit, submitted }) {
 
   useEffect(() => {
     if (activity.options && !submitted) {
+      // options { cards: [{front, back}] } veya düz array [{left, right}] olabilir
+      const rawCards = Array.isArray(activity.options)
+        ? activity.options
+        : (activity.options?.cards ?? []);
+
       const deck = [];
-      activity.options.forEach((pair, idx) => {
-        deck.push({ id: 'l_' + idx, text: pair.left, matchId: idx });
-        deck.push({ id: 'r_' + idx, text: pair.right, matchId: idx });
+      rawCards.forEach((pair, idx) => {
+        // { front, back } veya { left, right } formatı
+        const leftText  = pair.front ?? pair.left  ?? `Kart ${idx + 1}`;
+        const rightText = pair.back  ?? pair.right ?? `Eşleşme ${idx + 1}`;
+        deck.push({ id: 'l_' + idx, text: leftText,  matchId: idx });
+        deck.push({ id: 'r_' + idx, text: rightText, matchId: idx });
       });
       setCards(deck.sort(() => Math.random() - 0.5));
     }
