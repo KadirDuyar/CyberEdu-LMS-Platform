@@ -163,9 +163,8 @@ export async function getCohortMembers(cohortId) {
     const { data, error } = await supabase
       .from('cohort_members')
       .select(`
-        id,
-        joined_at,
         student_id,
+        joined_at,
         profiles:student_id (
           id,
           full_name,
@@ -176,18 +175,60 @@ export async function getCohortMembers(cohortId) {
           skill_level
         )
       `)
-      .eq('cohort_id', cohortId)
-      .order('joined_at', { ascending: false });
+      .eq('cohort_id', cohortId);
 
-    if (error) throw error;
+    if (error) {
+      console.warn('getCohortMembers join error, falling back:', error);
+      const { data: rawRows, error: rawErr } = await supabase
+        .from('cohort_members')
+        .select('student_id, joined_at')
+        .eq('cohort_id', cohortId);
+
+      if (rawErr || !rawRows || rawRows.length === 0) return { data: [], error: rawErr || error };
+
+      const studentIds = rawRows.map((r) => r.student_id);
+      const { data: profs } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_emoji, xp, level, learning_area, skill_level')
+        .in('id', studentIds);
+
+      const pMap = new Map((profs || []).map((p) => [p.id, p]));
+      const mapped = rawRows.map((m) => {
+        const prof = pMap.get(m.student_id) || {};
+        return {
+          membershipId: m.student_id,
+          studentId: m.student_id,
+          joinedAt: m.joined_at,
+          id: m.student_id,
+          full_name: prof.full_name || 'Bilinmeyen Öğrenci',
+          avatar_emoji: prof.avatar_emoji || '👤',
+          xp: prof.xp || 0,
+          level: prof.level || 1,
+          learning_area: prof.learning_area || 'awareness',
+          skill_level: prof.skill_level || 'beginner',
+        };
+      });
+      return { data: mapped, error: null };
+    }
+
+    const membersList = (data || []).map((m) => {
+      const prof = (Array.isArray(m.profiles) ? m.profiles[0] : m.profiles) || {};
+      return {
+        membershipId: m.student_id,
+        studentId: m.student_id,
+        joinedAt: m.joined_at,
+        id: m.student_id,
+        full_name: prof.full_name || 'Bilinmeyen Öğrenci',
+        avatar_emoji: prof.avatar_emoji || '👤',
+        xp: prof.xp || 0,
+        level: prof.level || 1,
+        learning_area: prof.learning_area || 'awareness',
+        skill_level: prof.skill_level || 'beginner',
+      };
+    });
 
     return {
-      data: (data || []).map((m) => ({
-        membershipId: m.id,
-        joinedAt: m.joined_at,
-        studentId: m.student_id,
-        ...(m.profiles || { full_name: 'Bilinmeyen Öğrenci', avatar_emoji: '👤', xp: 0, level: 1 }),
-      })),
+      data: membersList,
       error: null,
     };
   } catch (err) {

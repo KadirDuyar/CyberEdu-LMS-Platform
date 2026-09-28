@@ -120,6 +120,25 @@ export default function CohortDetails() {
     setLoadingProgress(true);
     const { students: pStudents, weeks: pWeeks, stats: pStats } = await getCohortProgressMatrix(cohortId);
     setProgressData({ students: pStudents, weeks: pWeeks, stats: pStats });
+
+    if (pStudents && pStudents.length > 0) {
+      setMembers((prev) => {
+        if (!prev || prev.length < pStudents.length) {
+          return pStudents.map((s) => ({
+            membershipId: s.id,
+            studentId: s.id,
+            joinedAt: s.joinedAt,
+            id: s.id,
+            full_name: s.full_name,
+            avatar_emoji: s.avatar_emoji,
+            xp: s.xp,
+            level: s.level,
+            learning_area: s.learning_area,
+          }));
+        }
+        return prev;
+      });
+    }
     setLoadingProgress(false);
   }
 
@@ -145,7 +164,23 @@ export default function CohortDetails() {
 
   async function loadMembers() {
     const { data } = await getCohortMembers(cohortId);
-    if (data) setMembers(data);
+    if (data && data.length > 0) {
+      setMembers(data);
+    } else if (progressData?.students && progressData.students.length > 0) {
+      setMembers(progressData.students.map((s) => ({
+        membershipId: s.id,
+        studentId: s.id,
+        joinedAt: s.joinedAt,
+        id: s.id,
+        full_name: s.full_name,
+        avatar_emoji: s.avatar_emoji,
+        xp: s.xp,
+        level: s.level,
+        learning_area: s.learning_area,
+      })));
+    } else {
+      setMembers(data || []);
+    }
   }
 
   async function loadCourses() {
@@ -421,6 +456,7 @@ export default function CohortDetails() {
     } else {
       showToast(`${studentName} gruba eklendi!`);
       loadMembers();
+      loadProgressData();
       // Arama sonucundan kaldır
       setSearchResults((prev) => prev.filter((s) => s.id !== studentId));
     }
@@ -435,6 +471,7 @@ export default function CohortDetails() {
       } else {
         showToast(`${studentName} gruptan çıkarıldı.`);
         loadMembers();
+        loadProgressData();
       }
     }
   };
