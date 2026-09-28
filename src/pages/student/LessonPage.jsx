@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { findNewUnlockedReward } from '../../data/achievementsData';
 import { notifyFollowersCourseCompleted } from '../../services/socialService';
+import { useDemoMode } from '../../hooks/useDemoMode';
 
 const PASS_PERCENT = 50;
 
@@ -127,6 +128,7 @@ export default function LessonPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
   const { user, addXP } = useAuth();
+  const { isDemoMode } = useDemoMode();
 
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -189,9 +191,9 @@ export default function LessonPage() {
   }, [hasStoryline]);
 
   const interactiveActivities = lesson?.activities?.filter((a) => !['heading', 'text', 'storyline'].includes(a.type)) || [];
-  const allActivitiesDone = interactiveActivities.length > 0
+  const allActivitiesDone = isDemoMode || (interactiveActivities.length > 0
     ? interactiveActivities.every((a) => activityStates[a.id]?.submitted)
-    : true;
+    : true);
 
   const handleActivitySubmit = async (activity, { userAnswer, isCorrect }) => {
     const points = isCorrect ? activity.points : 0;
@@ -298,7 +300,7 @@ export default function LessonPage() {
 
     if (totalQuestions > 0) {
       const percentage = (correctCount / totalQuestions) * 100;
-      if (percentage < PASS_PERCENT) {
+      if (percentage < PASS_PERCENT && !isDemoMode) {
         setFailedMessage(`Soruların en az %${PASS_PERCENT}'sini doğru cevaplamalısın. (Senin başarın: %${Math.round(percentage)})`);
         setCompleting(false);
         return;
@@ -582,7 +584,7 @@ export default function LessonPage() {
               const isPassthrough = ['heading', 'text', 'storyline'].includes(activity.type);
               const state = activityStates[activity.id];
 
-              const isUnlocked = idx === 0 || activities.slice(0, idx).every((a) =>
+              const isUnlocked = isDemoMode || idx === 0 || activities.slice(0, idx).every((a) =>
                 ['heading', 'text', 'storyline'].includes(a.type) ? true : activityStates[a.id]?.submitted
               );
 

@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCourse } from '../../hooks/useCourses';
 import { supabase } from '../../lib/supabase';
 import { sortCoursesByCurriculum } from '../../services/courseService';
+import { useDemoMode } from '../../hooks/useDemoMode';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import Card from '../../components/Card';
 import ProgressBar from '../../components/ui/ProgressBar';
@@ -25,6 +26,7 @@ export default function CoursePage() {
   const navigate     = useNavigate();
   const { user, profile, addXP } = useAuth();
   const isTeacher    = profile?.role === 'teacher' || profile?.role === 'admin';
+  const { isDemoMode } = useDemoMode();
 
   const {
     course, enrolled, progress, loading, enrolling, dropping, error,
@@ -45,7 +47,7 @@ export default function CoursePage() {
 
   useEffect(() => {
     async function checkCourseLock() {
-      if (!course || !user || isTeacher) {
+      if (!course || !user || isTeacher || isDemoMode) {
         setCourseLockInfo({ isLocked: false, prevCourse: null });
         setLockChecking(false);
         return;
@@ -101,7 +103,7 @@ export default function CoursePage() {
     }
 
     checkCourseLock();
-  }, [course, user, isTeacher]);
+  }, [course, user, isTeacher, isDemoMode]);
 
   if (loading) {
     return (

@@ -6,6 +6,7 @@ import {
   BarChart3, Settings, Users, Shield, PlusCircle, Menu, X, Sun, Moon, User, Check, Calendar
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useDemoMode } from '../hooks/useDemoMode';
 import AiChatWidget from '../components/AiChatWidget';
 import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../services/socialService';
 
@@ -191,6 +192,7 @@ function SidebarItem({ item, collapsed, userRole }) {
 
 export default function DashboardLayout({ children, forceCollapsed }) {
   const { user, profile, role, logout } = useAuth();
+  const { isDemoMode, toggleDemoMode } = useDemoMode();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -453,6 +455,22 @@ export default function DashboardLayout({ children, forceCollapsed }) {
                   {xp.toLocaleString('tr-TR')} XP
                 </span>
               </div>
+            )}
+
+            {/* Demo Modu Butonu — Sadece Öğrenci */}
+            {isStudent && (
+              <button
+                onClick={toggleDemoMode}
+                title={isDemoMode ? 'Demo Modu Aktif — Tıkla: Kapat' : 'Demo Modu — Tüm kilitleri kaldırır'}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all shadow-sm cursor-pointer select-none ${
+                  isDemoMode
+                    ? 'bg-emerald-500 border-emerald-400 text-white shadow-emerald-500/40 shadow-md animate-pulse'
+                    : 'border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300'
+                }`}
+              >
+                <span>🎬</span>
+                <span className="hidden sm:inline">{isDemoMode ? 'Demo Aktif' : 'Demo Modu'}</span>
+              </button>
             )}
 
             {/* Tema Butonu */}

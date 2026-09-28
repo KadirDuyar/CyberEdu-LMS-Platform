@@ -9,6 +9,7 @@ import Card from '../../components/Card';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import EmptyState from '../../components/ui/EmptyState';
 import { BookOpen, Zap, ArrowRight, Shield, Code2, CheckCircle2, Play, Lock, AlertCircle, Sparkles, Filter, Calendar } from 'lucide-react';
+import { useDemoMode } from '../../hooks/useDemoMode';
 
 // ─── Kategori görünüm ayarları ────────────────────────────────────────────────
 const CATEGORY_UI = {
@@ -44,6 +45,7 @@ export default function CourseList() {
   const navigate             = useNavigate();
   const [searchParams]       = useSearchParams();
   const { user, profile }    = useAuth();
+  const { isDemoMode }       = useDemoMode();
   const { courses, loading, error } = useCourses();
 
   const [activeTab, setActiveTab] = useState(searchParams.get('filter') === 'elective' ? 'elective' : 'all');
@@ -253,9 +255,10 @@ export default function CourseList() {
               // Sıralı ilerleme mantığı:
               // Seçmeli kurslar serbestçe alınabilir (kilitli değildir).
               // Zorunlu kurslar: İlk zorunlu kurs açık, sonrakiler bir önceki zorunlu kurs tamamlandığında açılır.
+              // Demo modunda tüm kilitler kaldırılır.
               let isLocked = false;
               let prevCourse = null;
-              if (isMandatory) {
+              if (isMandatory && !isDemoMode) {
                 const mandatoryCourses = courses
                   .filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği ve Zafiyet Analizi'))
                   .filter((c) => c.is_mandatory !== false && c.course_type !== 'elective');
