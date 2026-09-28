@@ -1,3 +1,5 @@
+import { supabase } from '../lib/supabase';
+
 // ─── MÜFREDAT VE KURS SIRALAMA TANIMLARI ───
 export const TECHNICAL_COURSE_ORDER = [
   'web uygulama mimarisi',
