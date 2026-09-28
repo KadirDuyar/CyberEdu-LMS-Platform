@@ -105,13 +105,15 @@ export default function StudentDashboard() {
       const enrolledIds = new Set(enrollments.map((e) => e.course_id));
       const latestEnrolledCourseId = enrollments?.[0]?.course_id;
 
-      // 4. Tüm yayınlanmış kursları çek (tüm kategoriler dahil)
+      // 4. Tüm yayınlanmış kursları çek — zorunlu kurslar önce, sonra created_at sırası
       const area = profile?.learning_area || 'awareness';
       const { data: rawCourses } = await supabase
         .from('courses')
         .select('*, lessons(id, title, xp_reward, order_index, is_published)')
         .eq('is_published', true)
-        .order('created_at', { ascending: true });
+        .order('is_mandatory', { ascending: false })   // zorunlu (true) önce
+        .order('course_type', { ascending: true })     // 'mandatory' < 'elective' alfabetik
+        .order('created_at', { ascending: true });     // sonra eski→yeni
 
       const allCourses = (rawCourses || []).filter(
         (c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')
@@ -188,11 +190,20 @@ export default function StudentDashboard() {
           targetCourse = inProgressCourses[0];
         }
 
-        // D) En son kayıt olunan kurs (eğer henüz başlanmamış veya devam ediyorsa)
+        // D) En son kayıt olunan kurs (eğer tamamlanmamışsa) —
+        //    ama kayıtlı olduğu zorunlu kurs varsa seçmeli kursu atla
         if (!targetCourse && latestEnrolledCourseId) {
           const found = processedCourses.find((c) => c.id === latestEnrolledCourseId);
+          // Tamamlanmamış zorunlu kurs varsa seçmeli kursu atla
+          const hasIncompleteMandatory = processedCourses.some(
+            (c) => c.isMandatory && !c.isCompleted
+          );
           if (found && !found.isCompleted) {
-            targetCourse = found;
+            if (!found.isMandatory && hasIncompleteMandatory) {
+              // Seçmeli atla — zorunlu kurs E adımında bulunacak
+            } else {
+              targetCourse = found;
+            }
           }
         }
 
