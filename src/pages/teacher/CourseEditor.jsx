@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getCourseDetails, saveCourse, deleteLesson } from '../../services/teacherService';
+import { getCourseDetails, saveCourse, deleteLesson, deleteCourse } from '../../services/teacherService';
 import { supabase } from '../../lib/supabase';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
@@ -17,6 +17,7 @@ export default function CourseEditor() {
   const isNew = courseId === 'new' || !courseId;
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [notification, setNotification] = useState(null);
 
   const [course, setCourse] = useState({
@@ -144,6 +145,25 @@ export default function CourseEditor() {
     }
   };
 
+  const handleDeleteCourse = async () => {
+    if (!courseId || isNew) return;
+    const confirmMessage = `"${course.title || 'Bu kurs'}" ve kursa ait TÜM dersler, aktiviteler, öğrenci ilerlemeleri kalıcı olarak silinecektir.\n\nBu işlem geri alınamaz! Kursu silmek istediğinize emin misiniz?`;
+    if (!window.confirm(confirmMessage)) return;
+
+    setDeleting(true);
+    const { error } = await deleteCourse(courseId);
+    setDeleting(false);
+
+    if (error) {
+      showNotif('error', 'Kurs silinirken hata oluştu: ' + (error.message || 'Veritabanı kısıtlaması'));
+    } else {
+      showNotif('success', 'Kurs ve ilişkili tüm veriler başarıyla silindi.');
+      setTimeout(() => {
+        navigate('/teacher/courses');
+      }, 700);
+    }
+  };
+
   if (loading) return <DashboardLayout><LoadingSpinner fullPage/></DashboardLayout>;
 
   return (
@@ -165,13 +185,28 @@ export default function CourseEditor() {
             <ArrowLeft size={16}/> Kurslara Dön
           </button>
 
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold transition-all shadow-lg shadow-violet-500/30 disabled:opacity-50"
-          >
-            {saving ? <LoadingSpinner size="sm"/> : <Save size={18}/>} Kaydet
-          </button>
+          <div className="flex items-center gap-3">
+            {!isNew && (
+              <button
+                type="button"
+                onClick={handleDeleteCourse}
+                disabled={deleting || saving}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 text-sm font-bold transition-all shadow-sm hover:border-rose-400 disabled:opacity-50 cursor-pointer"
+                title="Kursu ve veritabanındaki tüm ilişkili verileri kalıcı olarak sil"
+              >
+                {deleting ? <LoadingSpinner size="sm" /> : <Trash2 size={16} />}
+                <span>{deleting ? 'Siliniyor...' : 'Kursu Sil'}</span>
+              </button>
+            )}
+
+            <button
+              onClick={handleSave}
+              disabled={saving || deleting}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold transition-all shadow-lg shadow-violet-500/30 disabled:opacity-50 cursor-pointer"
+            >
+              {saving ? <LoadingSpinner size="sm"/> : <Save size={18}/>} Kaydet
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -323,6 +358,28 @@ export default function CourseEditor() {
                 </div>
               </div>
             </Card>
+
+            {!isNew && (
+              <div className="p-5 rounded-2xl border border-rose-200 dark:border-rose-900/40 bg-rose-50/50 dark:bg-rose-950/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                <div>
+                  <h4 className="text-sm font-bold text-rose-800 dark:text-rose-300 flex items-center gap-2">
+                    <Trash2 size={16} /> Tehlikeli Bölge: Kursu Sil
+                  </h4>
+                  <p className="text-xs text-rose-600/90 dark:text-rose-400/80 mt-1 max-w-xl">
+                    Bu kursu sildiğinizde bağlı tüm dersler, etkileşimli aktiviteler, çözümler, öğrenci kayıtları ve ilerleme verileri veritabanından kalıcı olarak silinir. Bu işlem geri alınamaz.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDeleteCourse}
+                  disabled={deleting || saving}
+                  className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-md shrink-0 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <Trash2 size={14} />
+                  <span>{deleting ? 'Siliniyor...' : 'Kursu Kalıcı Olarak Sil'}</span>
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="md:col-span-1">

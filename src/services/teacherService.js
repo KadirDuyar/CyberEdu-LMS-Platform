@@ -265,14 +265,121 @@ export async function createDemoCourse(teacherId) {
   return { data: course, error: null };
 }
 
-// SİLME İŞLEMLERİ
+// SİLME İŞLEMLERİ (CASCADE - İLİŞKİLİ TÜM VERİLERİ TEMİZLER)
 export async function deleteCourse(courseId) {
-  const { error } = await supabase.from('courses').delete().eq('id', courseId);
-  return { error };
+  try {
+    // 1. Kursa ait ders ID'lerini bul
+    const { data: lessonsData } = await supabase
+      .from('lessons')
+      .select('id')
+      .eq('course_id', courseId);
+
+    const lessonIds = lessonsData ? lessonsData.map((l) => l.id) : [];
+
+    // 2. Bu derslere ait aktivite ID'lerini bul
+    let activityIds = [];
+    if (lessonIds.length > 0) {
+      const { data: actsData } = await supabase
+        .from('activities')
+        .select('id')
+        .in('lesson_id', lessonIds);
+      if (actsData) activityIds = actsData.map((a) => a.id);
+    }
+
+    // 3. activity_attempts sil
+    if (activityIds.length > 0) {
+      await supabase.from('activity_attempts').delete().in('activity_id', activityIds);
+    }
+
+    // 4. activities sil
+    if (lessonIds.length > 0) {
+      await supabase.from('activities').delete().in('lesson_id', lessonIds);
+    }
+
+    // 5. lesson_progress sil
+    if (lessonIds.length > 0) {
+      await supabase.from('lesson_progress').delete().in('lesson_id', lessonIds);
+    }
+
+    // 6. cohort_weeks ve cohort_progress sil
+    let cohortWeekIds = [];
+    const { data: cwData } = await supabase
+      .from('cohort_weeks')
+      .select('id')
+      .eq('course_id', courseId);
+    if (cwData) cohortWeekIds = cwData.map((w) => w.id);
+
+    if (lessonIds.length > 0) {
+      const { data: cwLessonData } = await supabase
+        .from('cohort_weeks')
+        .select('id')
+        .in('lesson_id', lessonIds);
+      if (cwLessonData) {
+        cwLessonData.forEach((w) => {
+          if (!cohortWeekIds.includes(w.id)) cohortWeekIds.push(w.id);
+        });
+      }
+    }
+
+    if (cohortWeekIds.length > 0) {
+      await supabase.from('cohort_progress').delete().in('cohort_week_id', cohortWeekIds);
+      await supabase.from('cohort_weeks').delete().in('id', cohortWeekIds);
+    }
+
+    // 7. course_feedbacks sil
+    await supabase.from('course_feedbacks').delete().eq('course_id', courseId);
+
+    // 8. enrollments sil
+    await supabase.from('enrollments').delete().eq('course_id', courseId);
+
+    // 9. lessons sil
+    if (lessonIds.length > 0) {
+      await supabase.from('lessons').delete().eq('course_id', courseId);
+    }
+
+    // 10. Son olarak courses sil
+    const { error: courseErr } = await supabase
+      .from('courses')
+      .delete()
+      .eq('id', courseId);
+
+    if (courseErr) return { error: courseErr };
+    return { error: null };
+  } catch (err) {
+    console.error('Kurs silme işlemi sırasında hata:', err);
+    return { error: err };
+  }
 }
 
 export async function deleteLesson(lessonId) {
-  const { error } = await supabase.from('lessons').delete().eq('id', lessonId);
-  return { error };
+  try {
+    // 1. Aktivite ID'lerini bul
+    const { data: actsData } = await supabase
+      .from('activities')
+      .select('id')
+      .eq('lesson_id', lessonId);
+    const actIds = actsData ? actsData.map((a) => a.id) : [];
+
+    // 2. activity_attempts sil
+    if (actIds.length > 0) {
+      await supabase.from('activity_attempts').delete().in('activity_id', actIds);
+    }
+
+    // 3. activities sil
+    await supabase.from('activities').delete().eq('lesson_id', lessonId);
+
+    // 4. lesson_progress sil
+    await supabase.from('lesson_progress').delete().eq('lesson_id', lessonId);
+
+    // 5. cohort_weeks lesson_id referanslarını temizle/sil
+    await supabase.from('cohort_weeks').delete().eq('lesson_id', lessonId);
+
+    // 6. lesson sil
+    const { error } = await supabase.from('lessons').delete().eq('id', lessonId);
+    return { error };
+  } catch (err) {
+    console.error('Ders silme işlemi sırasında hata:', err);
+    return { error: err };
+  }
 }
 
