@@ -23,8 +23,8 @@ export default function TeacherDashboard() {
       try {
         const { data: coursesData } = await supabase
           .from('courses')
-          .select('id, title, description, category, is_published, created_at')
-          .eq('created_by', user.id)
+          .select('id, title, description, category, is_published, created_at, thumbnail_emoji, lessons(count)')
+          .or(`created_by.eq.${user.id},created_by.is.null`)
           .order('created_at', { ascending: false });
 
         if (coursesData) {
@@ -151,12 +151,17 @@ export default function TeacherDashboard() {
         {/* Mevcut Kurslarım Listesi */}
         <Card>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">Hazırladığın Kurslar</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">Hazırladığın Kurslar</h3>
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 dark:bg-cyan-500/20 dark:text-cyan-300">
+                {courses.length} Kurs
+              </span>
+            </div>
             <button
               onClick={() => navigate('/teacher/courses')}
               className="text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline"
             >
-              Tümünü Gör
+              Tümünü Gör ({courses.length}) →
             </button>
           </div>
 
@@ -165,31 +170,51 @@ export default function TeacherDashboard() {
               <p className="text-xs text-slate-500 dark:text-slate-400">Henüz bir kurs oluşturmadın.</p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {courses.slice(0, 4).map((c) => (
-                <div
-                  key={c.id}
-                  className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:glass border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/15 transition-all"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">🛡️</span>
-                    <div>
-                      <p className="font-bold text-sm text-slate-900 dark:text-white">{c.title}</p>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-100 text-cyan-800 border border-cyan-300 dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/30">
-                        {c.category === 'technical' ? 'Teknik' : 'Farkındalık'}
-                      </span>
+            <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
+              {courses.map((c) => {
+                const lessonCount = c.lessons?.[0]?.count ?? 0;
+                return (
+                  <div
+                    key={c.id}
+                    className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:glass border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/15 transition-all"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-2xl shrink-0">{c.thumbnail_emoji || '🛡️'}</span>
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{c.title}</p>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-100 text-cyan-800 border border-cyan-300 dark:bg-cyan-500/20 dark:text-cyan-300 dark:border-cyan-500/30">
+                            {c.category === 'technical' ? 'Teknik' : 'Farkındalık'}
+                          </span>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                            {lessonCount} Ders
+                          </span>
+                          <span className={`text-[10px] font-bold ${c.is_published ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                            {c.is_published ? '• Yayında' : '• Taslak'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                      <button
+                        onClick={() => navigate(`/student/courses/${c.id}`)}
+                        className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors hidden sm:inline-block"
+                        title="Önizle"
+                      >
+                        Önizle
+                      </button>
+                      <button
+                        onClick={() => navigate(`/teacher/courses/${c.id}/edit`)}
+                        className="p-2 rounded-lg bg-cyan-50 hover:bg-cyan-100 text-cyan-700 dark:bg-cyan-500/10 dark:hover:bg-cyan-500/20 dark:text-cyan-300 transition-colors"
+                        title="Kursu Düzenle"
+                      >
+                        <Edit2 size={16} />
+                      </button>
                     </div>
                   </div>
-
-                  <button
-                    onClick={() => navigate(`/teacher/courses/${c.id}/edit`)}
-                    className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-slate-200 transition-colors"
-                    title="Kursu ve Dersleri Düzenle"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </Card>

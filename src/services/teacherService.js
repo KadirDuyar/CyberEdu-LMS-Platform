@@ -4,11 +4,16 @@ import { supabase } from '../lib/supabase';
 // KURS İŞLEMLERİ
 
 export async function getTeacherCourses(teacherId) {
-  const { data, error } = await supabase
+  let query = supabase
     .from('courses')
     .select('*, lessons(count)')
-    .eq('created_by', teacherId)
     .order('created_at', { ascending: false });
+
+  if (teacherId) {
+    query = query.or(`created_by.eq.${teacherId},created_by.is.null`);
+  }
+
+  const { data, error } = await query;
   return { data, error };
 }
 
