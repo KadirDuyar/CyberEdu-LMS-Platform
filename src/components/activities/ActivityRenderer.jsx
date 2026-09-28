@@ -814,16 +814,24 @@ function HotspotActivity({ activity, onSubmit, submitted, result, initialAnswer 
   const [clickPos, setClickPos] = useState(initialAnswer || null);
 
   const resolveImgSrc = () => {
-    if (typeof activity.options === 'string') return activity.options;
-    if (activity.options && typeof activity.options === 'object') {
-      return activity.options.image_url || activity.options.url || activity.options.image || null;
+    let opts = activity.options;
+    if (typeof opts === 'string') {
+      try {
+        if (opts.trim().startsWith('{') || opts.trim().startsWith('[')) {
+          opts = JSON.parse(opts);
+        }
+      } catch (e) {}
     }
-    return null;
+    if (typeof opts === 'string' && (opts.startsWith('http') || opts.startsWith('/'))) return opts;
+    if (opts && typeof opts === 'object') {
+      const url = opts.image_url || opts.url || opts.image;
+      if (url && typeof url === 'string') return url;
+    }
+    // Varsayılan ve garantili görsel: yerel oltalama görseli
+    return '/images/phishing-sample.jpg';
   };
 
-  const [imgSrc, setImgSrc] = useState(
-    resolveImgSrc() || 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800'
-  );
+  const [imgSrc, setImgSrc] = useState(resolveImgSrc());
 
   useEffect(() => {
     const resolved = resolveImgSrc();
@@ -839,7 +847,12 @@ function HotspotActivity({ activity, onSubmit, submitted, result, initialAnswer 
     if (activity.options?.spots && Array.isArray(activity.options.spots)) {
       return activity.options.spots;
     }
-    return [{ x: 50, y: 50, label: 'Hedef Bölge' }];
+    // Görseldeki gerçek koordinatlar: Sahte bit.ly bağlantısı, görünen metin ve sahte gönderen
+    return [
+      { x: 68, y: 66, radius: 16, label: "Tuzak Bağlantı (bit.ly)" },
+      { x: 23, y: 65, radius: 15, label: "Şüpheli Parola Sıfırlama Linki" },
+      { x: 35, y: 31, radius: 14, label: "Sahte Gönderen (.support)" }
+    ];
   };
 
   const targets = getTargets();
@@ -877,9 +890,13 @@ function HotspotActivity({ activity, onSubmit, submitted, result, initialAnswer 
         <img
           src={imgSrc}
           onError={() => {
-            setImgSrc(
-              "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='350' viewBox='0 0 600 350'><rect fill='%230f172a' width='100%25' height='100%25'/><text fill='%2394a3b8' font-family='sans-serif' font-size='16' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'>Sistem Ağ Şeması (Örnek Görsel)</text></svg>"
-            );
+            if (imgSrc !== '/images/phishing-sample.jpg') {
+              setImgSrc('/images/phishing-sample.jpg');
+            } else {
+              setImgSrc(
+                "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='350' viewBox='0 0 600 350'><rect fill='%230f172a' width='100%25' height='100%25'/><text fill='%2394a3b8' font-family='sans-serif' font-size='16' font-weight='bold' x='50%25' y='50%25' text-anchor='middle'>Sistem Ağ Şeması (Örnek Görsel)</text></svg>"
+              );
+            }
           }}
           alt="Hedef"
           className="w-full h-auto max-w-full block select-none"
