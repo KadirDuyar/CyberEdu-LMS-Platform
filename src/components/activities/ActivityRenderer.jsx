@@ -812,9 +812,37 @@ function MemoryCardActivity({ activity, onSubmit, submitted }) {
 
 function HotspotActivity({ activity, onSubmit, submitted, result, initialAnswer }) {
   const [clickPos, setClickPos] = useState(initialAnswer || null);
+
+  const resolveImgSrc = () => {
+    if (typeof activity.options === 'string') return activity.options;
+    if (activity.options && typeof activity.options === 'object') {
+      return activity.options.image_url || activity.options.url || activity.options.image || null;
+    }
+    return null;
+  };
+
   const [imgSrc, setImgSrc] = useState(
-    activity.options || 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800'
+    resolveImgSrc() || 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800'
   );
+
+  useEffect(() => {
+    const resolved = resolveImgSrc();
+    if (resolved) setImgSrc(resolved);
+  }, [activity.options]);
+
+  const getTargets = () => {
+    const ca = activity.correct_answer;
+    if (Array.isArray(ca)) return ca;
+    if (ca?.targets && Array.isArray(ca.targets)) return ca.targets;
+    if (ca?.spots && Array.isArray(ca.spots)) return ca.spots;
+    if (ca?.x !== undefined && ca?.y !== undefined) return [ca];
+    if (activity.options?.spots && Array.isArray(activity.options.spots)) {
+      return activity.options.spots;
+    }
+    return [{ x: 50, y: 50, label: 'Hedef Bölge' }];
+  };
+
+  const targets = getTargets();
 
   const handleImageClick = (e) => {
     if (submitted) return;
@@ -826,9 +854,13 @@ function HotspotActivity({ activity, onSubmit, submitted, result, initialAnswer 
 
   const handleSubmit = () => {
     if (!clickPos) return;
-    const target = activity.correct_answer || { x: 50, y: 50 };
-    const dist = Math.sqrt(Math.pow(clickPos.x - target.x, 2) + Math.pow(clickPos.y - target.y, 2));
-    const isCorrect = dist <= 12;
+    const isCorrect = targets.some((t) => {
+      const radius = t.radius || 15;
+      const dx = Math.abs(clickPos.x - t.x);
+      const dy = Math.abs(clickPos.y - t.y);
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      return dist <= radius || (dx <= radius * 1.6 && dy <= radius);
+    });
     onSubmit({ userAnswer: clickPos, isCorrect });
   };
 
@@ -860,12 +892,26 @@ function HotspotActivity({ activity, onSubmit, submitted, result, initialAnswer 
           />
         )}
 
-        {submitted && activity.correct_answer && (
+        {submitted && targets.map((t, idx) => (
           <div
-            className="absolute w-8 h-8 -ml-4 -mt-4 rounded-full border-4 border-emerald-500 bg-emerald-500/30 pointer-events-none z-10"
-            style={{ left: `${activity.correct_answer.x}%`, top: `${activity.correct_answer.y}%` }}
-          />
-        )}
+            key={idx}
+            className="absolute rounded-full border-4 border-emerald-500 bg-emerald-500/30 pointer-events-none z-10 flex items-center justify-center animate-pulse"
+            style={{
+              left: `${t.x}%`,
+              top: `${t.y}%`,
+              width: '36px',
+              height: '36px',
+              transform: 'translate(-50%, -50%)',
+            }}
+            title={t.label || 'Doğru Hedef'}
+          >
+            {t.label && (
+              <span className="absolute -top-7 whitespace-nowrap bg-emerald-700 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">
+                {t.label}
+              </span>
+            )}
+          </div>
+        ))}
       </div>
 
       {!submitted && (
@@ -873,7 +919,7 @@ function HotspotActivity({ activity, onSubmit, submitted, result, initialAnswer 
           <button
             onClick={handleSubmit}
             disabled={!clickPos}
-            className="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white font-bold text-sm shadow-md"
+            className="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 disabled:opacity-40 text-white font-bold text-sm shadow-md cursor-pointer transition-all"
           >
             Seçimi Onayla
           </button>
@@ -885,7 +931,7 @@ function HotspotActivity({ activity, onSubmit, submitted, result, initialAnswer 
           correct={result.isCorrect}
           explanation={activity.explanation}
           points={activity.points}
-          correctAnswer={activity.correct_answer}
+          correctAnswer={targets.map((t) => t.label || `X: %${t.x}, Y: %${t.y}`).join(' veya ')}
         />
       )}
     </div>
