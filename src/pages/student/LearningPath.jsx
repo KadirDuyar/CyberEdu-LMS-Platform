@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { enrollInCourse } from '../../services/courseService';
+import { enrollInCourse, sortCoursesByCurriculum } from '../../services/courseService';
 import { Zap, CheckCircle2, Lock, ArrowRight, BookOpen, Sparkles, Play, AlertCircle } from 'lucide-react';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
@@ -57,15 +57,16 @@ export default function LearningPath() {
         if (courseList) {
           const filtered = courseList.filter(
             (c) => !c.title.includes('Kurumsal Siber Güvenlik') && 
-                   !c.title.includes('Uygulama Güvenliği') &&
+                   !c.title.includes('Uygulama Güvenliği ve Zafiyet Analizi') &&
                    c.is_mandatory !== false &&
                    c.course_type !== 'elective'
           );
-          setCourses(filtered);
+          const sorted = sortCoursesByCurriculum(filtered, area);
+          setCourses(sorted);
 
           // İlk kursa otomatik kayıt ol (eğer kayıtlı değilse)
-          if (filtered.length > 0 && user) {
-            const firstCourseId = filtered[0].id;
+          if (sorted.length > 0 && user) {
+            const firstCourseId = sorted[0].id;
             setEnrolledCourseIds((prev) => {
               const updated = new Set(prev);
               updated.add(firstCourseId);

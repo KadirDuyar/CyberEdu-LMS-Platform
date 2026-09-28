@@ -143,14 +143,43 @@ export default function Navigator() {
     // İlk kursu bulup öğrenciyi otomatik kaydet (enroll)
     try {
       if (user) {
-        const { data: firstCourse } = await supabase
-          .from('courses')
-          .select('id')
-          .eq('category', learningArea)
-          .eq('is_published', true)
-          .order('created_at', { ascending: true })
-          .limit(1)
-          .maybeSingle();
+        let firstCourse = null;
+
+        if (learningArea === 'technical') {
+          // Teknik öğrenci için ilk kurs: Web Uygulama Mimarisi
+          const { data: webArch } = await supabase
+            .from('courses')
+            .select('id')
+            .ilike('title', '%Web Uygulama Mimarisi%')
+            .eq('is_published', true)
+            .limit(1)
+            .maybeSingle();
+          if (webArch) firstCourse = webArch;
+        } else if (learningArea === 'awareness') {
+          // Farkındalık öğrencisi için ilk kurs: Siber Güvenliğe Giriş
+          const { data: introCourse } = await supabase
+            .from('courses')
+            .select('id')
+            .ilike('title', '%Siber Güvenliğe Giriş%')
+            .eq('is_published', true)
+            .limit(1)
+            .maybeSingle();
+          if (introCourse) firstCourse = introCourse;
+        }
+
+        // Bulunamazsa kategorideki ilk yayınlanmış zorunlu kursu bul
+        if (!firstCourse) {
+          const { data: fallbackCourse } = await supabase
+            .from('courses')
+            .select('id')
+            .eq('category', learningArea)
+            .eq('is_published', true)
+            .order('is_mandatory', { ascending: false })
+            .order('created_at', { ascending: true })
+            .limit(1)
+            .maybeSingle();
+          firstCourse = fallbackCourse;
+        }
 
         if (firstCourse) {
           await supabase.from('enrollments').upsert([

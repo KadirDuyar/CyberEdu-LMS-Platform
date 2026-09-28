@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCourse } from '../../hooks/useCourses';
 import { supabase } from '../../lib/supabase';
+import { sortCoursesByCurriculum } from '../../services/courseService';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import Card from '../../components/Card';
 import ProgressBar from '../../components/ui/ProgressBar';
@@ -65,12 +66,13 @@ export default function CoursePage() {
           .eq('is_published', true)
           .order('created_at', { ascending: true });
 
-        const filtered = (allCourses || []).filter(
+        const rawFiltered = (allCourses || []).filter(
           (c) => !c.title.includes('Kurumsal Siber Güvenlik') && 
-                 !c.title.includes('Uygulama Güvenliği') &&
+                 !c.title.includes('Uygulama Güvenliği ve Zafiyet Analizi') &&
                  c.is_mandatory !== false &&
                  c.course_type !== 'elective'
         );
+        const filtered = sortCoursesByCurriculum(rawFiltered, course.category);
 
         const currentIdx = filtered.findIndex((c) => c.id === course.id);
         if (currentIdx > 0) {

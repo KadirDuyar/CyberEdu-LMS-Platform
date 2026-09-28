@@ -183,7 +183,7 @@ export default function CourseList() {
                 : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-transparent'
             }`}
           >
-            Tüm Kurslar ({courses.filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')).length})
+            Tüm Kurslar ({courses.filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği ve Zafiyet Analizi')).length})
           </button>
           <button
             onClick={() => setActiveTab('mandatory')}
@@ -231,7 +231,7 @@ export default function CourseList() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {courses
-              .filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği'))
+              .filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği ve Zafiyet Analizi'))
               .filter((c) => {
                 const isElective = c.is_mandatory === false || c.course_type === 'elective';
                 if (activeTab === 'elective') return isElective;
@@ -257,7 +257,7 @@ export default function CourseList() {
               let prevCourse = null;
               if (isMandatory) {
                 const mandatoryCourses = courses
-                  .filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği'))
+                  .filter((c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği ve Zafiyet Analizi'))
                   .filter((c) => c.is_mandatory !== false && c.course_type !== 'elective');
                 const mandIdx = mandatoryCourses.findIndex((c) => c.id === course.id);
                 if (mandIdx > 0) {

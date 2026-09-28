@@ -12,6 +12,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import OnboardingTour from '../components/ui/OnboardingTour';
 import WeeklyTasksBanner from '../components/cohorts/WeeklyTasksBanner';
 import { getFollowingIds, followUser, unfollowUser } from '../services/socialService';
+import { sortCoursesByCurriculum } from '../services/courseService';
 
 export default function StudentDashboard() {
   const { user, profile } = useAuth();
@@ -116,12 +117,12 @@ export default function StudentDashboard() {
         .order('created_at', { ascending: true });     // sonra eski→yeni
 
       const allCourses = (rawCourses || []).filter(
-        (c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği')
+        (c) => !c.title.includes('Kurumsal Siber Güvenlik') && !c.title.includes('Uygulama Güvenliği ve Zafiyet Analizi')
       );
 
       if (allCourses && allCourses.length > 0) {
         // Her kurs için ilerleme durumunu ve son aktivite zamanını hesapla
-        const processedCourses = allCourses.map((c, idx) => {
+        let processedCourses = allCourses.map((c, idx) => {
           const pubLessons = (c.lessons || [])
             .filter((l) => l.is_published)
             .sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0));
@@ -154,6 +155,9 @@ export default function StudentDashboard() {
           };
         });
 
+        // Müfredat akış sırasına göre sırala (Teknik: Web Uygulama Mimarisi ilk, Farkındalık: Siber Güvenliğe Giriş ilk)
+        processedCourses = sortCoursesByCurriculum(processedCourses, area);
+
         // ── AKILLI AKTİF KURS BELİRLEME MANTIĞI ──
         const savedLastCourseId = localStorage.getItem(`cyberedu_last_active_course_${user.id}`) || localStorage.getItem('cyberedu_last_active_course');
         let targetCourse = null;
@@ -163,9 +167,20 @@ export default function StudentDashboard() {
           .filter((c) => c.isInProgress)
           .sort((a, b) => b.latestActivityTime - a.latestActivityTime);
 
-        // B) Eğer localStorage'daki kurs geçerliyse:
+        // B) Eğer öğrencinin henüz hiç devam eden/tamamlanan dersi yoksa (yeni kayıt veya yeni başlayan)
+        // Teknik öğrencide doğrudan Web Uygulama Mimarisi'ni, Farkındalıkta Siber Güvenliğe Giriş'i seç
+        const hasStartedAny = inProgressCourses.length > 0 || doneIds.size > 0;
+        if (!hasStartedAny) {
+          if (area === 'technical') {
+            targetCourse = processedCourses.find((c) => c.title.toLowerCase().includes('web uygulama mimarisi') && !c.isCompleted);
+          } else if (area === 'awareness') {
+            targetCourse = processedCourses.find((c) => c.title.toLowerCase().includes('siber güvenliğe giriş') && !c.isCompleted);
+          }
+        }
+
+        // C) Eğer hafızadaki kurs geçerliyse:
         // YALNIZCA kullanıcının veritabanında gerçekten kayıtlı olduğu kursu kabul et
-        if (savedLastCourseId && enrolledIds.has(savedLastCourseId)) {
+        if (!targetCourse && savedLastCourseId && enrolledIds.has(savedLastCourseId)) {
           const found = processedCourses.find((c) => c.id === savedLastCourseId);
           if (found) {
             // Eğer localStorage'daki kurs bitmemişse veya aktif olarak üzerinde çalışılıyorsa öncelik ver
@@ -185,12 +200,12 @@ export default function StudentDashboard() {
           } catch (e) {}
         }
 
-        // C) Eğer hala belirlenmediyse: Devam eden ilk kurs
+        // D) Eğer hala belirlenmediyse: Devam eden ilk kurs
         if (!targetCourse && inProgressCourses.length > 0) {
           targetCourse = inProgressCourses[0];
         }
 
-        // D) En son kayıt olunan kurs (eğer tamamlanmamışsa) —
+        // E) En son kayıt olunan kurs (eğer tamamlanmamışsa) —
         //    ama kayıtlı olduğu zorunlu kurs varsa seçmeli kursu atla
         if (!targetCourse && latestEnrolledCourseId) {
           const found = processedCourses.find((c) => c.id === latestEnrolledCourseId);
@@ -200,24 +215,42 @@ export default function StudentDashboard() {
           );
           if (found && !found.isCompleted) {
             if (!found.isMandatory && hasIncompleteMandatory) {
-              // Seçmeli atla — zorunlu kurs E adımında bulunacak
+              // Seçmeli atla — zorunlu kurs F adımında bulunacak
             } else {
               targetCourse = found;
             }
           }
         }
 
-        // E) Öğrencinin alanındaki (awareness/technical) ilk tamamlanmamış ZORUNLU kurs, yoksa ilk tamamlanmamış kurs
+        // F) Öğrencinin alanındaki (awareness/technical) ilk tamamlanmamış ZORUNLU kurs (Teknik: Web Uygulama Mimarisi, Farkındalık: Siber Güvenliğe Giriş öncelikli)
         if (!targetCourse) {
           const areaCourses = processedCourses.filter((c) => c.category === area);
-          targetCourse = areaCourses.find((c) => c.isMandatory && !c.isCompleted)
-            || areaCourses.find((c) => !c.isCompleted)
-            || processedCourses.find((c) => !c.isCompleted);
+          if (area === 'technical') {
+            targetCourse = areaCourses.find((c) => c.title.toLowerCase().includes('web uygulama mimarisi') && !c.isCompleted);
+          } else if (area === 'awareness') {
+            targetCourse = areaCourses.find((c) => c.title.toLowerCase().includes('siber güvenliğe giriş') && !c.isCompleted);
+          }
+
+          if (!targetCourse) {
+            targetCourse = areaCourses.find((c) => c.isMandatory && !c.isCompleted)
+              || areaCourses.find((c) => !c.isCompleted)
+              || processedCourses.find((c) => !c.isCompleted);
+          }
         }
 
-        // F) Tüm kurslar bittiyse veya yeni öğrenci için ilk alan kursunu seç
+        // G) Tüm kurslar bittiyse veya yeni öğrenci için ilk alan kursunu seç
         if (!targetCourse) {
-          targetCourse = processedCourses.find((c) => c.category === area) || processedCourses[0];
+          if (area === 'technical') {
+            targetCourse = processedCourses.find((c) => c.title.toLowerCase().includes('web uygulama mimarisi'))
+              || processedCourses.find((c) => c.category === area)
+              || processedCourses[0];
+          } else if (area === 'awareness') {
+            targetCourse = processedCourses.find((c) => c.title.toLowerCase().includes('siber güvenliğe giriş'))
+              || processedCourses.find((c) => c.category === area)
+              || processedCourses[0];
+          } else {
+            targetCourse = processedCourses.find((c) => c.category === area) || processedCourses[0];
+          }
         }
 
         if (targetCourse) {

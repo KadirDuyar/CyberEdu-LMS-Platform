@@ -1,4 +1,45 @@
-import { supabase } from '../lib/supabase';
+// ─── MÜFREDAT VE KURS SIRALAMA TANIMLARI ───
+export const TECHNICAL_COURSE_ORDER = [
+  'web uygulama mimarisi',
+  'güvenli kod yazımı',
+  'http & https',
+  'sql injection',
+  'xss',
+];
+
+export const AWARENESS_COURSE_ORDER = [
+  'siber güvenliğe giriş',
+  'phishing',
+  'güçlü parola',
+  'mfa',
+  'sosyal mühendislik',
+];
+
+export function getCourseSortOrder(course, area) {
+  const title = (course?.title || '').toLowerCase();
+  const orderList = area === 'technical' ? TECHNICAL_COURSE_ORDER : AWARENESS_COURSE_ORDER;
+  const idx = orderList.findIndex((keyword) => title.includes(keyword));
+  return idx !== -1 ? idx : 999;
+}
+
+export function sortCoursesByCurriculum(coursesList, area) {
+  if (!coursesList || !Array.isArray(coursesList)) return [];
+  return [...coursesList].sort((a, b) => {
+    // 1. Zorunlu kurslar önce gelsin
+    const aMandatory = a.is_mandatory !== false && a.course_type !== 'elective';
+    const bMandatory = b.is_mandatory !== false && b.course_type !== 'elective';
+    if (aMandatory && !bMandatory) return -1;
+    if (!aMandatory && bMandatory) return 1;
+
+    // 2. Müfredat sırasına göre
+    const orderA = getCourseSortOrder(a, area);
+    const orderB = getCourseSortOrder(b, area);
+    if (orderA !== orderB) return orderA - orderB;
+
+    // 3. Tarihe göre (eskiden yeniye)
+    return new Date(a.created_at || 0) - new Date(b.created_at || 0);
+  });
+}
 
 // ─── ÖĞRENCİ KURS İŞLEMLERİ ───
 
@@ -15,7 +56,8 @@ export async function getCoursesByCategory(category) {
   }
 
   const { data, error } = await query;
-  return { data, error };
+  const sorted = data ? sortCoursesByCurriculum(data, category) : data;
+  return { data: sorted, error };
 }
 
 // Kurs detayını ve ders listesini çeker
