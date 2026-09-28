@@ -30,6 +30,7 @@ import CohortDetails   from './pages/teacher/CohortDetails';
 
 // ─── Admin Pages ──────────────────────────────────────────────────────────────
 import AdminDashboard from './pages/AdminDashboard';
+import AdminCourses from './pages/admin/AdminCourses';
 
 // ─── Shared Pages ─────────────────────────────────────────────────────────────
 import ProfilePage from './pages/ProfilePage';
@@ -186,7 +187,7 @@ export default function App() {
           <Route
             path="/teacher/courses/new"
             element={
-              <ProtectedRoute allowedRoles={['teacher']}>
+              <ProtectedRoute allowedRoles={['teacher', 'admin']}>
                 <CourseEditor />
               </ProtectedRoute>
             }
@@ -194,7 +195,7 @@ export default function App() {
           <Route
             path="/teacher/courses/:courseId/edit"
             element={
-              <ProtectedRoute allowedRoles={['teacher']}>
+              <ProtectedRoute allowedRoles={['teacher', 'admin']}>
                 <CourseEditor />
               </ProtectedRoute>
             }
@@ -202,7 +203,7 @@ export default function App() {
           <Route
             path="/teacher/courses/:courseId/details"
             element={
-              <ProtectedRoute allowedRoles={['teacher']}>
+              <ProtectedRoute allowedRoles={['teacher', 'admin']}>
                 <TeacherCourseDetails />
               </ProtectedRoute>
             }
@@ -210,7 +211,7 @@ export default function App() {
           <Route
             path="/teacher/courses/:courseId/lessons/new"
             element={
-              <ProtectedRoute allowedRoles={['teacher']}>
+              <ProtectedRoute allowedRoles={['teacher', 'admin']}>
                 <LessonBuilder />
               </ProtectedRoute>
             }
@@ -218,7 +219,7 @@ export default function App() {
           <Route
             path="/teacher/courses/:courseId/lessons/:lessonId/edit"
             element={
-              <ProtectedRoute allowedRoles={['teacher']}>
+              <ProtectedRoute allowedRoles={['teacher', 'admin']}>
                 <LessonBuilder />
               </ProtectedRoute>
             }
@@ -277,7 +278,23 @@ export default function App() {
             path="/admin/courses"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
-                <ComingSoon title="Kurs Yönetimi" emoji="📚" />
+                <AdminCourses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/courses/new"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <CourseEditor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/courses/:courseId/edit"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <CourseEditor />
               </ProtectedRoute>
             }
           />

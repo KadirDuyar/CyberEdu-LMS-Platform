@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { getAllProfiles, resetStudentProgress } from '../services/adminService';
@@ -6,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import {
   Users, ShieldCheck, Activity, BookOpen,
   RefreshCw, RotateCcw, UserCheck, ShieldAlert,
-  Search, X, Sparkles
+  Search, X, Sparkles, Plus
 } from 'lucide-react';
 import Card from '../components/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -25,6 +26,7 @@ const ROLE_LABELS = {
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalCourses, setTotalCourses] = useState(0);
@@ -150,6 +152,20 @@ export default function AdminDashboard() {
             <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm mt-2 max-w-2xl leading-relaxed">
               Platform kullanıcıları, içerik bütünlüğü ve rol tabanlı yetkilendirme (RBAC) kontrolleri aktif.
             </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={() => navigate('/admin/courses')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs transition-all shadow-md cursor-pointer hover:scale-105"
+              >
+                <BookOpen size={15} /> Kursları Yönet
+              </button>
+              <button
+                onClick={() => navigate('/teacher/courses/new')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-white/10 hover:bg-slate-100 dark:hover:bg-white/20 text-slate-800 dark:text-white font-bold text-xs transition-all border border-slate-300 dark:border-white/10 cursor-pointer hover:scale-105 shadow-sm"
+              >
+                <Plus size={15} /> Yeni Kurs Oluştur
+              </button>
+            </div>
           </div>
         </div>
 
@@ -163,13 +179,20 @@ export default function AdminDashboard() {
             <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">Toplam Kullanıcı</p>
           </Card>
 
-          <Card hover className="border-cyan-500/20 p-3.5 sm:p-5">
-            <BookOpen size={20} className="text-cyan-600 dark:text-cyan-400 sm:w-6 sm:h-6" />
-            <p className="font-display font-black text-xl sm:text-2xl mt-2 text-cyan-600 dark:text-cyan-400">
-              {loading ? '—' : totalCourses}
-            </p>
-            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">Kayıtlı Kurs</p>
-          </Card>
+          <div onClick={() => navigate('/admin/courses')} className="cursor-pointer">
+            <Card hover className="border-cyan-500/20 hover:border-cyan-400/50 transition-all p-3.5 sm:p-5">
+              <div className="flex items-center justify-between">
+                <BookOpen size={20} className="text-cyan-600 dark:text-cyan-400 sm:w-6 sm:h-6" />
+                <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-100 dark:bg-cyan-950/60 px-2 py-0.5 rounded">
+                  Yönet →
+                </span>
+              </div>
+              <p className="font-display font-black text-xl sm:text-2xl mt-2 text-cyan-600 dark:text-cyan-400">
+                {loading ? '—' : totalCourses}
+              </p>
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">Kayıtlı Kurs</p>
+            </Card>
+          </div>
 
           <Card hover className="border-emerald-500/20 p-3.5 sm:p-5">
             <ShieldCheck size={20} className="text-emerald-600 dark:text-emerald-400 sm:w-6 sm:h-6" />

@@ -12,7 +12,9 @@ import AiPromptModal from '../../components/ui/AiPromptModal';
 export default function CourseEditor() {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const isAdmin = profile?.role === 'admin';
+  const returnUrl = isAdmin ? '/admin/courses' : '/teacher/courses';
 
   const isNew = courseId === 'new' || !courseId;
   const [loading, setLoading] = useState(!isNew);
@@ -159,7 +161,7 @@ export default function CourseEditor() {
     } else {
       showNotif('success', 'Kurs ve ilişkili tüm veriler başarıyla silindi.');
       setTimeout(() => {
-        navigate('/teacher/courses');
+        navigate(returnUrl);
       }, 700);
     }
   };
@@ -181,7 +183,7 @@ export default function CourseEditor() {
         )}
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <button onClick={() => navigate('/teacher/courses')} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-sm w-fit transition-colors">
+          <button onClick={() => navigate(returnUrl)} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white text-sm w-fit transition-colors cursor-pointer">
             <ArrowLeft size={16}/> Kurslara Dön
           </button>
 
