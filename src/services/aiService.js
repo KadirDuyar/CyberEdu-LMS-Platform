@@ -1,224 +1,40 @@
-// ─── CyberEdu LMS: Çoklu Sağlayıcı Hedge Request (Yarışçı) AI Motoru ────────
-// Groq (Llama 3.1) ve Google Gemini aynı anda çağrılır.
-// İlk başarılı dönen yanıt kullanılır, diğeri AbortController ile iptal edilir.
-
-const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
-const groqApiKey = import.meta.env.VITE_GROQ_API_KEY;
-const configuredGeminiModel = import.meta.env.VITE_GEMINI_MODEL || 'gemini-2.5-flash';
-const configuredGroqModel = import.meta.env.VITE_GROQ_MODEL;
+// ─── CyberEdu LMS: Güvenli Sunucu Tarafı AI Proxy Motoru ────────────────────────
+// Hassas API anahtarları (Gemini & Groq) artık tarayıcı koduna (bundle) gömülmez.
+// Tüm AI istekleri sunucu tarafındaki /api/ai uç noktası üzerinden güvenle yürütülür.
 
 /**
- * Groq Cloud REST API Çağrısı (openai/gpt-oss-120b / Llama 3.3 / Llama 3)
- */
-async function callGroq({ prompt, systemInstruction = '', history = [], signal }) {
-  if (!groqApiKey) {
-    throw new Error('[Groq Hatası]: API anahtarı tanımlı değil (VITE_GROQ_API_KEY).');
-  }
-
-  const messages = [];
-
-  if (systemInstruction) {
-    messages.push({ role: 'system', content: systemInstruction });
-  }
-
-  if (Array.isArray(history) && history.length > 0) {
-    for (const msg of history) {
-      messages.push({
-        role: msg.role === 'model' || msg.role === 'assistant' ? 'assistant' : 'user',
-        content: msg.content || msg.text || ''
-      });
-    }
-  }
-
-  messages.push({ role: 'user', content: prompt });
-
-  // Bilinen ve kullanımdan kaldırılmış (decommissioned) modelleri filtrele veya en güncele yönlendir
-  const sanitizedConfigModel =
-    configuredGroqModel === 'llama-3.1-8b-instant' ||
-    configuredGroqModel === 'gemma2-9b-it' ||
-    configuredGroqModel === 'gemma-7b-it'
-      ? 'llama-3.3-70b-versatile'
-      : configuredGroqModel;
-
-  // Aktif modeller (Öncelik: openai/gpt-oss-120b -> Llama 3.3 70B -> Llama 3 8B -> Llama 3.1 70B)
-  const candidateModels = Array.from(
-    new Set([
-      'openai/gpt-oss-120b',
-      sanitizedConfigModel,
-      'llama-3.3-70b-versatile',
-      'llama3-8b-8192',
-      'llama-3.1-70b-versatile'
-    ].filter(Boolean))
-  );
-
-  const errorDetails = [];
-
-  for (const model of candidateModels) {
-    const startTime = performance.now();
-    try {
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        signal,
-        headers: {
-          'Authorization': `Bearer ${groqApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model,
-          messages,
-          temperature: 0.7
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const text = data?.choices?.[0]?.message?.content;
-        if (text) {
-          const duration = Math.round(performance.now() - startTime);
-          return { provider: `Groq (${model})`, text, duration };
-        }
-      } else {
-        const errorData = await res.json().catch(() => null);
-        const errorMsg = errorData?.error?.message || (await res.text().catch(() => ''));
-        console.warn(`⚠️ [Groq Modeli Başarısız (${model})]: HTTP ${res.status} - ${errorMsg}`);
-        errorDetails.push(`[${model}: ${res.status} - ${errorMsg}]`);
-      }
-    } catch (err) {
-      if (err.name === 'AbortError') throw err;
-      errorDetails.push(`[${model}: ${err.message}]`);
-    }
-  }
-
-  throw new Error(`[Groq Hatası]: ${errorDetails.join(' | ')}`);
-}
-
-/**
- * Google Gemini REST API Çağrısı (Gemini 2.5 Flash / Gemini 2.5 Pro & Fallback)
- */
-async function callGemini({ prompt, systemInstruction = '', history = [], signal }) {
-  if (!geminiApiKey) {
-    throw new Error('[Gemini Hatası]: API anahtarı tanımlı değil (VITE_GEMINI_API_KEY).');
-  }
-
-  const contents = [];
-
-  if (Array.isArray(history) && history.length > 0) {
-    for (const msg of history) {
-      contents.push({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content || msg.text || '' }]
-      });
-    }
-  }
-
-  // Gemini v1 ve v1beta endpoint'lerinde %100 uyumluluk için sistem talimatını kullanıcı mesajına ekle
-  const userPromptText = systemInstruction
-    ? `${systemInstruction}\n\n---\nKULLANICI TALEBİ:\n${prompt}`
-    : prompt;
-
-  contents.push({
-    role: 'user',
-    parts: [{ text: userPromptText }]
-  });
-
-  const payload = { contents };
-
-  // Bilinen eski modelleri temizle
-  const sanitizedGeminiModel =
-    configuredGeminiModel === 'gemini-2.0-flash' || configuredGeminiModel === 'gemini-1.0-pro'
-      ? 'gemini-2.5-flash'
-      : configuredGeminiModel;
-
-  // Kullanıcının API anahtarında tam yetkili Gemini 2.5 Flash & 2.5 Pro modelleri
-  const candidateEndpoints = [
-    `https://generativelanguage.googleapis.com/v1beta/models/${sanitizedGeminiModel}:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1/models/${sanitizedGeminiModel}:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${geminiApiKey}`,
-    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`
-  ];
-
-  // Tekrarlayan endpoint'leri kaldır
-  const uniqueEndpoints = Array.from(new Set(candidateEndpoints));
-
-  const errorDetails = [];
-
-  for (const url of uniqueEndpoints) {
-    const startTime = performance.now();
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        signal,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) {
-          const duration = Math.round(performance.now() - startTime);
-          const matchedModel = url.includes('gemini-2.5-flash')
-            ? 'Gemini 2.5 Flash'
-            : url.includes('gemini-2.5-pro')
-              ? 'Gemini 2.5 Pro'
-              : 'Gemini 1.5 Flash';
-          return { provider: `Google ${matchedModel}`, text, duration };
-        }
-      } else {
-        const errorData = await res.json().catch(() => null);
-        const errorMsg = errorData?.error?.message || (await res.text().catch(() => ''));
-        errorDetails.push(`[HTTP ${res.status}: ${errorMsg}]`);
-      }
-    } catch (err) {
-      if (err.name === 'AbortError') throw err;
-      errorDetails.push(`[${err.message}]`);
-    }
-  }
-
-  throw new Error(`[Gemini Hatası]: ${errorDetails.join(' | ')}`);
-}
-
-/**
- * ⚡ Hedge Request / Fast-Race Motoru (Promise.any)
- * Groq ve Gemini'ye aynı anda istek atar, ilk yanıt veren kazanır, diğeri anında iptal edilir.
+ * Sunucu tarafındaki güvenli AI uç noktasına istek gönderir.
+ * Arka planda Vercel Serverless Function (üretim) veya Vite dev middleware (yerel)
+ * Groq ve Gemini'yi eşzamanlı yarıştırarak (Hedge Request) en hızlı yanıtı döner.
  */
 export async function fetchFastestAI(prompt, systemInstruction = '', history = []) {
-  const controller = new AbortController();
-  const { signal } = controller;
-
-  const tasks = [];
-
-  // Groq tanımlıysa yarışa dahil et
-  if (groqApiKey) {
-    tasks.push(callGroq({ prompt, systemInstruction, history, signal }));
-  }
-
-  // Gemini tanımlıysa yarışa dahil et
-  if (geminiApiKey) {
-    tasks.push(callGemini({ prompt, systemInstruction, history, signal }));
-  }
-
-  if (tasks.length === 0) {
-    throw new Error('Hiçbir AI API anahtarı yapılandırılmamış! .env dosyasında VITE_GROQ_API_KEY veya VITE_GEMINI_API_KEY tanımlayın.');
-  }
-
   try {
-    // Hangisi önce başarılı dönerse onu al
-    const fastest = await Promise.any(tasks);
+    const res = await fetch('/api/ai', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ prompt, systemInstruction, history }),
+    });
 
-    // Kazanan belli oldu, arkada devam eden diğer isteği anında iptal et
-    controller.abort();
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      throw new Error(errData?.error || `AI servisi hatası: HTTP ${res.status}`);
+    }
 
-    console.info(`⚡ [Hedge Request Kazananı]: ${fastest.provider} (${fastest.duration} ms)`);
-    return fastest.text;
-  } catch (aggErr) {
-    // Tüm sağlayıcılar başarısız olduysa
-    console.error('💥 [Tüm AI Sağlayıcıları Başarısız]:', aggErr);
-    const detailList = aggErr?.errors?.map((e) => e?.message || e).join(' | ') || aggErr.message;
-    throw new Error(`Tüm Yapay Zeka servisleri başarısız oldu: ${detailList}`);
+    const data = await res.json();
+    if (!data || !data.text) {
+      throw new Error('AI servisinden geçerli bir yanıt metni alınamadı.');
+    }
+
+    if (data.provider) {
+      console.info(`⚡ [AI Yanıtı]: ${data.provider} (${data.duration || 0} ms)`);
+    }
+
+    return data.text;
+  } catch (err) {
+    console.error('💥 [AI İsteği Başarısız]:', err);
+    throw err;
   }
 }
 
