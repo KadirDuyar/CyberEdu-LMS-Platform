@@ -58,6 +58,55 @@ export default function LessonBuilder() {
     }
   }, [blocks]);
 
+  // DB'deki farklı JSON formatlarını LessonBuilder'ın beklediği forma dönüştürme
+  const normalizeBlockForBuilder = (b) => {
+    let opts = b.options;
+    if (typeof opts === 'string') {
+      try {
+        if (opts.trim().startsWith('{') || opts.trim().startsWith('[')) {
+          opts = JSON.parse(opts);
+        }
+      } catch (e) {}
+    }
+
+    if (b.type === 'multiple_choice' || b.type === 'ordering') {
+      if (!Array.isArray(opts)) opts = opts ? [String(opts)] : ['Seçenek 1', 'Seçenek 2'];
+    } else if (b.type === 'matching') {
+      if (!Array.isArray(opts)) {
+        opts = opts?.pairs && Array.isArray(opts.pairs) ? opts.pairs : [{ left: '', right: '' }];
+      }
+    } else if (b.type === 'memory_card') {
+      if (!Array.isArray(opts)) {
+        if (opts?.cards && Array.isArray(opts.cards)) {
+          opts = opts.cards.map((c) => ({ left: c.front || c.left || '', right: c.back || c.right || '' }));
+        } else {
+          opts = [{ left: '', right: '' }];
+        }
+      }
+    } else if (b.type === 'scenario') {
+      if (!Array.isArray(opts)) {
+        if (opts?.choices && Array.isArray(opts.choices)) {
+          opts = opts.choices.map((c) => ({
+            text: c.text || '',
+            consequence: c.consequence || c.outcome || '',
+            isCorrect: !!c.isCorrect
+          }));
+        } else {
+          opts = [{ text: '', consequence: '', isCorrect: false }];
+        }
+      }
+    } else if (b.type === 'hotspot') {
+      if (opts && typeof opts === 'object') {
+        opts = opts.image_url || opts.url || opts.image || '';
+      }
+    }
+
+    return {
+      ...b,
+      options: opts
+    };
+  };
+
   useEffect(() => {
     async function load() {
       if (lessonId && lessonId !== 'new') {
@@ -65,7 +114,7 @@ export default function LessonBuilder() {
         if (data) {
           setLessonTitle(data.title || '');
           setLessonXp(data.xp_reward || 100);
-          setBlocks(data.activities || []);
+          setBlocks((data.activities || []).map(normalizeBlockForBuilder));
           setContentType(data.content_type || 'default');
           setStorylineUrl(data.storyline_url || '');
         }
@@ -591,7 +640,7 @@ export default function LessonBuilder() {
                       {block.type === 'multiple_choice' && (
                         <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-3">
                           <p className="text-xs font-bold text-slate-600 dark:text-slate-400">Şıklar (Doğru seçeneği daireye tıklayarak seçin):</p>
-                          {(block.options || []).map((opt, oIdx) => (
+                          {(Array.isArray(block.options) ? block.options : []).map((opt, oIdx) => (
                             <div key={oIdx} className="flex items-center gap-2">
                               <input
                                 type="radio"
@@ -670,7 +719,7 @@ export default function LessonBuilder() {
                       {block.type === 'ordering' && (
                         <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-2">
                           <p className="text-xs font-bold text-slate-600 dark:text-slate-400">Doğru Sıralama (Adımları doğru sırada girin):</p>
-                          {(block.options || []).map((item, oIdx) => (
+                          {(Array.isArray(block.options) ? block.options : []).map((item, oIdx) => (
                             <div key={oIdx} className="flex items-center gap-2">
                               <span className="text-xs font-bold text-slate-400 w-5">{oIdx + 1}.</span>
                               <input
@@ -706,7 +755,7 @@ export default function LessonBuilder() {
                       {(block.type === 'matching' || block.type === 'memory_card') && (
                         <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-2">
                           <p className="text-xs font-bold text-slate-600 dark:text-slate-400">Eşleştirilecek Çiftler (Sol - Sağ):</p>
-                          {(block.options || []).map((pair, oIdx) => (
+                          {(Array.isArray(block.options) ? block.options : []).map((pair, oIdx) => (
                             <div key={oIdx} className="flex items-center gap-2">
                               <input
                                 placeholder="Sol Değer (Örn: Port 22)"
@@ -753,7 +802,7 @@ export default function LessonBuilder() {
                       {block.type === 'scenario' && (
                         <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-3">
                           <p className="text-xs font-bold text-slate-600 dark:text-slate-400">Senaryo Seçenekleri ve Sonuçları:</p>
-                          {(block.options || []).map((opt, oIdx) => (
+                          {(Array.isArray(block.options) ? block.options : []).map((opt, oIdx) => (
                             <div key={oIdx} className="p-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 space-y-2">
                               <div className="flex items-center gap-2">
                                 <input
