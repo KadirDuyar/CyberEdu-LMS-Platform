@@ -1,6 +1,5 @@
 # 🛡️ CyberEdu LMS — Açık ve Uzaktan Öğrenme Siber Güvenlik Platformu
 
-
 Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eğitim platformu. Üniversite, kurum veya bireysel eğitimler için hem genel siber farkındalık hem de ileri teknik dersler sunar.
 
 ### 🌐 Canlı Demo
@@ -10,10 +9,11 @@ Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eği
 ---
 
 ![CyberEdu Platformu](https://img.shields.io/badge/Platform-CyberEdu_LMS-blueviolet?style=for-the-badge)
-![React 18](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge\&logo=react)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge\&logo=tailwind-css)
-![Supabase](https://img.shields.io/badge/Database-Supabase_PostgreSQL-3ECF8E?style=for-the-badge\&logo=supabase)
-![Google Gemini](https://img.shields.io/badge/AI-Google_Gemini-4285F4?style=for-the-badge\&logo=google)
+![React 18](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)
+![Supabase](https://img.shields.io/badge/Database-Supabase_PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase)
+![Google Gemini](https://img.shields.io/badge/AI-Google_Gemini-4285F4?style=for-the-badge&logo=google)
+![SCORM / Storyline](https://img.shields.io/badge/eLearning-Articulate_Storyline_&_SCORM-orange?style=for-the-badge)
 
 ---
 
@@ -21,36 +21,35 @@ Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eği
 1. [Proje Hakkında](#-proje-hakkında)
 2. [Temel Teknolojiler](#-temel-teknolojiler)
 3. [Kullanıcı Rolleri & Mimari](#-kullanıcı-rolleri--mimari)
-4. [📸 Platform Ekran Görüntüleri](#-platform-ekran-görüntüleri)
-   - [Öğrenci Arayüzleri](#1-öğrenci-paneli-ekran-görüntüleri)
-   - [Öğretmen Arayüzleri](#2-öğretmen-paneli-ekran-görüntüleri)
-   - [Yönetici Arayüzü](#3-yönetici-admin-paneli-ekran-görüntüsü)
-5. [Öğrenci Özellikleri](#-öğrenci-özellikleri)
-6. [Oyunlaştırma & Karakter Koleksiyonu](#-oyunlaştırma--karakter-koleksiyonu)
-7. [Yapay Zeka (AI) Entegrasyonu](#-yapay-zeka-ai-entegrasyonu)
-8. [👨‍🏫 Öğretmen / Eğitmen Özellikleri](#-öğretmen--eğitmen-özellikleri)
-9. [👑 Yönetici (Admin) Özellikleri](#-yönetici-admin-özellikleri)
-10. [🗄️ Veritabanı Şeması & Migrasyonlar](#-veritabanı-şeması--migrasyonlar)
-11. [🛠️ Kurulum & Çalıştırma](#-kurulum--çalıştırma)
-12. [🌐 Canlıya Alma (Vercel Deployment)](#-canlıya-alma-vercel-deployment)
+4. [🎬 Articulate Storyline & SCORM Entegrasyonu](#-articulate-storyline--scorm-entegrasyonu)
+5. [📸 Platform Ekran Görüntüleri](#-platform-ekran-görüntüleri)
+   - [Öğrenci Arayüzleri](#1-öğrenci-deneyimi-ve-öğrenme-yönetim-modülü)
+   - [Eğitmen Arayüzleri](#2-eğitmen-modülü-ve-yönetim-sistemi)
+   - [Yönetici Arayüzü](#3-sistem-yönetim-ve-denetim-admin-modülü)
+6. [🎓 Öğrenci Özellikleri](#-öğrenci-özellikleri)
+7. [🏆 Oyunlaştırma & Karakter Koleksiyonu](#-oyunlaştırma--karakter-koleksiyonu)
+8. [🤖 Yapay Zeka (AI) Entegrasyonu](#-yapay-zeka-ai-entegrasyonu)
+9. [👨‍🏫 Öğretmen / Eğitmen Özellikleri](#-öğretmen--eğitmen-özellikleri)
+10. [👑 Yönetici (Admin) Özellikleri](#-yönetici-admin-özellikleri)
+11. [🗄️ Veritabanı Şeması & Migrasyonlar](#-veritabanı-şeması--migrasyonlar)
 
 ---
 
 ## 🚀 Proje Hakkında
 
-**CyberEdu LMS**, öğrencilerin siber güvenlik bilgi ve yeteneklerini iki farklı uzmanlık hattında (Farkındalık ve Teknik Parkur) geliştirmelerini sağlayan açık ve uzaktan öğrenme yönetim sistemidir. Platform; teorik anlatımları interaktif etkinlikler, oyunlaştırma dinamikleri (XP, unvanlar, açılabilir avatarlar) ve gerçek zamanlı bir yapay zeka asistanı ile harmanlayarak yüksek motivasyonlu bir öğrenme deneyimi sunar.
+**CyberEdu LMS**, öğrencilerin siber güvenlik bilgi ve yeteneklerini iki farklı uzmanlık hattında (**Farkındalık** ve **Teknik Parkur**) geliştirmelerini sağlayan açık ve uzaktan öğrenme yönetim sistemidir. Platform; teorik anlatımları interaktif etkinlikler, simülasyonlar, oyunlaştırma dinamikleri (XP, unvanlar, açılabilir avatarlar) ve gerçek zamanlı yapay zekâ asistanı ile harmanlayarak yüksek motivasyonlu bir öğrenme deneyimi sunar.
 
 ---
 
 ## 🛠️ Temel Teknolojiler
 
 - **Frontend:** React 18 (Vite tabanlı), React Router DOM v6
-- **Stil & Tasarım:** Tailwind CSS, Özel Siber Neon Koyu Tema (Cyberpunk / Modern Dark UI), Glassmorphism efektleri
+- **Stil & Tasarım:** Tailwind CSS, Siber Neon Koyu Tema (Cyberpunk / Modern Dark UI), Glassmorphism efektleri
 - **İkonlar & Animasyonlar:** Lucide React, Framer Motion
 - **Backend / Veritabanı:** Supabase (PostgreSQL, Row Level Security - RLS Politikaları, Auth)
 - **Yapay Zeka (AI):** Google Gemini 1.5 Flash / Flash Lite API (Öğrenci Mentorluğu ve Öğretmen İçerik Üretimi)
+- **E-Öğrenme Standardı:** Articulate Storyline HTML5 Web & SCORM 1.2 / 2004 postMessage Entegrasyonu
 - **Medya Entegrasyonu:** Özel YouTube Player API kontrolleri (Zaman çubuğu, 10s ileri/geri sarma, tam ekran)
-- **Storyline Entegrasyonu:** Storyline içeriği, SCROM protokolü ile LMS'de tam entegre çalışıyor
 
 ---
 
@@ -59,23 +58,52 @@ Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eği
 Sistemde 3 temel kullanıcı rolü bulunur ve her rol kendi yetki sınırları dahilinde çalışır:
 
 1. **Öğrenci (`student`):**
-   - Kendi parkurundaki zorunlu dersleri sırayla takip eder.
-   - Seçmeli kurslara serbestçe kaydolur.
-   - İnteraktif etkinlikleri tamamlar, XP kazanır, karakter ve rozetlerin kilidini açar.
-   - AI Mentor'dan ders çalışırken ipucu desteği alır.
+   - Kendi parkurundaki zorunlu dersleri sarmal kilit mekanizmasıyla sırayla takip eder.
+   - Seçmeli kurslara serbestçe kaydolur ve tamamlar.
+   - İnteraktif etkinlikleri çözer, Storyline simülasyonlarını bitirir, XP kazanır, karakter ve rozetlerin kilidini açar.
+   - 7/24 AI Mentor'dan ders çalışırken ipucu ve rehberlik desteği alır.
 2. **Öğretmen (`teacher`):**
-   - Yeni kurs ve ders modülleri oluşturur/yayınlar.
-   - Soru, eşleştirme, video ve anlatım blokları tasarlar (veya YZ ile otomatik üretir).
-   - Öğrencilerin detaylı analizlerini ve **en son tamamladıkları dersleri** anlık olarak izler.
-   - Haftalık program oluşturarak özel öğretim programı oluşturabiliyor.
+   - Yeni kurs ve modüler ders adımları oluşturur/yayınlar.
+   - Soru, eşleştirme, video, Markdown metin ve **Articulate Storyline** blokları tasarlar (veya YZ ile otomatik üretir).
+   - Öğrencilerin detaylı analizlerini, haftalık çalışma durumlarını ve **en son tamamladıkları dersleri** canlı izler.
+   - Haftalık program modülüyle sınıf gruplarına (cohort) özel öğretim takvimleri kurgular.
 3. **Yönetici (`admin`):**
-   - Tüm kullanıcıları, rolleri ve kursları yönetir.
-   - Gerektiğinde öğrenci ilerlemelerini sıfırlayabilir.
+   - Kullanıcıların rollerini (`student`, `teacher`, `admin`) anlık yönetir.
+   - Test süreçleri için öğrenci ilerleme verilerini veya kılavuz yönergelerini güvenle sıfırlar.
+
+---
+
+## 🎬 Articulate Storyline & SCORM Entegrasyonu
+
+CyberEdu LMS, kurumsal e-öğrenme standartlarından olan **Articulate Storyline 360** ve **SCORM** paketlerini harici bir SCORM Cloud aracına ihtiyaç duymadan doğrudan sistem içerisinde yerel olarak oynatır ve skorlar:
+
+### 1. `StorylinePlayer` Mimarisi
+- **İki İzleme Modu:**
+  - **Inline Mod:** Ders içi aktivite akışında 16:9 en-boy oranıyla şık bir kart olarak konumlanır.
+  - **Full Mod / Theatre Mode:** Dersin kendisi doğrudan Storyline paketi olduğunda sol yan çubuğu otomatik daraltarak tam odaklanma sağlar.
+- **Tarayıcı Fullscreen API:** Öğrenciler tek tıkla tarayıcı tam ekranına geçip interaktif senaryoları simülasyon deneyiminde çözebilir.
+
+### 2. Çift Yönlü İletişim Köprüsü (postMessage & SCORM API)
+Platform, Storyline paketleri ile güvenli `postMessage` protokolü ve emüle edilmiş SCORM CMI veri modeli üzerinden konuşur:
+- **Otomatik Puan ve Skor Yakalama:** `TotalScore`, `ScorePoints`, `cmi.core.score.raw` veya `cmi.score.raw` parametrelerini anlık filtreler.
+- **Dinamik XP Dönüşümü:** Storyline'da alınan ham puan (örn. 300 üzerinden 250), dersin tanımlı `xpReward` değeriyle otomatik oranlanır (`(puan / maxPuan) * xpReward`).
+- **Anlık Tamamlama & Veritabanı Senkronizasyonu:** Storyline modülü başarıyla tamamlandığında LMS veritabanına (`lesson_progress` ve `profiles`) öğrenci ilerlemesi ve XP'si otomatik işlenir.
+
+```javascript
+// Storyline'da son slayt veya tamamlama trigger'ına eklenecek JS kodu:
+window.parent.postMessage(
+  JSON.stringify({ 
+    type: 'storyline_complete', 
+    score: 100,      // veya %Results.ScorePoints% değişkeni
+    maxScore: 100    // veya %Results.PassPoints%
+  }),
+  '*'
+);
+```
 
 ---
 
 ## 📸 Platform Ekran Görüntüleri
-
 
 ### 1. Öğrenci Deneyimi ve Öğrenme Yönetim Modülü
 
@@ -84,137 +112,104 @@ CyberEdu LMS öğrenci arayüzü; siber güvenlik farkındalığı ve teknik uzm
 ---
 
 #### 📊 Öğrenci Kontrol Paneli (Dashboard)
-Öğrencinin platformdaki aktif durumunu tek merkezden takip ettiği ana ekrandır. "Kaldığın Yerden Devam Et" modülü üzerinden en son çalışılan ders tek tıkla açılabilir. Öğrenme süresi, toplam kazanılan XP puanı ve mevcut kurs tamamlanma oranının yanı sıra aktif derslerin aşamaları ile sınıf geneli Canlı Liderlik Tablosu (Leaderboard) bu ekrandan dinamik olarak izlenir.
+Öğrencinin platformdaki aktif durumunu tek merkezden takip ettiği ana ekrandır. "Kaldığın Yerden Devam Et" modülü üzerinden en son çalışılan ders tek tıkla açılabilir. Toplam öğrenme süresi, kazanılan XP, mevcut kurs tamamlama oranları ve sınıf geneli Canlı Liderlik Tablosu bu ekrandan dinamik olarak izlenir.
 
 ![Öğrenci Kontrol Paneli](docs/screenshots/student-dashboard.png)
 
 ---
 
 #### 🗺️ Öğrenme Yolculuğum (Sarmal Müfredat Haritası)
-Yalnızca zorunlu müfredat adımlarını içeren, ön koşullu ve sıralı kilit mekanizmasına sahip sarmal ilerleme rotasıdır. Öğrenci bir kursu başarıyla tamamlamadan bir sonraki aşamanın kilidi açılmaz. Tamamlanan kurslar yeşil onay simgesiyle işaretlenir, aktif kurs parlak rota göstergesiyle vurgulanır ve öğrencinin öğrenme disiplini korunur.
+Yalnızca zorunlu müfredat adımlarını içeren, ön koşullu ve sıralı kilit mekanizmasına sahip sarmal ilerleme rotasıdır. Öğrenci bir kursu başarıyla tamamlamadan bir sonraki aşamanın kilidi açılmaz; tamamlanan modüller yeşil kalkan simgesiyle işaretlenir.
 
 ![Öğrenme Yolculuğum](docs/screenshots/student-learningPath.png)
 
 ---
 
 #### 📚 Kurslar ve Seçmeli Modül Kataloğu (`/student/courses`)
-Öğrencinin kendi ilgi alanına göre keşfedebileceği tüm eğitimlerin yer aldığı modül merkezidir. Kurslar "Tüm Kurslar", "Seçmeli Kurslar" ve "Zorunlu Müfredat" sekmeleri altında filtrelenebilir. Öğrenciler zorunlu yol haritasına bağlı kalmaksızın istedikleri seçmeli kurslara (MFA/2FA, Brute Force, Nmap vb.) doğrudan kaydolup bağımsız olarak tamamlayabilirler.
+Öğrencinin kendi ilgi alanına göre keşfedebileceği tüm eğitimlerin yer aldığı modül merkezidir. Kurslar "Tüm Kurslar", "Seçmeli Kurslar" ve "Zorunlu Müfredat" sekmeleri altında filtrelenebilir. Öğrenciler istedikleri seçmeli kurslara doğrudan kaydolup bağımsız olarak tamamlayabilirler.
 
 ![Kurslar ve Seçmeli Modül Kataloğu](docs/screenshots/student-courses.png)
 
 ---
 
+#### 📅 Haftalık Sınıf Görevleri & Cohort Programı
+Öğrencilerin haftalık bazda takip etmesi gereken dersleri, sınıf görevlerini ve grup çalışmalarını gösteren yapılandırılmış takvim arayüzüdür. Düzenli çalışma alışkanlığı kazandırmak amacıyla modüller haftalık periyotlara bölünmüştür.
+
+![Haftalık Sınıf Görevleri](docs/screenshots/student-haftalikGorevler.png)
+
+---
+
+#### 🎬 Articulate Storyline & SCORM Etkileşimli Ders Oynatıcı
+Storyline HTML5 modüllerinin ve SCORM standartlarındaki zafiyet simülasyonlarının sistem içinde gömülü veya tam ekran çalıştığı alandır. Kullanıcı yanıtları, sınav puanları ve tamamlama durumları gerçek zamanlı yakalanarak öğrenci profiline işlenir.
+
+![Storyline & SCORM Oynatıcı](docs/screenshots/student-stroyline.png)
+
+---
+
+#### 🏆 Canlı Liderlik Tablosu & Sosyal Rekabet
+Tüm platform genelindeki öğrencilerin XP puanlarına, seviyelerine ve tamamladıkları ders sayılarına göre sıralandığı dinamik rekabet alanıdır. Rozetler, dereceler ve güncel sıralamalar anlık güncellenir.
+
+![Canlı Liderlik Tablosu](docs/screenshots/student-leaderboard.png)
+
+---
+
+#### 🎖️ Başarılar & Karakter Koleksiyonu Odası (`/student/achievements`)
+Platformun oyunlaştırma vitrinidir. Öğrencinin tamamladığı kurslara göre kazandığı "Kurs Madalyaları", platform görevleriyle açılan "Başarı Rozetleri" ve 13 farklı açılabilir siber kahraman avatarı burada sergilenir. Açılan karakterler "Karakteri Kuşan" butonuyla profil ikonu olarak atanabilir.
+
+![Başarılar ve Karakter Koleksiyonu](docs/screenshots/student-achievements.png)
+
+---
+
 #### 🤖 CyberEdu AI Mentor (Kişisel Siber Güvenlik Rehberi)
-7/24 kesintisiz rehberlik sunan tam sayfa yapay zekâ çalışma alanıdır. Öğrenciler OWASP Top 10 zafiyetleri, ağ protokolleri, port güvenlik riskleri veya kariyer adımları gibi önerilen hazır konuları seçebilir ya da doğrudan serbest sorular yöneltebilir. Model, doğrudan cevap vermek yerine yönlendirici ve Sokratik ipuçlarıyla öğrencinin analitik düşünmesini destekler.
+Google Gemini destekli 7/24 kesintisiz rehberlik sunan akıllı çalışma alanıdır. Öğrenciler OWASP Top 10, ağ güvenliği, parola politikaları gibi konularda sorular sorabilir; asistan doğrudan yanıt yerine Sokratik ipuçlarıyla yönlendirme sağlar.
 
 ![AI Mentor Çalışma Alanı](docs/screenshots/student-aiMentor.png)
 
 ---
 
-#### 💬 Hızlı AI Asistan (Ders İçi Yüzen Sohbet)
-Ders çalışma veya etkinlik çözme anında sayfa değiştirmeden sağ alttan tetiklenebilen kompakt asistan penceresidir. Öğrenci bir soruda takıldığında veya teorik bir kavramı anlamadığında "Bu konuyu basitçe özetle" veya hazır bağlamsal hızlı eylemlerle anında yardım alabilir.
-
-![Hızlı AI Asistan](docs/screenshots/student-fastAI.png)
-
----
-
-#### ✅ Anlık Etkinlik Doğrulama ve Başarı Geri Bildirimi
-İnteraktif sorularda (Eşleştirme, D/Y, Çoktan Seçmeli vb.) doğru yanıt verildiğinde devreye giren pozitif pekiştirme katmanıdır. Öğrenciye anında kazanılan XP ödülü (+50 XP, +80 XP vb.) gösterilir ve teknik çözüm mantığı açıklanarak öğrenme süreci doğrulanır.
-
-![Doğru Cevap Geri Bildirimi](docs/screenshots/student-trueanAnswer.png)
-
----
-
-#### ❌ Çözüm Açıklamalı Hata Analizi
-Yanlış yanıt verildiğinde öğrenciyi cezalandırmak yerine eksik bilgiyi kapatmayı hedefleyen detaylı analiz panelidir. Sistem doğru eşleşmeleri veya yanıt anahtarını net bir şekilde sergilerken, alt kısımda "Açıklama & Çözüm Mantığı" sunarak kavram yanılgısını anında giderir.
-
-![Hatalı Cevap ve Çözüm Analizi](docs/screenshots/student-wrongAnswer.png)
-
----
-
-#### 🏆 Kurs Bitirme ve Kutlama Ekranı (Greeting Modal)
-Bir kurstaki tüm dersler ve interaktif sınavlar başarıyla tamamlandığında açılan ödül penceresidir. Öğrencinin kurstan kazandığı tüm XP puanlarının hesap bakiyesine aktarıldığını doğrular, motivasyonu artırır ve kullanıcıyı doğrudan rozetler veya yeni kurslar sayfasına yönlendirir.
-
-![Kurs Bitirme Kutlaması](docs/screenshots/student-greeting.png)
-
----
-
-#### 🎖️ Başarılar & Karakter Koleksiyonu Odası (`/student/achievements`)
-Platformun gamification omurgasını oluşturan vitrindir. Öğrencinin tamamladığı kurslara göre kazandığı "Kurs Madalyaları", platform görevleriyle açılan "Başarı Rozetleri" ve kademe bazlı "Siber Unvanlar" burada listelenir. Açılan siber kahraman avatarları (Siber Çırak, Kod Stratejisti, Dijital Kaşif vb.) incelenebilir ve "Karakteri Kuşan" özelliğiyle profil ikonu olarak atanabilir.
-
-![Başarılar ve Karakter Koleksiyonu](docs/screenshots/student-achievements.png)
-
 ### 2. Eğitmen Modülü ve Yönetim Sistemi
 
-CyberEdu LMS eğitmen modülü; siber güvenlik eğitimlerinin planlanması, modüler ders içeriklerinin hazırlanması, interaktif etkinliklerin kurgulanması, öğrenci başarı metriklerinin gerçek zamanlı izlenmesi ve üretken yapay zekâ entegrasyonuyla içerik geliştirme süreçlerinin hızlandırılmasını sağlayan kapsamlı bir yönetim mimarisi sunar.
+CyberEdu LMS eğitmen modülü; siber güvenlik eğitimlerinin planlanması, modüler ders içeriklerinin hazırlanması, interaktif etkinliklerin kurgulanması, haftalık grup programlarının yönetilmesi ve öğrenci başarı metriklerinin gerçek zamanlı izlenmesini sağlar.
 
 ---
 
 #### 🏫 Eğitmen Kontrol Paneli (Dashboard)
-Platform üzerindeki aktif eğitim süreçlerinin üst düzey izlendiği ana yönetim merkezidir. Toplam kurs adedi, yayındaki modüller ve sisteme kayıtlı öğrenci sayıları gibi genel metrikleri özetler. Eğitmenler bu ekrandan doğrudan "Farkındalık Eğitimi" veya "Teknik Zafiyet Kursu" şablonlarını tetikleyebilir ve mevcut kurslarının durumunu inceleyebilir.
+Platform üzerindeki eğitim süreçlerinin izlendiği ana yönetim merkezidir. Toplam kurs adedi, yayındaki modüller ve sisteme kayıtlı öğrenci sayıları gibi genel göstergeleri özetler; eğitmenler bu ekrandan doğrudan yeni kurs tanımlayabilir veya şablon eğitimleri yükleyebilir.
 
 ![Eğitmen Kontrol Paneli](docs/screenshots/teacher-dashboard.png)
 
 ---
 
 #### 📚 Kurs Yönetimi ve Müfredat Listesi (`/teacher/courses`)
-Eğitmen tarafından oluşturulan tüm kursların kartlar halinde listelendiği, yayın durumlarının (Yayında / Taslak) ve hedef kitle kategorilerinin (Teknik / Farkındalık) yönetildiği paneldir. Kurs içeriklerinin önizlenmesi, düzenlenmesi ve yeni eğitim oluşturma süreçleri bu alandan başlatılır.
+Eğitmen tarafından oluşturulan tüm kursların kartlar halinde listelendiği, yayın durumlarının (Yayında / Taslak) ve hedef kitle kategorilerinin (Teknik / Farkındalık) yönetildiği paneldir.
 
 ![Kurslarım Ekranı](docs/screenshots/teacher-courses.png)
 
 ---
 
-#### ➕ Kurs Yapılandırma ve Tanımlama Ekranı (`/teacher/courses/new`)
-Yeni bir siber güvenlik modülü oluştururken meta verilerin girildiği form arayüzüdür. Kurs başlığı, pedagojik açıklama metni, hedef kitle (Farkındalık / Teknik), müfredat türü (Zorunlu / Seçmeli), zorluk derecesi ve temsili görsel emoji bu adımda belirlenir.
-
-![Manuel Kurs Tanımlama](docs/screenshots/teacher-newCourse.png)
-
----
-
-#### 🤖 YZ Destekli Kurs Oluşturma Sihirbazı
-Eğitim planlama süresini minimuma indirmek amacıyla entegre edilen üretken yapay zekâ özelliğidir. Üst paneldeki *"✨ YZ ile Kurs Oluştur"* fonksiyonu tetiklendiğinde; girilen konu başlığına uygun detaylı açıklama, zorluk seviyesi, hedef kitle sınıflandırması ve görsel rozet otomatik olarak üretilip forma aktarılır.
-
-![YZ ile Kurs Üretimi](docs/screenshots/teacher-newCourseWithAi.png)
-
----
-
-#### 🗂️ Kurs Detayı ve Ders Sıralama Yönetimi
-Kaydedilen bir kursun genel ayarlarının güncellendiği ve kursa bağlı ders adımlarının kronolojik olarak yönetildiği çalışma alanıdır. Bu ekrandan kursa yeni dersler eklenebilir, mevcut derslerin yayın durumu değiştirilebilir ve doğrudan içerik düzenleyicisine geçiş yapılabilir.
-
-![Kurs Detayı ve Ders Listesi](docs/screenshots/teacher-course.png)
-
----
-
 #### 🛠️ Modüler Ders & İçerik Düzenleyici (Lesson Builder)
-Ders akışının blok tabanlı bir mimariyle kurgulandığı merkezdir. Teorik anlatımlar, video materyalleri ve interaktif sınavlar sıralı bloklar halinde düzenlenir. Her blok için bağımsız XP puanı atanabilir, blok sıralamaları değiştirilebilir ve sistemde tanımlı 11 farklı aktivite türü (Çoktan Seçmeli, D/Y, Eşleştirme, Sıralama, Hafıza Kartı, Hotspot, Senaryo vb.) derse dahil edilebilir.
+Ders akışının blok tabanlı mimariyle kurgulandığı merkezdir. Markdown anlatımlar, YouTube video blokları, **Articulate Storyline HTML5 paketleri** ve 11 farklı aktivite türü (Çoktan Seçmeli, D/Y, Eşleştirme, Boşluk Doldurma vb.) sıralı olarak yapılandırılır.
 
 ![Ders İçi Blok Düzenleyici](docs/screenshots/teacher-Content.png)
 
 ---
 
-#### ✍️ YZ ile Teorik Anlatım & Metin Bloğu Üretimi
-Ders içi içerik bloklarında yer alan *"✨ YZ ile Üret"* aracı; eğitmenin belirlediği teknik başlık doğrultusunda pedagojik standartlara ve şablonlara uygun zengin Markdown formatında konu anlatımları türetir.
+#### 📅 Haftalık Sınıf & Program Yönetimi (Cohorts)
+Eğitmenlerin sınıf bazlı çalışma grupları (cohort) için haftalık programlar oluşturabildiği, dersleri haftalara atayabildiği ve öğrencilerin haftalık tamamlama durumlarını kontrol edebildiği yönetim ekranıdır.
 
-![YZ ile Metin Üretimi](docs/screenshots/teacher-Promt.png)
-
----
-
-#### 🎯 YZ ile Otomatik İnteraktif Etkinlik Üretimi
-Ders akışına pratik soru ve değerlendirme adımları eklemek için kullanılan modal arayüzdür. Eğitmen hedef etkinlik türünü ve konu detayını belirttiğinde, sistem doğrudan doğru cevap anahtarı, seçenekleri, ipuçları ve hata açıklama mantığı tanımlanmış etkinlik objeleri üretir.
-
-![YZ Etkinlik Üretim Sihirbazı](docs/screenshots/teacher-promtContent.png)
+![Haftalık Program Yönetimi](docs/screenshots/teacher-haftalikProgram.png)
 
 ---
 
 #### 📈 Öğrenci İlerleme & Ders İstatistikleri (`/teacher/stats`)
-Kayıtlı öğrencilerin eğitim çıktılarını gerçek zamanlı takip eden analitik merkezidir. Toplam bitirilen ders adedi, ortalama öğrenci XP puanı, aktif katılım yüzdesi gibi makro göstergelerin yanı sıra her öğrencinin parkur türü, en son tamamladığı ders, zaman damgası (*"50 dk önce"* vb.), bitirdiği ders sayısı ve güncel seviyesi bu panel üzerinden izlenebilir.
+Kayıtlı öğrencilerin eğitim çıktılarını gerçek zamanlı takip eden analitik merkezidir. Her öğrencinin parkur türü, en son tamamladığı ders, zaman damgası (*"50 dk önce"* vb.), bitirdiği ders sayısı ve seviyesi canlı olarak izlenebilir.
 
 ![Öğrenci İlerleme & Ders İstatistikleri](docs/screenshots/teacher-stats.png)
 
 ---
 
 #### 👤 Eğitmen Profili ve Hesap Güvenliği (`/teacher/profile`)
-Eğitmenin platform üzerindeki kimlik ve yetki parametrelerini düzenlediği ekrandır. Profil avatar emojisi seçimi, ad-soyad güncellemesi ve parola yenileme gibi hesap güvenliği işlemleri bu merkezden gerçekleştirilir.
+Eğitmenin platform üzerindeki kimlik ve yetki parametrelerini düzenlediği ekrandır. Profil avatar emojisi seçimi, ad-soyad güncellemesi ve parola yenileme işlemleri bu ekrandan yürütülür.
 
 ![Eğitmen Profil Yönetimi](docs/screenshots/teacher-profile.png)
 
@@ -222,21 +217,17 @@ Eğitmenin platform üzerindeki kimlik ve yetki parametrelerini düzenlediği ek
 
 ### 3. Sistem Yönetim ve Denetim (Admin) Modülü
 
-Platformun rol tabanlı erişim kontrolü (RBAC), veri bütünlüğü ve test süreçlerinin güvenle yürütülmesini sağlayan üst düzey yönetim arayüzüdür.
+Platformun rol tabanlı erişim kontrolü (RBAC), veri bütünlüğü ve denetim süreçlerinin güvenle yürütülmesini sağlayan üst düzey yönetim arayüzüdür.
 
 ---
 
 #### ⚙️ Yönetici Kontrol Paneli (`/admin`)
-Sistem genelindeki toplam kullanıcı sayısı, kayıtlı kurs hacmi, Row Level Security (RLS) veri güvenliği durumu ve kullanıcıların rol dağılımı (Öğrenci/Eğitmen) bu merkezden izlenir. Tablo üzerinden kullanıcıların rolleri tek tıkla dinamik olarak değiştirilebilir (Öğrenciyi Eğitmen yapma veya tersi) ve test hesaplarının süreçlerini denetlemek için ilerleme sıfırlama mekanizması tetiklenebilir.
+Sistem genelindeki toplam kullanıcı sayısı, kayıtlı kurs hacmi, Row Level Security (RLS) veri güvenliği durumu ve kullanıcı rolleri bu merkezden yönetilir. Kullanıcıların rolleri tek tıkla değiştirilebilir (`student`, `teacher`, `admin`) ve test süreçleri için güvenli ilerleme & kılavuz yönergesi sıfırlama mekanizması tetiklenebilir.
 
 ![Yönetici Kontrol Paneli](docs/screenshots/admin-dashboard.png)
 
 ---
 
-#### 🔄 İlerleme Sıfırlama ve İşlem Onay Mekanizması
-Yanlışlıkla veri silinmesini önlemek amacıyla çift aşamalı onay (Modal Dialog) mekanizmasıyla korunur. Bir öğrencinin ilerlemesi sıfırlanmak istendiğinde; tamamlanan dersler, çözülen aktiviteler ve kazanılan XP puanlarının kalıcı olarak silineceğini belirten uyarı ekranı açılır ve yönetici onayı alınır. Arka planda çalışan `admin_reset_student` RPC fonksiyonu sayesinde ilgili öğrencinin ilerleme tablosundaki kayıtları güvenle temizlenir.
-
-![İlerleme Sıfırlama Onay Ekranı](docs/screenshots/admin-approval.png)
 ## 🎓 Öğrenci Özellikleri
 
 ### 1. Akıllı Oryantasyon (Navigator)
@@ -247,7 +238,6 @@ Yanlışlıkla veri silinmesini önlemek amacıyla çift aşamalı onay (Modal D
 - Seviyesini belirler (Başlangıç, Orta, İleri).
 
 ### 2. Akıllı Öğrenci Kontrol Paneli (Dashboard)
-- **Yeni Öğrenci Karşılama ("🎯 İlk Kursun Hazır!"):** Henüz ders tamamlamamış yeni kayıtlı öğrencilere özel bir karşılama kartı ve ilk dersine tek tıkla başlama butonu sunar.
 - **Kaldığın Yerden Devam Etme:** Öğrencinin son çalıştığı veya dersini bitirdiği kursu anlık olarak hafızada tutar ve doğrudan sıradaki dersi önerir.
 - **Kurs Tamamlama Kutlaması:** Kursun tüm dersleri bittiğinde tebrik banner'ı çıkar ve sıradaki kursları önerir.
 - **Metrik Sayaçları:** Toplam öğrenme süresi (dk/saat), kazanılan toplam XP ve aktif kurs ilerleme yüzdesi.
@@ -265,11 +255,12 @@ Yanlışlıkla veri silinmesini önlemek amacıyla çift aşamalı onay (Modal D
 
 ### 5. İnteraktif Ders & Etkinlik Motoru
 - **Markdown Destekli Ders İçeriği:** Zengin biçimlendirilmiş metinler ve kod blokları.
+- **Articulate Storyline & SCORM Simülasyonları:** Gerçek zamanlı puan yakalama ve tamamlama köprüsü.
 - **Çoktan Seçmeli Sorular:** Anlık doğruluk kontrolü ve geri bildirim.
 - **Doğru / Yanlış Soruları:** Hızlı pekiştirme soruları.
 - **Boşluk Doldurma:** Metin tabanlı etkileşimler.
 - **Eşleştirme (Matching):** Kavram ve tanımları eşleştiren interaktif kartlar.
-- **Gelişmiş Video Eğitimi:** Özel video ilerleme çubuğu (slider), dakika:saniye sayacı, -10 sn geri sarma, +10 sn ileri sarma, baştan başlatma ve tam ekran izleme.
+- **Gelişmiş Video Eğitimi:** Özel video ilerleme çubuğu (slider), dakika:saniye sayacı, -10 sn geri sarma, +10 sn ileri sarma ve tam ekran izleme.
 - **Başarı Eşiği:** Dersin tamamlanabilmesi için interaktif sorulardan en az %50 başarı elde edilmesi gerekir.
 
 ---
@@ -303,10 +294,9 @@ Kurslar tamamlandıkça yeni karakterlerin kilitleri açılır:
 
 Platformda Google Gemini API ile çalışan iki yönlü yapay zeka gücü bulunur:
 
-1. **Öğrenci AI Mentor (Sağ Altta Sabit Widget):**
-   - Her sayfada sağ altta bulunan butona tıklandığında modern bir sohbet penceresi açılır.
+1. **Öğrenci AI Mentor (Tam Sayfa & Sohbet):**
    - Sokratik yöntem: Öğrenci bir soruda zorlandığında cevabı doğrudan söylemek yerine düşünmeye teşvik edici ipuçları verir.
-   - Siber güvenlik kavramlarını açıklar ve yol gösterir.
+   - Siber güvenlik kavramlarını açıklar ve pratik öneriler sunar.
 2. **Öğretmen İçerik Asistanı (YZ ile Üret):**
    - Kurs ve ders oluştururken öğretmen konu başlığını ve hedefini girer.
    - Yapay zeka saniyeler içinde zengin ders içeriği, çoktan seçmeli sorular ve eşleştirme etkinlikleri üretir.
@@ -316,48 +306,32 @@ Platformda Google Gemini API ile çalışan iki yönlü yapay zeka gücü bulunu
 ## 👨‍🏫 Öğretmen / Eğitmen Özellikleri
 
 ### 1. Eğitmen Kontrol Paneli (`/teacher`)
-Eğitmenlerin sisteme giriş yaptığında karşılaştığı ana komuta merkezidir. Öğretmenler bu ekranda toplam kurs sayılarını, yayında olan kurslarını ve platforma kayıtlı toplam öğrenci sayısını anlık metrikler üzerinden takip edebilir. Ayrıca, "Tek Tıkla Şablon Kurslar Yükle" butonu sayesinde yeni eğitmenler örnek müfredatları (Farkındalık ve Teknik parkurlar için) hızlıca kendi hesaplarına klonlayabilirler.
+Öğretmenler bu ekranda toplam kurs sayılarını, yayında olan kurslarını ve platforma kayıtlı toplam öğrenci sayısını anlık metrikler üzerinden takip edebilir.
 
-### 2. Kurslarım Sekmesi (`/teacher/courses`)
-Öğretmenlerin hazırladıkları tüm kursları listeleyen yönetim sayfasıdır. Bu sayfadan:
+### 2. Kurs Yönetimi (`/teacher/courses`)
 - **Yeni Kurs Oluşturma:** Baştan sona yeni bir kurs müfredatı kurgulanabilir.
 - **Kurs Durumu:** Hangi kursların yayında olduğu, hangilerinin taslak halinde beklediği görülebilir.
-- **Düzenleme ve Silme:** Mevcut kursların içeriklerine saniyeler içinde müdahale edilebilir veya tamamen sistemden kaldırılabilir.
+- **Zorunlu / Seçmeli Ayrımı:** Kursun, öğrencilerin zorunlu yol haritasında mı çıkacağı, yoksa seçmeli katalogda mı listeleneceği tek tıkla ayarlanabilir.
 
-### 3. Kurs Oluşturma & Ders Ekleme (`/teacher/courses/new`)
-Eğitmenler esnek ve modern bir arayüz ile kurslarını detaylandırabilir:
-- **Kurs Detayları:** Kurs başlığı, açıklaması, zorluk seviyesi (Başlangıç, Orta, İleri), kategorisi (Farkındalık veya Teknik) belirlenir.
-- **Zorunlu / Seçmeli Ayrımı:** Kursun, öğrencilerin zorunlu yol haritasında mı çıkacağı, yoksa seçmeli katalogda mı listeleneceği tek bir butonla ayarlanabilir.
-- **Ders Sıralaması:** Sürükle bırak benzeri mantıkla derslerin sırası değiştirilebilir ve kilit mekanizmaları ayarlanabilir.
+### 3. Görsel Ders İnşa Edici (Lesson Builder) & Etkinlik Motoru
+Öğretmenler kod yazmadan, blok tabanlı bir sistemle ders içeriklerini tasarlar:
+- 📝 **Markdown Metin:** Zengin metin editörüyle konu anlatımı.
+- 🎬 **Articulate Storyline / SCORM:** Web çıktısı HTML5 URL entegrasyonu ve otomatik XP puanlama.
+- 🎥 **YouTube Video Entegrasyonu:** Zaman etiketleriyle sınırlandırılabilen video blokları.
+- ❓ **Çoktan Seçmeli & Doğru / Yanlış Soruları:** Şıklar, doğru cevap seçimi ve hata açıklamaları.
+- 🔤 **Boşluk Doldurma & Eşleştirme:** İnteraktif uygulama ve pekiştirme kartları.
 
-### 4. Görsel Ders İnşa Edici (Lesson Builder) & Etkinlik Motoru
-Öğretmenler kod yazmadan, blok tabanlı bir sistemle ders içeriklerini tasarlar. Sisteme eklenebilen etkinlik türleri:
-- 📝 **H1 Başlık & Metin (Markdown):** Zengin metin editörüyle konu anlatımı.
-- 🎥 **YouTube Video Entegrasyonu:** Zaman etiketleriyle sınırlandırılabilen interaktif video blokları.
-- ❓ **Çoktan Seçmeli Sorular:** Şıklar, doğru cevap seçimi ve hata yapıldığında gösterilecek özel açıklamalar.
-- 🔘 **Doğru / Yanlış Soruları:** Hızlı test ve pekiştirme etkinlikleri.
-- 🔤 **Boşluk Doldurma:** Öğrencinin klavyeyle cevap girdiği interaktif metinler.
-- 🧩 **Eşleştirme (Matching):** Kavram ve tanımların sürüklenerek veya seçilerek eşleştirildiği etkinlikler.
-- 📍 **Resim Noktası (Hotspot) & Sıralama:** Gelişmiş etkileşim türleri.
-- 🌿 **Senaryo (Dallandırma):** Öğrencinin seçimine göre değişen olay örgüleri.
-
-### 5. ✨ Yapay Zeka (AI) Desteği ile Hızlı Üretim
-Ders hazırlama sürecini saniyelere indiren yapay zeka modülü, Gemini API ile entegre çalışır:
-- **YZ ile Kurs Oluştur:** Sadece "Linux Temelleri" yazarak kursun adını, açıklamasını ve seviyesini otomatik doldurtabilirsiniz.
-- **YZ ile Blok (Ders) Üretimi:** Dersin içine "Linux Komutları konu anlatımı yap" veya "Web güvenliği üzerine çoktan seçmeli zor bir soru hazırla" diyerek anında ilgili etkinliği (metin, soru, eşleştirme) oluşturabilirsiniz.
-
-### 6. Öğrenci Analiz & İstatistik Merkezi (`/teacher/stats`)
-Sistemdeki tüm öğrencilerin gelişimlerinin izlendiği detaylı analiz sayfasıdır.
+### 4. Öğrenci Analiz & İstatistik Merkezi (`/teacher/stats`)
 - **🎯 En Son Tamamlanan Ders Takibi:** Her öğrencinin en son bitirdiği dersin başlığı, ait olduğu kurs ve zaman damgası (*"10 dk önce"*, *"Bugün"*, *"Dün"*) canlı olarak listelenir.
 - **Öğrenci Kartları & İlerleme:** Tamamlanan ders sayısı, toplam XP, seviye ve parkur bilgisi.
-- **Filtreleme & Arama:** Öğrenci adına göre anlık arama, parkura göre (`Farkındalık` / `Teknik`) filtreleme ve `En Son Tamamlayanlar` sıralaması.
+- **Filtreleme & Arama:** Öğrenci adına göre anlık arama, parkura göre (`Farkındalık` / `Teknik`) filtreleme.
 
 ---
 
 ## 👑 Yönetici (Admin) Özellikleri
 
 - **Kullanıcı Yönetimi (`/admin`):** Sistemdeki tüm kullanıcıları listeleme, rolleri (`student`, `teacher`, `admin`) anında değiştirme.
-- **Öğrenci İlerlemesini Sıfırlama:** Test süreçleri için öğrencinin XP, seviye ve ders ilerlemelerini güvenli onay penceresiyle sıfırlama.
+- **Öğrenci İlerlemesini & Yönergeleri Sıfırlama:** Test süreçleri için öğrencinin XP, seviye, ders ilerlemeleri veya oryantasyon/site tanıtım kılavuzlarını güvenli onay penceresiyle sıfırlama.
 - **Sistem İstatistikleri:** Platform genelindeki toplam kullanıcı, öğrenci, öğretmen ve kurs metrikleri.
 
 ---
@@ -373,75 +347,11 @@ Proje veritabanı Supabase üzerinde PostgreSQL ile yapılandırılmıştır. T�
 - `activities`: İnteraktif aktiviteler (`lesson_id`, `type`, `question`, `options`, `correct_answer`, `points`).
 - `enrollments`: Kurs kayıtları (`user_id`, `course_id`, `status`, `enrolled_at`, `completed_at`).
 - `lesson_progress`: Ders tamamlama durumları (`user_id`, `lesson_id`, `status`, `completed_at`, `updated_at`).
-- `activity_attempts`: Soru cevaplama ve puan denemeleri.
+- `cohort_schedules`: Haftalık sınıf görevleri ve program takvimi.
 - `badges` & `user_badges`: Başarı rozetleri ve kazanım kayıtları.
-
-### 🔧 Gerekli SQL Dosyaları (Supabase SQL Editor):
-1. `supabase/migration.sql`: Tüm veritabanı şeması, RLS güvenlik politikaları, sosyal etkileşim, geri bildirim ve bildirim tabloları (Tek ve ana şema dosyası).
-2. `supabase/seed_exact_courses.sql`: Farkındalık ve Teknik standart kurs müfredat verileri (Zorunlu ve Seçmeli kurs tohum verileri).
-
----
-
-## 🛠️ Kurulum & Çalıştırma
-
-### Yöntem A: Otomatik Kurulum (Bash Script) 🚀
-Linux, macOS veya Windows (Git Bash / WSL) üzerinde tek komutla tüm ortamı kurmak ve başlatmak için:
-
-```bash
-# Script'e çalıştırma izni verin ve çalıştırın:
-chmod +x setup.sh
-./setup.sh
-```
-
-Bu script:
-- Node.js ve npm gereksinimlerini denetler.
-- Eksikse `.env.example` dosyasından otomatik `.env` üretir.
-- Bağımlılıkları (`npm install`) yükler.
-- Supabase SQL adımlarını hatırlatır ve sunucuyu başlatır.
-
----
-
-### Yöntem B: Manuel Kurulum ⚙️
-
-#### 1. Depoyu Klonlayın
-```bash
-git clone https://github.com/KadirDuyar/CyberEdu-LMS-Platform.git
-cd CyberEdu-LMS-Platform
-```
-
-#### 2. Bağımlılıkları Yükleyin
-```bash
-npm install
-```
-
-#### 3. Çevre Değişkenlerini Tanımlayın (`.env`)
-Proje kök dizininde bir `.env` dosyası oluşturun (veya `.env.example` dosyasını kopyalayın):
-```env
-VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOi...your-anon-key
-VITE_GEMINI_API_KEY=AIzaSy...your-gemini-key
-```
-
-#### 4. Geliştirme Sunucusunu Başlatın
-```bash
-npm run dev
-```
-Uygulama varsayılan olarak `http://localhost:5173` adresinde açılacaktır.
-
----
-
-## 🌐 Canlıya Alma (Vercel Deployment)
-
-1. Projeyi GitHub reponuza push edin (`git push origin main`).
-2. [Vercel Dashboard](https://vercel.com) üzerinden **Add New Project** seçeneğiyle deponuzu bağlayın.
-3. **Environment Variables** bölümüne `.env` dosyanızdaki anahtarları ekleyin:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_GEMINI_API_KEY`
-4. **Deploy** butonuna tıklayın. Vercel projeyi otomatik olarak derleyip yayına alacaktır.
 
 ---
 
 ## 📄 Lisans
-Bu proje eğitim amaçlı açık ve uzaktan öğrenme platformu olarak geliştirilmiştir.
+Bu proje eğitim amaçlı açık ve uzaktan öğrenme platformu olarak geliştirilmiştir.  
 Tüm hakları saklıdır © 2026 CyberEdu LMS.
