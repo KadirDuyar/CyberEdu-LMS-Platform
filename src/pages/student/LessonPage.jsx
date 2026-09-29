@@ -353,6 +353,16 @@ export default function LessonPage() {
     setCompleting(false);
   };
 
+  const handleStorylineSubmit = async (res) => {
+    // Storyline tamamlandı sinyali geldiğinde:
+    // Eğer bu ders saf Storyline dersi ise (ekstra soru yoksa), otomatik olarak dersi tamamla ve XP ver:
+    if (interactiveActivities.length === 0) {
+      if (!alreadyCompleted && !completed && !completing) {
+        await handleComplete();
+      }
+    }
+  };
+
   const handleRetry = () => {
     setActivityStates({});
     setFailedMessage(null);
@@ -567,7 +577,35 @@ export default function LessonPage() {
               allowFullscreen={true}
               onCollapseSidebar={setSidebarCollapsed}
               submitted={alreadyCompleted}
+              onSubmit={handleStorylineSubmit}
+              maxScore={lesson.xp_reward || 100}
+              xpReward={lesson.xp_reward || 100}
             />
+          </div>
+        )}
+
+        {/* Storyline Dersi İçin Hızlı Tamamlama & XP Kazanma Çubuğu */}
+        {lesson.content_type === 'storyline' && !alreadyCompleted && !completed && (
+          <div className="p-4 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-violet-500/10 border border-emerald-500/30 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md animate-in fade-in">
+            <div className="flex items-center gap-2.5 text-slate-800 dark:text-slate-200">
+              <span className="text-2xl">🏆</span>
+              <div>
+                <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                  Storyline modülünü bitirdiğinde ders otomatik tamamlanır.
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Tamamlama Ödülü: <span className="text-amber-500 font-bold font-mono">+{lesson.xp_reward || 0} XP</span>
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleComplete}
+              disabled={completing}
+              className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+            >
+              <CheckCircle size={16} />
+              {completing ? 'Kaydediliyor...' : `Dersi Tamamla & ${lesson.xp_reward || 0} XP Kazan`}
+            </button>
           </div>
         )}
 

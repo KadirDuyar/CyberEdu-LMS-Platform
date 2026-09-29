@@ -76,6 +76,37 @@ export default function StorylinePlayer({
     };
   }, []);
 
+  const [currentMaxScore, setCurrentMaxScore] = useState(maxScore || 100);
+
+  // Callback ref'i oluşturarak closure stale state sorunlarını engelle
+  const handleCompleteRef = useRef();
+
+  const handleCompleteWithScore = useCallback((scoreOverride, maxScoreOverride) => {
+    if (isCompleted) return;
+    setIsCompleted(true);
+
+    const targetMax = maxScoreOverride ?? currentMaxScore;
+    const finalScore = scoreOverride !== null && scoreOverride !== undefined
+      ? scoreOverride
+      : (capturedScore !== null ? capturedScore : targetMax);
+
+    const isCorrect = finalScore >= (targetMax * 0.5);
+
+    if (onSubmit) {
+      onSubmit({
+        userAnswer: `score:${finalScore ?? 'completed'}`,
+        isCorrect,
+        score: finalScore,
+        maxScore: targetMax,
+        earnedXP: xpReward && finalScore !== null
+          ? Math.round((finalScore / targetMax) * xpReward)
+          : (xpReward || finalScore),
+      });
+    }
+  }, [isCompleted, onSubmit, capturedScore, currentMaxScore, xpReward]);
+
+  handleCompleteRef.current = handleCompleteWithScore;
+
   // ─── SCORM / xAPI / özel postMessage dinleyicisi ───────────────────────────
   useEffect(() => {
     const handleMessage = (e) => {
@@ -83,21 +114,37 @@ export default function StorylinePlayer({
         const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
         if (!data) return;
 
-        // Skor yakalama
+        // Skor yakalama (farklı Storyline değişken adlarına karşı toleranslı)
         let score = null;
+        let incomingMax = null;
 
-        // 1) Özel mesaj: { type: 'storyline_complete', score: 85 }
-        if (data.type === 'storyline_complete' && data.score !== undefined) {
-          score = parseFloat(data.score);
+        // 1) Özel mesaj: { type: 'storyline_complete', score: 300, maxScore: 300 }
+        if (data.type === 'storyline_complete') {
+          const rawCandidate = data.score ?? data.points ?? data.finalScore ?? data.totalScore;
+          if (rawCandidate !== undefined && rawCandidate !== null && !isNaN(Number(rawCandidate))) {
+            score = parseFloat(rawCandidate);
+          }
         }
+
         // 2) SCORM 1.2: LMSSetValue ile cmi.core.score.raw veya cmi.score.raw
         if (data.LMSSetValue && typeof data.LMSSetValue === 'string') {
           const match = data.LMSSetValue.match(/cmi\.(?:core\.)?score\.raw=(\d+(?:\.\d+)?)/);
           if (match) score = parseFloat(match[1]);
         }
+
         // 3) xAPI / SCORM 2004
         if (data.score?.raw !== undefined) score = parseFloat(data.score.raw);
         if (data.result?.score?.raw !== undefined) score = parseFloat(data.result.score.raw);
+
+        // MaxScore yakalama
+        const maxCandidate = data.maxScore ?? data.max_score ?? data.maxPoints ?? data.totalPoints;
+        if (maxCandidate !== undefined && !isNaN(Number(maxCandidate))) {
+          incomingMax = parseFloat(maxCandidate);
+          setCurrentMaxScore(incomingMax);
+        } else if (score !== null && score > (maxScore || 100)) {
+          incomingMax = score;
+          setCurrentMaxScore(score);
+        }
 
         if (score !== null && !isNaN(score)) {
           setCapturedScore(score);
@@ -116,34 +163,18 @@ export default function StorylinePlayer({
           ));
 
         if (isComplete) {
-          handleCompleteWithScore(score);
+          handleCompleteRef.current?.(score, incomingMax);
         }
       } catch {
-        // JSON parse hatası
+        // JSON parse hatası veya alakasız mesaj
       }
     };
+
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [maxScore]);
 
-  const handleCompleteWithScore = useCallback((scoreOverride) => {
-    if (isCompleted) return;
-    setIsCompleted(true);
-    if (onSubmit) {
-      const finalScore = scoreOverride ?? capturedScore;
-      const isCorrect = finalScore === null ? true : finalScore >= (maxScore * 0.5);
-      onSubmit({
-        userAnswer: `score:${finalScore ?? 'completed'}`,
-        isCorrect,
-        score: finalScore,
-        earnedXP: xpReward && finalScore !== null
-          ? Math.round((finalScore / maxScore) * xpReward)
-          : undefined,
-      });
-    }
-  }, [isCompleted, onSubmit, capturedScore, maxScore, xpReward]);
-
-  const handleComplete = () => handleCompleteWithScore(null);
+  const handleComplete = () => handleCompleteWithScore(capturedScore ?? currentMaxScore);
 
   // Tarayıcı Fullscreen aç/kapat
   const toggleBrowserFullscreen = async () => {
@@ -291,7 +322,7 @@ export default function StorylinePlayer({
               : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
             {capturedScore !== null && (
               <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
-                📊 Puan: {capturedScore}/{maxScore}
+                📊 Puan: {capturedScore}/{currentMaxScore}
               </span>
             )}
             <button
@@ -310,8 +341,8 @@ export default function StorylinePlayer({
               ✓ Bu içerik tamamlandı
             </span>
             {capturedScore !== null && (
-              <span className="text-xs text-emerald-600 dark:text-emerald-500">
-                · Puan: {capturedScore}/{maxScore}
+              <span className="text-xs text-emerald-600 dark:text-emerald-500 font-bold font-mono">
+                · Puan: {capturedScore}/{currentMaxScore}
               </span>
             )}
           </div>
@@ -426,7 +457,7 @@ export default function StorylinePlayer({
             : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
           {capturedScore !== null && (
             <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
-              📊 Puan: {capturedScore}/{maxScore}
+              📊 Puan: {capturedScore}/{currentMaxScore}
             </span>
           )}
           <button
