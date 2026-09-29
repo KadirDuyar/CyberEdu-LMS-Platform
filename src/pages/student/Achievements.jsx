@@ -48,15 +48,29 @@ export default function Achievements() {
           .select('id, title, lessons(id, is_published)')
           .eq('is_published', true);
 
-        const finishedTitles = [];
+        // 3. enrollments tablosundan da tamamlananları çek (çift yönlü doğrulama)
+        const { data: completedEnrollments } = await supabase
+          .from('enrollments')
+          .select('course_id, status, courses(id, title)')
+          .eq('user_id', user.id)
+          .eq('status', 'completed');
+
+        const finishedTitlesSet = new Set();
+
+        // enrollments'tan tamamlananları ekle
+        (completedEnrollments || []).forEach((e) => {
+          if (e.courses?.title) finishedTitlesSet.add(e.courses.title);
+        });
+
+        // Dersleri biten kursları da ekle
         (allCourses || []).forEach((c) => {
           const pubLessons = (c.lessons || []).filter((l) => l.is_published);
           if (pubLessons.length > 0 && pubLessons.every((l) => doneIds.has(l.id))) {
-            finishedTitles.push(c.title);
+            finishedTitlesSet.add(c.title);
           }
         });
 
-        setCompletedCourseTitles(finishedTitles);
+        setCompletedCourseTitles(Array.from(finishedTitlesSet));
       } catch (err) {
         console.error('Başarılar yükleme hatası:', err);
       } finally {
