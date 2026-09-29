@@ -1,4 +1,4 @@
-# 🛡️ CyberEdu LMS — Açık ve Uzaktan Öğrenme Siber Güvenlik Platformu
+# 🛡️ CyberEdu LMS — Öğrenme Yönetim Sistemi Siber Güvenlik Platformu
 
 Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eğitim platformu. Üniversite, kurum veya bireysel eğitimler için hem genel siber farkındalık hem de ileri teknik dersler sunar.
 
