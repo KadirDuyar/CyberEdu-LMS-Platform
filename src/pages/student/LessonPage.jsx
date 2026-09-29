@@ -646,14 +646,16 @@ export default function LessonPage() {
                   <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30">
                     Daha Önce Tamamlandı
                   </span>
-                  <button
-                    onClick={handleResetLessonProgress}
-                    className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 flex items-center gap-1 transition cursor-pointer active:scale-95"
-                    title="Bu dersin tamamlanma kaydını sıfırla ve yeniden çözerek XP kazan"
-                  >
-                    <RotateCcw size={11}/>
-                    <span>Dersi Sıfırla & Baştan Çöz</span>
-                  </button>
+                  {isDemoMode && (
+                    <button
+                      onClick={handleResetLessonProgress}
+                      className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 flex items-center gap-1 transition cursor-pointer active:scale-95"
+                      title="Bu dersin tamamlanma kaydını sıfırla ve yeniden çözerek XP kazan"
+                    >
+                      <RotateCcw size={11}/>
+                      <span>Dersi Sıfırla & Baştan Çöz</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -888,7 +890,7 @@ export default function LessonPage() {
                     </>
                   )}
                 </button>
-                {alreadyCompleted && (
+                {alreadyCompleted && isDemoMode && (
                   <p className="text-center text-xs text-slate-500 dark:text-slate-400">
                     <button
                       onClick={handleResetLessonProgress}
