@@ -22,7 +22,7 @@ export async function getLessonWithActivities(lessonId) {
 }
 
 export async function startLesson(userId, lessonId) {
-  // Tamamlanmış dersi in_progress'e çekmemek için kontrol
+  // Zaten bir kayıt (in_progress veya completed) varsa doğrudan dön, gereksiz upsert yapma
   const { data: existing } = await supabase
     .from('lesson_progress')
     .select('status')
@@ -30,7 +30,7 @@ export async function startLesson(userId, lessonId) {
     .eq('lesson_id', lessonId)
     .maybeSingle();
 
-  if (existing?.status === 'completed') {
+  if (existing) {
     return { data: existing, error: null };
   }
 
@@ -45,7 +45,7 @@ export async function startLesson(userId, lessonId) {
       { onConflict: 'user_id,lesson_id', ignoreDuplicates: true }
     )
     .select()
-    .single();
+    .maybeSingle();
 
   return { data, error };
 }
@@ -64,7 +64,7 @@ export async function completeLesson(userId, lessonId) {
       { onConflict: 'user_id,lesson_id' }
     )
     .select()
-    .single();
+    .maybeSingle();
 
   if (!error && userId) {
     // Arka planda haftalık grup görevini de kontrol edip tamamla
@@ -96,7 +96,7 @@ export async function saveActivityAttempt({ userId, activityId, userAnswer, isCo
       points_earned: pointsEarned
     })
     .select()
-    .single();
+    .maybeSingle();
 
   return { data, error };
 }
