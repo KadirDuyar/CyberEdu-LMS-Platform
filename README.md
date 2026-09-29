@@ -67,6 +67,7 @@ Sistemde 3 temel kullanıcı rolü bulunur ve her rol kendi yetki sınırları d
    - Yeni kurs ve ders modülleri oluşturur/yayınlar.
    - Soru, eşleştirme, video ve anlatım blokları tasarlar (veya YZ ile otomatik üretir).
    - Öğrencilerin detaylı analizlerini ve **en son tamamladıkları dersleri** anlık olarak izler.
+   - Haftalık program oluşturarak özel öğretim programı oluşturabiliyor.
 3. **Yönetici (`admin`):**
    - Tüm kullanıcıları, rolleri ve kursları yönetir.
    - Gerektiğinde öğrenci ilerlemelerini sıfırlayabilir.
