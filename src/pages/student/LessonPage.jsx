@@ -306,7 +306,7 @@ export default function LessonPage() {
   };
 
   const handleComplete = async (directStoryResult = null) => {
-    if (completing) return;
+    if (completing || alreadyCompleted) return;
     setCompleting(true);
     setFailedMessage(null);
 
@@ -427,7 +427,7 @@ export default function LessonPage() {
   };
 
   const awardStorylineXP = async (res) => {
-    if (!user || awardingRef.current) return;
+    if (!user || awardingRef.current || alreadyCompleted) return;
     awardingRef.current = true;
     try {
       const score = Number(res?.score ?? 0);
@@ -724,12 +724,16 @@ export default function LessonPage() {
               </div>
             </div>
             <button
-              onClick={() => handleComplete()}
-              disabled={completing}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+              onClick={() => !alreadyCompleted && handleComplete()}
+              disabled={completing || alreadyCompleted}
+              className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-1.5 shrink-0 ${
+                alreadyCompleted 
+                  ? 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed shadow-none'
+                  : 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-emerald-500/30 hover:scale-105 active:scale-95 cursor-pointer'
+              }`}
             >
               <CheckCircle size={16}/>
-              {completing ? 'Kaydediliyor...' : 'Dersi Tamamla & Puanı Ekle'}
+              {completing ? 'Kaydediliyor...' : alreadyCompleted ? 'Tamamlandı' : 'Dersi Tamamla & Puanı Ekle'}
             </button>
           </div>
         )}
@@ -873,12 +877,21 @@ export default function LessonPage() {
             {!failedMessage && (
               <div className="space-y-2">
                 <button
-                  onClick={() => handleComplete()}
-                  disabled={completing}
-                  className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-base shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60 cursor-pointer"
+                  onClick={() => !alreadyCompleted && handleComplete()}
+                  disabled={completing || alreadyCompleted}
+                  className={`w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-base shadow-lg transition-all duration-200 ${
+                    alreadyCompleted 
+                      ? 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed shadow-none'
+                      : 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-emerald-500/30 hover:-translate-y-0.5 cursor-pointer disabled:opacity-60'
+                  }`}
                 >
                   {completing ? (
                     'Puanlar Hesaplanıyor & Kaydediliyor...'
+                  ) : alreadyCompleted ? (
+                    <>
+                      <CheckCircle size={20}/>
+                      <span>Ders Başarıyla Tamamlandı</span>
+                    </>
                   ) : (
                     <>
                       <CheckCircle size={20}/>
