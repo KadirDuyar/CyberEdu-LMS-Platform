@@ -337,12 +337,16 @@ export default function LessonPage() {
     if (stResult) {
       const rawCandidate = stResult.earnedXP ?? stResult.score ?? stResult.points;
       if (rawCandidate !== undefined && rawCandidate !== null && !isNaN(Number(rawCandidate))) {
-        const numScore = parseFloat(rawCandidate);
-        const numMax = stResult.maxScore ? parseFloat(stResult.maxScore) : 100;
-        if (lesson?.xp_reward && numMax > 0) {
-          storyXP = Math.round((numScore / numMax) * lesson.xp_reward);
+        if (stResult.earnedXP !== undefined) {
+          storyXP = Math.round(parseFloat(stResult.earnedXP));
         } else {
-          storyXP = Math.round(numScore);
+          const numScore = parseFloat(rawCandidate);
+          const numMax = stResult.maxScore ? parseFloat(stResult.maxScore) : 100;
+          if (lesson?.content_type === 'storyline' && lesson?.xp_reward && numMax > 0) {
+            storyXP = Math.round((numScore / numMax) * lesson.xp_reward);
+          } else {
+            storyXP = Math.round(numScore);
+          }
         }
       }
     }
@@ -773,7 +777,10 @@ export default function LessonPage() {
                     <ActivityRenderer
                       activity={activity}
                       key={`${activity.id}-${retryCount}`}
-                      onSubmit={(res) => handleActivitySubmit(activity, res)}
+                      onSubmit={(res) => {
+                        handleStorylineSubmit(res);
+                        handleActivitySubmit(activity, res);
+                      }}
                       submitted={state?.submitted ?? false}
                       result={state?.result}
                     />
