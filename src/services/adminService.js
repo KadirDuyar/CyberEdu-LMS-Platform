@@ -77,3 +77,61 @@ export async function resetStudentProgress(userId) {
 
   return { data: { success: true, message: 'Öğrencinin tüm kurs kayıtları, program üyelikleri ve ilerlemeleri başarıyla sıfırlandı.' }, error: null };
 }
+
+/**
+ * Öğrencinin kurs ve ders ilerlemelerine, puanlarına (XP) veya rozetlerine
+ * DOKUNMADAN yalnızca Navigator ve site tanıtım turunu (yönergeleri) sıfırlar.
+ */
+export async function resetStudentOnboardingAndTour(userId) {
+  // 1. Tarayıcı önbelleğindeki tur durumunu sıfırla
+  try {
+    localStorage.removeItem(`cyberedu_tour_completed_${userId}`);
+    localStorage.removeItem('cyberedu_tour_completed');
+    localStorage.removeItem(`cyberedu_tour_last_seen_${userId}`);
+    localStorage.removeItem('cyberedu_tour_last_seen');
+  } catch (e) {
+    console.warn('LocalStorage temizleme uyarısı:', e);
+  }
+
+  // 2. Profiles tablosunda SADECE onboarding ve tour sütunlarını sıfırla
+  // (xp, level, enrollments, lesson_progress vb. korunur)
+  const basePayload = {
+    onboarding_completed: false,
+    tour_completed: false,
+    learning_area: null,
+    skill_level: null,
+    updated_at: new Date().toISOString()
+  };
+
+  try {
+    let { data, error } = await supabase
+      .from('profiles')
+      .update(basePayload)
+      .eq('id', userId);
+
+    if (error) {
+      console.warn('Profil tour/onboarding sıfırlama hatası (tour_completed olmadan deneniyor):', error);
+      delete basePayload.tour_completed;
+      const res = await supabase
+        .from('profiles')
+        .update(basePayload)
+        .eq('id', userId);
+      data = res.data;
+      error = res.error;
+    }
+
+    if (error) {
+      return { data: null, error };
+    }
+
+    // 3. RPC fonksiyonu varsa çağır
+    try {
+      await supabase.rpc('admin_reset_student_onboarding', { target_user_id: userId });
+    } catch (_) {}
+
+    return { data: { success: true, message: 'Navigator ve site tanıtım yönergeleri başarıyla sıfırlandı.' }, error: null };
+  } catch (err) {
+    console.error('resetStudentOnboardingAndTour hatası:', err);
+    return { data: null, error: err };
+  }
+}

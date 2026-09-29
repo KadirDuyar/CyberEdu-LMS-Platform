@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
-import { getAllProfiles, resetStudentProgress } from '../services/adminService';
+import { getAllProfiles, resetStudentProgress, resetStudentOnboardingAndTour } from '../services/adminService';
 import { supabase } from '../lib/supabase';
 import {
   Users, ShieldCheck, Activity, BookOpen,
   RefreshCw, RotateCcw, UserCheck, ShieldAlert,
-  Search, X, Sparkles, Plus
+  Search, X, Sparkles, Plus, Compass
 } from 'lucide-react';
 import Card from '../components/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -64,6 +64,9 @@ export default function AdminDashboard() {
     title: '',
     message: '',
     confirmText: 'Onayla',
+    confirmBtnClass: '',
+    icon: null,
+    iconClass: '',
     isDanger: false,
     onConfirm: null,
   });
@@ -80,6 +83,9 @@ export default function AdminDashboard() {
       title: 'Öğrenci Verilerini ve İlerlemesini Sıfırla',
       message: `${userName} adlı öğrencinin e-postası ve şifresi hariç; kayıtlı olduğu tüm kurslar, dahil olduğu haftalık sınıf programları, ders ilerlemeleri, sınav sonuçları, yorumları, takipleri ve rozetleri kalıcı olarak silinecektir. Bu işlemi onaylıyor musunuz?`,
       confirmText: 'Evet, Tamamen Sıfırla',
+      confirmBtnClass: '',
+      icon: <RotateCcw size={22} />,
+      iconClass: 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30',
       isDanger: true,
       onConfirm: async () => {
         setConfirmModal((m) => ({ ...m, isOpen: false }));
@@ -88,6 +94,29 @@ export default function AdminDashboard() {
           showToast('error', 'Hata: ' + error.message);
         } else {
           showToast('success', `${userName} kullanıcısının tüm kurs, program ve ders ilerlemeleri başarıyla sıfırlandı.`);
+          loadDashboardData();
+        }
+      },
+    });
+  };
+
+  const handleResetTour = (userId, userName) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Navigator & Tanıtım Yönergelerini Sıfırla',
+      message: `${userName} adlı öğrencinin kazandığı XP'ler, ders/kurs ilerlemeleri, sınav sonuçları, rozetleri ve kayıtlı kurslarına DOKUNULMAYACAKTIR. Sadece ilk giriş Navigator seçimi ve site tanıtım yönergeleri (rehber turu) sıfırlanacaktır. Bu işlemi onaylıyor musunuz?`,
+      confirmText: 'Evet, Sıfırla',
+      confirmBtnClass: 'bg-amber-600 hover:bg-amber-500 shadow-amber-500/30',
+      icon: <Compass size={22} />,
+      iconClass: 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-300 dark:border-amber-500/30',
+      isDanger: false,
+      onConfirm: async () => {
+        setConfirmModal((m) => ({ ...m, isOpen: false }));
+        const { error } = await resetStudentOnboardingAndTour(userId);
+        if (error) {
+          showToast('error', 'Hata: ' + error.message);
+        } else {
+          showToast('success', `${userName} kullanıcısının navigator ve site tanıtım yönergeleri başarıyla sıfırlandı. Kurs ilerlemeleri korundu.`);
           loadDashboardData();
         }
       },
@@ -220,7 +249,7 @@ export default function AdminDashboard() {
                 </span>
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                Rolleri yönetebilir veya öğrencilerin tüm verilerini tek tıkla sıfırlayabilirsiniz.
+                Rolleri yönetebilir, navigator/tanıtım yönergelerini veya tüm verileri tek tıkla sıfırlayabilirsiniz.
               </p>
             </div>
             <button
@@ -311,11 +340,15 @@ export default function AdminDashboard() {
                         <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border uppercase tracking-wider ${ROLE_COLORS[u.role] || ''}`}>
                           {ROLE_LABELS[u.role] || u.role}
                         </span>
-                        {u.learning_area && (
+                        {u.role === 'student' && !u.onboarding_completed ? (
+                          <span className="text-[10px] font-bold text-amber-700 bg-amber-100 border border-amber-300 dark:text-amber-300 dark:bg-amber-950/60 dark:border-amber-700/40 px-2 py-0.5 rounded-md">
+                            🧭 Navigator Bekliyor
+                          </span>
+                        ) : u.learning_area ? (
                           <span className="text-[10px] font-bold text-violet-700 bg-violet-100 border border-violet-300 dark:text-violet-300 dark:bg-violet-950/60 dark:border-violet-700/40 px-2 py-0.5 rounded-md">
                             {u.learning_area === 'awareness' ? '🛡️ Farkındalık' : '⚔️ Teknik'}
                           </span>
-                        )}
+                        ) : null}
                       </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5 flex items-center gap-2 flex-wrap">
                         <span>Kayıt: {new Date(u.created_at).toLocaleDateString('tr-TR')}</span>
@@ -341,7 +374,19 @@ export default function AdminDashboard() {
                       </button>
                     )}
 
-                    {/* Sıfırlama Butonu (Sadece öğrenci için) */}
+                    {/* Sadece Navigator & Tanıtım Turunu Sıfırlama Butonu (Sadece öğrenci için) */}
+                    {u.role === 'student' && (
+                      <button
+                        onClick={() => handleResetTour(u.id, u.full_name || 'Öğrenci')}
+                        className="flex-1 sm:flex-none p-2 sm:px-3 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 text-amber-800 dark:text-amber-300 text-xs font-bold border border-amber-300 dark:border-amber-500/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-95"
+                        title="İlerleme ve puanları silmeden sadece Navigator ve site tanıtım yönergelerini sıfırla"
+                      >
+                        <Compass size={14} />
+                        <span>Rehber & Turu Sıfırla</span>
+                      </button>
+                    )}
+
+                    {/* Tüm Verileri Sıfırlama Butonu (Sadece öğrenci için) */}
                     {u.role === 'student' && (
                       <button
                         onClick={() => handleResetProgress(u.id, u.full_name || 'Öğrenci')}
@@ -371,9 +416,13 @@ export default function AdminDashboard() {
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/15 rounded-3xl p-5 sm:p-7 max-w-md w-full shadow-2xl space-y-4">
               <div className="flex items-center gap-3">
                 <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                  confirmModal.isDanger ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30' : 'bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-300 dark:border-violet-500/30'
+                  confirmModal.iconClass
+                    ? confirmModal.iconClass
+                    : confirmModal.isDanger
+                      ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30'
+                      : 'bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 border border-violet-300 dark:border-violet-500/30'
                 }`}>
-                  {confirmModal.isDanger ? <RotateCcw size={22} /> : <UserCheck size={22} />}
+                  {confirmModal.icon || (confirmModal.isDanger ? <RotateCcw size={22} /> : <UserCheck size={22} />)}
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">{confirmModal.title}</h3>
@@ -399,7 +448,7 @@ export default function AdminDashboard() {
                   className={`w-full sm:flex-1 py-2.5 sm:py-3 px-4 rounded-xl font-bold text-xs sm:text-sm text-white transition-all shadow-lg cursor-pointer ${
                     confirmModal.isDanger
                       ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-500/30'
-                      : 'bg-violet-600 hover:bg-violet-500 shadow-violet-500/30'
+                      : confirmModal.confirmBtnClass || 'bg-violet-600 hover:bg-violet-500 shadow-violet-500/30'
                   }`}
                 >
                   {confirmModal.confirmText}
