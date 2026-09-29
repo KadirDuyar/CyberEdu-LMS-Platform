@@ -37,14 +37,14 @@ Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eği
 
 ## 🚀 Proje Hakkında
 
-**CyberEdu LMS**, öğrencilerin siber güvenlik bilgi ve yeteneklerini iki farklı uzmanlık hattında (**Farkındalık** ve **Teknik Parkur**) geliştirmelerini sağlayan açık ve uzaktan öğrenme yönetim sistemidir. Platform; teorik anlatımları interaktif etkinlikler, simülasyonlar, oyunlaştırma dinamikleri (XP, unvanlar, açılabilir avatarlar) ve gerçek zamanlı yapay zekâ asistanı ile harmanlayarak yüksek motivasyonlu bir öğrenme deneyimi sunar.
+**CyberEdu LMS**, öğrencilerin siber güvenlik bilgi ve yeteneklerini iki farklı alanda (**Farkındalık** ve **Teknik Parkur**) geliştirmelerini amaçlayan açık ve uzaktan öğrenme yönetim sistemidir. Platform; teorik anlatımları interaktif etkinlikler, simülasyonlar, oyunlaştırma bileşenleri (XP, seviye, açılabilir avatarlar) ve yapay zekâ asistanı ile bir araya getirir.
 
 ---
 
 ## 🛠️ Temel Teknolojiler
 
 - **Frontend:** React 18 (Vite tabanlı), React Router DOM v6
-- **Stil & Tasarım:** Tailwind CSS, Siber Neon Koyu Tema (Cyberpunk / Modern Dark UI), Glassmorphism efektleri
+- **Stil & Tasarım:** Tailwind CSS, Koyu Tema (Dark UI), Glassmorphism efektleri
 - **İkonlar & Animasyonlar:** Lucide React, Framer Motion
 - **Backend / Veritabanı:** Supabase (PostgreSQL, Row Level Security - RLS Politikaları, Auth)
 - **Yapay Zeka (AI):** Google Gemini 1.5 Flash / Flash Lite API (Öğrenci Mentorluğu ve Öğretmen İçerik Üretimi)
@@ -75,19 +75,19 @@ Sistemde 3 temel kullanıcı rolü bulunur ve her rol kendi yetki sınırları d
 
 ## 🎬 Articulate Storyline & SCORM Entegrasyonu
 
-CyberEdu LMS, kurumsal e-öğrenme standartlarından olan **Articulate Storyline 360** ve **SCORM** paketlerini harici bir SCORM Cloud aracına ihtiyaç duymadan doğrudan sistem içerisinde yerel olarak oynatır ve skorlar:
+CyberEdu LMS, **Articulate Storyline 360** HTML5 web çıktılarını ve SCORM paketlerini `StorylinePlayer` bileşeni üzerinden oynatır ve tamamlanma/skor verilerini yakalar:
 
-### 1. `StorylinePlayer` Mimarisi
-- **İki İzleme Modu:**
-  - **Inline Mod:** Ders içi aktivite akışında 16:9 en-boy oranıyla şık bir kart olarak konumlanır.
-  - **Full Mod / Theatre Mode:** Dersin kendisi doğrudan Storyline paketi olduğunda sol yan çubuğu otomatik daraltarak tam odaklanma sağlar.
-- **Tarayıcı Fullscreen API:** Öğrenciler tek tıkla tarayıcı tam ekranına geçip interaktif senaryoları simülasyon deneyiminde çözebilir.
+### 1. `StorylinePlayer` Bileşeni
+- **İzleme Modları:**
+  - **Inline Mod:** Ders içi içerik akışında 16:9 oranında iframe oynatıcı.
+  - **Full Mod:** İçerik tam ekran açıldığında yan gezinme çubuğunu otomatik daraltan görünüm.
+- **Tarayıcı Fullscreen API:** Tarayıcı tam ekran desteği.
 
-### 2. Çift Yönlü İletişim Köprüsü (postMessage & SCORM API)
-Platform, Storyline paketleri ile güvenli `postMessage` protokolü ve emüle edilmiş SCORM CMI veri modeli üzerinden konuşur:
-- **Otomatik Puan ve Skor Yakalama:** `TotalScore`, `ScorePoints`, `cmi.core.score.raw` veya `cmi.score.raw` parametrelerini anlık filtreler.
-- **Dinamik XP Dönüşümü:** Storyline'da alınan ham puan (örn. 300 üzerinden 250), dersin tanımlı `xpReward` değeriyle otomatik oranlanır (`(puan / maxPuan) * xpReward`).
-- **Anlık Tamamlama & Veritabanı Senkronizasyonu:** Storyline modülü başarıyla tamamlandığında LMS veritabanına (`lesson_progress` ve `profiles`) öğrenci ilerlemesi ve XP'si otomatik işlenir.
+### 2. Veri İletişimi (postMessage & SCORM Dinleyicisi)
+Storyline paketinden gelen tamamlama ve puan sinyalleri `postMessage` dinleyicisi ile karşılanır:
+- **Puan / Skor Yakalama:** `TotalScore`, `ScorePoints`, `cmi.core.score.raw` veya `cmi.score.raw` alanları okunur.
+- **Oransal XP Hesabı:** Storyline sınav puanı, dersin `xpReward` katsayısıyla oranlanarak hesaplanır (`(puan / maxPuan) * xpReward`).
+- **Veritabanı Kaydı:** Tamamlama sinyali alındığında Supabase üzerindeki `lesson_progress` tablosu güncellenir ve öğrenci profiline XP eklenir.
 
 ```javascript
 // Storyline'da son slayt veya tamamlama trigger'ına eklenecek JS kodu:

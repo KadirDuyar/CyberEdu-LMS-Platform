@@ -48,6 +48,14 @@ export default function StorylinePlayer({
   const [isCompleted, setIsCompleted] = useState(submitted);
   const [capturedScore, setCapturedScore] = useState(null);
 
+  // submitted prop'u değişirse (ör. ders sıfırlandığında) durumu senkronize et
+  useEffect(() => {
+    setIsCompleted(submitted);
+    if (!submitted) {
+      setCapturedScore(null);
+    }
+  }, [submitted]);
+
   // Full modda sidebar'ı otomatik daralt
   useEffect(() => {
     if (mode === 'full' && onCollapseSidebar) {

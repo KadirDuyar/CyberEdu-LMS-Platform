@@ -127,7 +127,7 @@ function renderInline(text) {
 export default function LessonPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
-  const { user, addXP } = useAuth();
+  const { user, profile, addXP } = useAuth();
   const { isDemoMode } = useDemoMode();
 
   const [lesson, setLesson] = useState(null);
@@ -170,7 +170,17 @@ export default function LessonPage() {
           .eq('lesson_id', lessonId)
           .maybeSingle();
 
-        if (progress?.status === 'completed') {
+        // Eğer öğrencinin toplam profil XP'si 0 ise ve ders "completed" görünüyorsa (sıfırlama sonrası kalan yetim kayıt)
+        if (progress?.status === 'completed' && (profile?.xp === 0 || profile?.xp === null)) {
+          try {
+            await supabase.from('lesson_progress').delete().eq('user_id', user.id).eq('lesson_id', lessonId);
+            await supabase.from('activity_attempts').delete().eq('user_id', user.id).eq('lesson_id', lessonId);
+          } catch (e) {
+            console.warn('Eski ders ilerlemesi temizlenirken uyarı:', e);
+          }
+          setAlreadyCompleted(false);
+          await startLesson(user.id, lessonId);
+        } else if (progress?.status === 'completed') {
           setAlreadyCompleted(true);
         } else {
           await startLesson(user.id, lessonId);
@@ -180,7 +190,7 @@ export default function LessonPage() {
     }
     load();
     return () => { cancelled = true; };
-  }, [lessonId, user]);
+  }, [lessonId, user, profile?.xp]);
 
   const hasStoryline = lesson?.content_type === 'storyline' || lesson?.activities?.some((a) => a.type === 'storyline');
 
@@ -307,7 +317,7 @@ export default function LessonPage() {
       }
     }
 
-    if (alreadyCompleted) {
+    if (alreadyCompleted && !isDemoMode) {
       await checkCourseCompletion();
       setEarnedXP(0);
       setCompleted(true);
@@ -357,9 +367,24 @@ export default function LessonPage() {
     // Storyline tamamlandı sinyali geldiğinde:
     // Eğer bu ders saf Storyline dersi ise (ekstra soru yoksa), otomatik olarak dersi tamamla ve XP ver:
     if (interactiveActivities.length === 0) {
-      if (!alreadyCompleted && !completed && !completing) {
+      if ((!alreadyCompleted || isDemoMode) && !completed && !completing) {
         await handleComplete();
       }
+    }
+  };
+
+  const handleResetLessonProgress = async () => {
+    if (!user) return;
+    try {
+      await supabase.from('lesson_progress').delete().eq('user_id', user.id).eq('lesson_id', lessonId);
+      await supabase.from('activity_attempts').delete().eq('user_id', user.id).eq('lesson_id', lessonId);
+      setAlreadyCompleted(false);
+      setCompleted(false);
+      setEarnedXP(0);
+      setActivityStates({});
+      await startLesson(user.id, lessonId);
+    } catch (e) {
+      console.warn('Ders sıfırlama hatası:', e);
     }
   };
 
@@ -535,9 +560,19 @@ export default function LessonPage() {
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="font-display font-black text-xl text-slate-900 dark:text-white">{lesson.title}</h1>
               {alreadyCompleted && (
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30">
-                  Daha Önce Tamamlandı
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-500/30">
+                    Daha Önce Tamamlandı
+                  </span>
+                  <button
+                    onClick={handleResetLessonProgress}
+                    className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 flex items-center gap-1 transition cursor-pointer active:scale-95"
+                    title="Bu dersin tamamlanma kaydını sıfırla ve yeniden çözerek XP kazan"
+                  >
+                    <RotateCcw size={11} />
+                    <span>Dersi Sıfırla & Baştan Çöz</span>
+                  </button>
+                </div>
               )}
             </div>
             <div className="flex items-center gap-3 mt-1">
@@ -743,20 +778,33 @@ export default function LessonPage() {
             )}
 
             {!failedMessage && (
-              <button
-                onClick={handleComplete}
-                disabled={completing}
-                className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-bold text-base shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60"
-              >
-                {completing ? (
-                  'Kaydediliyor...'
-                ) : (
-                  <>
-                    <CheckCircle size={20}/>
-                    {alreadyCompleted ? 'Dersi İncelemeyi Tamamla' : 'Dersi Tamamla & XP Kazan'}
-                  </>
+              <div className="space-y-2">
+                <button
+                  onClick={handleComplete}
+                  disabled={completing}
+                  className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-bold text-base shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60 cursor-pointer"
+                >
+                  {completing ? (
+                    'Kaydediliyor...'
+                  ) : (
+                    <>
+                      <CheckCircle size={20}/>
+                      {alreadyCompleted && !isDemoMode ? 'Dersi İncelemeyi Tamamla' : `Dersi Tamamla & +${lesson.xp_reward || 0} XP Kazan`}
+                    </>
+                  )}
+                </button>
+                {alreadyCompleted && !isDemoMode && (
+                  <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+                    Bu ders daha önce tamamlanmış görünüyor.{' '}
+                    <button
+                      onClick={handleResetLessonProgress}
+                      className="text-amber-600 dark:text-amber-400 underline font-semibold hover:text-amber-500 cursor-pointer"
+                    >
+                      Dersi sıfırlayıp baştan çözmek ve XP kazanmak için tıklayın.
+                    </button>
+                  </p>
                 )}
-              </button>
+              </div>
             )}
           </div>
         )}
