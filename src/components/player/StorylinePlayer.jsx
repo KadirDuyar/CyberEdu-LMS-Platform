@@ -9,16 +9,16 @@ import { Maximize, Minimize, ExternalLink, MonitorPlay, AlertTriangle, Loader2 }
  *  - "full"    → Dersin kendisi tam ekran modu (sidebar otomatik daralır)
  *
  * Props:
- *  url              — story.html URL'si (zorunlu)
- *  mode             — "inline" | "full" (varsayılan: "inline")
- *  height           — inline modda iframe yüksekliği (varsayılan: "450px")
- *  allowFullscreen  — Fullscreen butonunu göster (varsayılan: true)
+ *  url             — story.html URL'si (zorunlu)
+ *  mode            — "inline" | "full" (varsayılan: "inline")
+ *  height          — inline modda iframe yüksekliği (varsayılan: "450px")
+ *  allowFullscreen — Fullscreen butonunu göster (varsayılan: true)
  *  onCollapseSidebar— Full modda sidebar'ı daralt callback
- *  submitted        — Ders akışında bu aktivite tamamlandı mı
- *  onSubmit         — Tamamlandı callback ({ userAnswer, isCorrect, score })
- *  title            — Oynatıcı başlığı (isteğe bağlı)
- *  maxScore         — Storyline'ın max puanı (varsayılan: 100) — XP oranı için
- *  xpReward         — Bu aktivite için verilecek max XP
+ *  submitted       — Ders akışında bu aktivite tamamlandı mı
+ *  onSubmit        — Tamamlandı callback ({ userAnswer, isCorrect, score })
+ *  title           — Oynatıcı başlığı (isteğe bağlı)
+ *  maxScore        — Storyline'ın max puanı (varsayılan: 100) — XP oranı için
+ *  xpReward        — Bu aktivite için verilecek max XP
  *
  * Storyline'dan XP almak için son slayta şu JavaScript trigger'ı ekleyin:
  *   window.parent.postMessage(
@@ -47,6 +47,23 @@ export default function StorylinePlayer({
   const [isBrowserFullscreen, setIsBrowserFullscreen] = useState(false);
   const [isCompleted, setIsCompleted] = useState(submitted);
   const [capturedScore, setCapturedScore] = useState(null);
+  const [currentMaxScore, setCurrentMaxScore] = useState(maxScore || 100);
+
+  // Ref & Origin Tanımlamaları
+  const lastSignalRef = useRef({ key: '', at: 0 });
+  const onSubmitRef = useRef(onSubmit);
+  
+  useEffect(() => { 
+    onSubmitRef.current = onSubmit; 
+  }, [onSubmit]);
+
+  const allowedOrigin = (() => {
+    try { 
+      return new URL(url, window.location.href).origin; 
+    } catch { 
+      return null; 
+    }
+  })();
 
   // submitted prop'u değişirse (ör. ders sıfırlandığında) durumu senkronize et
   useEffect(() => {
@@ -84,40 +101,37 @@ export default function StorylinePlayer({
     };
   }, []);
 
-  const [currentMaxScore, setCurrentMaxScore] = useState(maxScore || 100);
-
   // Callback ref'i oluşturarak closure stale state sorunlarını engelle
   const handleCompleteRef = useRef();
 
   const handleCompleteWithScore = useCallback((scoreOverride, maxScoreOverride) => {
-    if (isCompleted) return;
-    setIsCompleted(true);
-
     const targetMax = maxScoreOverride ?? currentMaxScore;
-    const finalScore = scoreOverride !== null && scoreOverride !== undefined
-      ? scoreOverride
-      : (capturedScore !== null ? capturedScore : targetMax);
+    const finalScore = scoreOverride ?? capturedScore ?? targetMax;
 
-    const isCorrect = finalScore >= (targetMax * 0.5);
+    // Aynı sinyal 3 sn içinde tekrar gelirse yoksay (çift tetiklenme koruması)
+    const key = `${finalScore}/${targetMax}`;
+    const now = Date.now();
+    if (lastSignalRef.current.key === key && now - lastSignalRef.current.at < 3000) return;
+    lastSignalRef.current = { key, at: now };
 
-    if (onSubmit) {
-      onSubmit({
-        userAnswer: `score:${finalScore ?? 'completed'}`,
-        isCorrect,
-        score: finalScore,
-        maxScore: targetMax,
-        earnedXP: xpReward && finalScore !== null
-          ? Math.round((finalScore / targetMax) * xpReward)
-          : (xpReward || finalScore),
-      });
-    }
-  }, [isCompleted, onSubmit, capturedScore, currentMaxScore, xpReward]);
+    setIsCompleted(true);
+    setCapturedScore(finalScore);
+
+    onSubmitRef.current?.({
+      userAnswer: `score:${finalScore}`,
+      isCorrect: finalScore >= targetMax * 0.5,
+      score: finalScore,
+      maxScore: targetMax,
+      earnedXP: xpReward ? Math.round((finalScore / targetMax) * xpReward) : finalScore,
+    });
+  }, [currentMaxScore, capturedScore, xpReward]);
 
   handleCompleteRef.current = handleCompleteWithScore;
 
   // ─── SCORM / xAPI / özel postMessage dinleyicisi ───────────────────────────
   useEffect(() => {
     const handleMessage = (e) => {
+      if (allowedOrigin && e.origin !== allowedOrigin) return;
       try {
         const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
         if (!data) return;
@@ -180,7 +194,7 @@ export default function StorylinePlayer({
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [maxScore]);
+  }, [maxScore, allowedOrigin]);
 
   const handleComplete = () => handleCompleteWithScore(capturedScore ?? currentMaxScore);
 
@@ -206,7 +220,6 @@ export default function StorylinePlayer({
       }
     }
   };
-
 
   if (!url) {
     return (

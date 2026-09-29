@@ -112,3 +112,12 @@ export async function getLessonProgress(userId, lessonIds) {
 
   return { data: data ?? [], error };
 }
+export async function awardLessonXP({ lessonId, xp, score, maxScore }) {
+  const { data, error } = await supabase.rpc('award_lesson_xp', {
+    p_lesson_id: lessonId,
+    p_xp: Math.max(0, Math.round(xp)),
+    p_score: score,
+    p_max_score: maxScore,
+  });
+  return { data, error };
+}

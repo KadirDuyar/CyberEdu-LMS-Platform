@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getLessonWithActivities, startLesson, completeLesson, rollbackLessonCompletion, saveActivityAttempt } from '../../services/lessonService';
+import { getLessonWithActivities, startLesson, completeLesson, rollbackLessonCompletion, saveActivityAttempt, awardLessonXP } from '../../services/lessonService';
 import { supabase } from '../../lib/supabase';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import ActivityRenderer from '../../components/activities/ActivityRenderer';
@@ -146,6 +146,10 @@ export default function LessonPage() {
   const [retryCount, setRetryCount] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  const awardingRef = useRef(false);
+  const profileXpRef = useRef(profile?.xp);
+  useEffect(() => { profileXpRef.current = profile?.xp; }, [profile?.xp]);
+
   useEffect(() => {
     let cancelled = false;
     async function load() {
@@ -172,7 +176,7 @@ export default function LessonPage() {
           .maybeSingle();
 
         // Eğer öğrencinin toplam profil XP'si 0 ise ve ders "completed" görünüyorsa (sıfırlama sonrası kalan yetim kayıt)
-        if (progress?.status === 'completed' && (profile?.xp === 0 || profile?.xp === null)) {
+        if (progress?.status === 'completed' && (profileXpRef.current === 0 || profileXpRef.current === null)) {
           try {
             await supabase.from('lesson_progress').delete().eq('user_id', user.id).eq('lesson_id', lessonId);
             await supabase.from('activity_attempts').delete().eq('user_id', user.id).eq('lesson_id', lessonId);
@@ -191,7 +195,7 @@ export default function LessonPage() {
     }
     load();
     return () => { cancelled = true; };
-  }, [lessonId, user, profile?.xp]);
+  }, [lessonId, user?.id]);
 
   const hasStoryline = lesson?.content_type === 'storyline' || lesson?.activities?.some((a) => a.type === 'storyline');
 
@@ -383,6 +387,7 @@ export default function LessonPage() {
 
       // Garanti Doğrudan Veritabanı Güncellemesi (State veya RLS gecikmelerine karşı fallback)
       try {
+        const prevXP = profile?.xp || 0;
         const { data: profNow } = await supabase
           .from('profiles')
           .select('xp, level')
@@ -391,7 +396,7 @@ export default function LessonPage() {
 
         const curXP = profNow?.xp || 0;
         // Eğer veritabanındaki XP henüz artmadıysa doğrudan yaz
-        if (curXP < totalXP) {
+        if (curXP === prevXP) {
           const nextXP = curXP + totalXP;
           const nextLevel = Math.floor(nextXP / 500) + 1;
           await supabase.from('profiles').update({
@@ -417,16 +422,31 @@ export default function LessonPage() {
     setCompleting(false);
   };
 
+  const awardStorylineXP = async (res) => {
+    if (!user || awardingRef.current) return;
+    awardingRef.current = true;
+    try {
+      const score = Number(res?.score ?? 0);
+      const max = Number(res?.maxScore) > 0 ? Number(res.maxScore) : 100;
+      const xp = lesson?.xp_reward
+        ? Math.round((score / max) * lesson.xp_reward)
+        : Math.round(score);
+      const { data, error } = await awardLessonXP({ lessonId, xp, score, maxScore: max });
+      if (error) { console.error('XP verilemedi:', error); return; }
+      setEarnedXP(data?.awarded ?? 0);   // 0 ise "Ders Tekrar İncelendi" ekranı çıkar
+      setAlreadyCompleted(true);
+      await refreshProfile?.();
+      await checkCourseCompletion();
+      setCompleted(true);
+    } finally {
+      awardingRef.current = false;
+    }
+  };
+
   const handleStorylineSubmit = async (res) => {
-    if (res) {
-      setStorylineResult(res);
-    }
-    // Eğer bu ders saf Storyline dersi ise (ekstra soru yoksa), doğrudan tamamla ve puanı ekle:
-    if (interactiveActivities.length === 0) {
-      if (!completing && !completed) {
-        await handleComplete(res);
-      }
-    }
+    if (res) setStorylineResult(res);
+    // Sorusuz saf Storyline dersi → skoru doğrudan işle
+    if (interactiveActivities.length === 0) await awardStorylineXP(res);
   };
 
   const handleResetLessonProgress = async () => {
@@ -438,6 +458,8 @@ export default function LessonPage() {
       setCompleted(false);
       setEarnedXP(0);
       setActivityStates({});
+      setStorylineResult(null);
+      setRetryCount((c) => c + 1);
       await startLesson(user.id, lessonId);
     } catch (e) {
       console.warn('Ders sıfırlama hatası:', e);
@@ -502,7 +524,7 @@ export default function LessonPage() {
 
               {/* XP Kazancı */}
               <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 my-3 shadow-lg">
-                <Zap className="text-amber-500 dark:text-amber-400" size={24} />
+                <Zap className="text-amber-500 dark:text-amber-400" size="{24}"/>
                 <span className="font-display font-black text-2xl text-amber-600 dark:text-amber-400">
                   {earnedXP > 0 ? `+${earnedXP} XP` : 'Tüm XP\'ler Toplandı'}
                 </span>
@@ -522,7 +544,7 @@ export default function LessonPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <span className="text-[10px] font-black uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-300 dark:border-amber-500/30 inline-flex items-center gap-1">
-                        <Sparkles size={11} /> Yeni Başarı Rozeti & Unvanı Kazandın!
+                        <Sparkles size="{11}"/> Yeni Başarı Rozeti & Unvanı Kazandın!
                       </span>
                       <h4 className="font-bold text-slate-900 dark:text-white text-base mt-1.5">{reward.title}</h4>
                       <p className="text-xs text-violet-700 dark:text-violet-300 font-bold mb-0.5">{reward.name}</p>
@@ -537,13 +559,13 @@ export default function LessonPage() {
                   onClick={() => navigate('/student/achievements')}
                   className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 text-white font-bold text-sm shadow-xl shadow-violet-600/30 hover:scale-[1.02] transition-all cursor-pointer"
                 >
-                  <Trophy size={18} /> Rozetlerimi & Başarılarımı Gör
+                  <Trophy size="{18}"/> Rozetlerimi & Başarılarımı Gör
                 </button>
                 <button
                   onClick={() => navigate('/student/courses')}
                   className="flex-1 flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-800 dark:text-slate-200 font-semibold text-sm transition-all cursor-pointer"
                 >
-                  <BookOpen size={18} /> Başka Kurslara Bak
+                  <BookOpen size="{18}"/> Başka Kurslara Bak
                 </button>
               </div>
             </div>
@@ -564,7 +586,7 @@ export default function LessonPage() {
           </div>
 
           <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/30">
-            <Zap className="text-amber-500 dark:text-amber-400" size={20}/>
+            <Zap className="text-amber-500 dark:text-amber-400" size="{20}"/>
             <span className="font-display font-black text-2xl text-amber-600 dark:text-amber-400">
               {earnedXP > 0 ? `+${earnedXP} XP` : 'Tamamlanmış Ders'}
             </span>
@@ -578,13 +600,13 @@ export default function LessonPage() {
               onClick={() => navigate('/student')}
               className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-800 dark:text-slate-300 font-semibold transition-colors cursor-pointer"
             >
-              <ArrowLeft size={16}/> Dashboard'a Dön
+              <ArrowLeft size="{16}"/> Dashboard'a Dön
             </button>
             <button
               onClick={() => navigate('/student/learning-path')}
               className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold transition-all hover:-translate-y-0.5 shadow-md shadow-violet-500/25 cursor-pointer"
             >
-              Yol Haritası <ChevronRight size={16}/>
+              Yol Haritası <ChevronRight size="{16}"/>
             </button>
           </div>
         </div>
@@ -599,18 +621,18 @@ export default function LessonPage() {
   // ardından tüm aktiviteler (sorular vb.) aşağıda normal şekilde listelenir.
 
   return (
-    <DashboardLayout forceCollapsed={sidebarCollapsed}>
+    <DashboardLayout forceCollapsed="{sidebarCollapsed}">
       <div className={`${hasStoryline ? 'max-w-5xl xl:max-w-6xl' : 'max-w-3xl'} mx-auto space-y-6 pb-16 transition-all duration-300`}>
         <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium cursor-pointer"
         >
-          <ArrowLeft size={16}/> Geri Dön
+          <ArrowLeft size="{16}"/> Geri Dön
         </button>
 
         <div className="flex items-start gap-4 p-5 rounded-2xl glass border border-slate-200 dark:border-white/10">
           <div className="w-11 h-11 rounded-xl bg-violet-500/20 flex items-center justify-center shrink-0">
-            <BookOpen className="text-violet-600 dark:text-violet-400" size={20}/>
+            <BookOpen className="text-violet-600 dark:text-violet-400" size="{20}"/>
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
@@ -625,7 +647,7 @@ export default function LessonPage() {
                     className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/15 dark:hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 flex items-center gap-1 transition cursor-pointer active:scale-95"
                     title="Bu dersin tamamlanma kaydını sıfırla ve yeniden çözerek XP kazan"
                   >
-                    <RotateCcw size={11} />
+                    <RotateCcw size="{11}"/>
                     <span>Dersi Sıfırla & Baştan Çöz</span>
                   </button>
                 </div>
@@ -633,12 +655,12 @@ export default function LessonPage() {
             </div>
             <div className="flex items-center gap-3 mt-1">
               <div className="flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-semibold">
-                <Zap size={12}/>
+                <Zap size="{12}"/>
                 <span>+{lesson.xp_reward || 0} XP</span>
               </div>
               {activities.length > 0 && (
                 <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-                  <Trophy size={12}/>
+                  <Trophy size="{12}"/>
                   <span>
                     {interactiveActivities.length > 0
                       ? `${interactiveActivities.length} soru/etkinlik (${activities.length} içerik bloğu)`
@@ -664,18 +686,7 @@ export default function LessonPage() {
                 <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">— Modülü tamamladıktan sonra aşağı kaydırarak devam edin</span>
               )}
             </div>
-            <StorylinePlayer
-              url={lesson.storyline_url}
-              mode="inline"
-              height="520px"
-              title={lesson.title}
-              allowFullscreen={true}
-              onCollapseSidebar={setSidebarCollapsed}
-              submitted={alreadyCompleted}
-              onSubmit={handleStorylineSubmit}
-              maxScore={lesson.xp_reward || 100}
-              xpReward={lesson.xp_reward || 100}
-            />
+            <StorylinePlayer 100} allowFullscreen="{true}" height="520px" maxScore="{lesson.xp_reward" mode="inline" onCollapseSidebar="{setSidebarCollapsed}" onSubmit="{handleStorylineSubmit}" submitted="{alreadyCompleted}" title="{lesson.title}" url="{lesson.storyline_url}" xpReward="{lesson.xp_reward" ||/>
           </div>
         )}
 
@@ -700,7 +711,7 @@ export default function LessonPage() {
               disabled={completing}
               className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
             >
-              <CheckCircle size={16} />
+              <CheckCircle size="{16}"/>
               {completing ? 'Kaydediliyor...' : 'Dersi Tamamla & Puanı Ekle'}
             </button>
           </div>
@@ -709,7 +720,7 @@ export default function LessonPage() {
         {activities.length > 0 && (
           <div className="space-y-6">
             <h2 className="font-display font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
-              <Trophy className="text-amber-500 dark:text-amber-400" size={18}/>
+              <Trophy className="text-amber-500 dark:text-amber-400" size="{18}"/>
               Etkileşimli Ders Akışı
             </h2>
 
@@ -733,7 +744,7 @@ export default function LessonPage() {
                       </h3>
                     ) : (
                       <div className="text-slate-800 dark:text-slate-300 leading-relaxed font-normal">
-                        <SafeMarkdown content={activity.question}/>
+                        <SafeMarkdown content="{activity.question}"/>
                       </div>
                     )}
                   </div>
@@ -748,10 +759,7 @@ export default function LessonPage() {
                     <div className="flex items-center gap-2 px-4 py-2.5 bg-violet-50 dark:bg-violet-950/40 border-b border-violet-200 dark:border-violet-500/20">
                       <span className="text-xs font-bold text-violet-700 dark:text-violet-300 uppercase tracking-wider">🎬 Storyline Modülü</span>
                     </div>
-                    <ActivityRenderer
-                      key={`${activity.id}-${retryCount}`}
-                      activity={activity}
-                      onSubmit={(res) => handleActivitySubmit(activity, res)}
+                    <ActivityRenderer activity="{activity}" key="{`${activity.id}-${retryCount}`}" onSubmit="{(res)"> handleActivitySubmit(activity, res)}
                       submitted={state?.submitted ?? false}
                       result={state?.result}
                     />
@@ -800,16 +808,13 @@ export default function LessonPage() {
                       }[activity.type] || activity.type}
                     </span>
                     <div className="ml-auto flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-semibold">
-                      <Zap size={11}/>
+                      <Zap size="{11}"/>
                       <span>{activity.points} puan</span>
                     </div>
                   </div>
 
                   {isUnlocked ? (
-                    <ActivityRenderer
-                      key={`${activity.id}-${retryCount}`}
-                      activity={activity}
-                      onSubmit={(res) => handleActivitySubmit(activity, res)}
+                    <ActivityRenderer activity="{activity}" key="{`${activity.id}-${retryCount}`}" onSubmit="{(res)"> handleActivitySubmit(activity, res)}
                       submitted={state?.submitted ?? false}
                       result={state?.result}
                     />
@@ -833,7 +838,7 @@ export default function LessonPage() {
                   onClick={handleRetry}
                   className="px-6 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm transition-all hover:-translate-y-0.5"
                 >
-                  <RotateCcw className="inline mr-2 -mt-0.5" size={16}/>
+                  <RotateCcw className="inline mr-2 -mt-0.5" size="{16}"/>
                   Cevapları Sıfırla ve Tekrar Dene
                 </button>
               </div>
@@ -850,7 +855,7 @@ export default function LessonPage() {
                     'Puanlar Hesaplanıyor & Kaydediliyor...'
                   ) : (
                     <>
-                      <CheckCircle size={20}/>
+                      <CheckCircle size="{20}"/>
                       <span>
                         {storylineResult?.score
                           ? `Dersi Tamamla & +${storylineResult.score} Puanı Kazan`
