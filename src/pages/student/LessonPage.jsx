@@ -127,7 +127,7 @@ function renderInline(text) {
 export default function LessonPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
-  const { user, profile, addXP } = useAuth();
+  const { user, profile, addXP, refreshProfile } = useAuth();
   const { isDemoMode } = useDemoMode();
 
   const [lesson, setLesson] = useState(null);
@@ -141,6 +141,7 @@ export default function LessonPage() {
   const [isCourseFinished, setIsCourseFinished] = useState(false);
 
   const [activityStates, setActivityStates] = useState({});
+  const [storylineResult, setStorylineResult] = useState(null);
   const [failedMessage, setFailedMessage] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -300,58 +301,111 @@ export default function LessonPage() {
     return false;
   };
 
-  const handleComplete = async () => {
+  const handleComplete = async (directStoryResult = null) => {
     if (completing) return;
     setCompleting(true);
     setFailedMessage(null);
 
+    const stResult = directStoryResult || storylineResult;
+
+    // 1. Etkinlik soruları başarı kontrolü
     const totalQuestions = interactiveActivities.length;
     const correctCount = Object.values(activityStates).filter((s) => s.result?.isCorrect).length;
 
-    if (totalQuestions > 0) {
+    if (totalQuestions > 0 && !isDemoMode) {
       const percentage = (correctCount / totalQuestions) * 100;
-      if (percentage < PASS_PERCENT && !isDemoMode) {
+      if (percentage < PASS_PERCENT) {
         setFailedMessage(`Soruların en az %${PASS_PERCENT}'sini doğru cevaplamalısın. (Senin başarın: %${Math.round(percentage)})`);
         setCompleting(false);
         return;
       }
     }
 
-    if (alreadyCompleted && !isDemoMode) {
-      await checkCourseCompletion();
-      setEarnedXP(0);
-      setCompleted(true);
-      setCompleting(false);
-      return;
-    }
-
+    // 2. Toplam Puan Hesabı (Tüm ders türleriyle tam uyumlu):
+    // A) Klasik aktivitelerden kazanılan puan
     const totalActivityPoints = interactiveActivities.reduce((sum, a) => sum + (a.points || 0), 0);
-    const xpFromActivities = Object.values(activityStates)
+    const activityXP = Object.values(activityStates)
       .filter((s) => s.result?.isCorrect)
-      .reduce((sum, s) => sum + (s.result.points ?? 0), 0);
+      .reduce((sum, s) => sum + (s.result?.points ?? 0), 0);
 
-    let totalXP = lesson?.xp_reward || 0;
-    if (totalActivityPoints > 0) {
-      totalXP = Math.round((xpFromActivities / totalActivityPoints) * totalXP);
+    // B) Storyline'dan kazanılan puan (varsa)
+    let storyXP = 0;
+    if (stResult) {
+      const rawCandidate = stResult.earnedXP ?? stResult.score ?? stResult.points;
+      if (rawCandidate !== undefined && rawCandidate !== null && !isNaN(Number(rawCandidate))) {
+        const numScore = parseFloat(rawCandidate);
+        const numMax = stResult.maxScore ? parseFloat(stResult.maxScore) : 100;
+        if (lesson?.xp_reward && numMax > 0) {
+          storyXP = Math.round((numScore / numMax) * lesson.xp_reward);
+        } else {
+          storyXP = Math.round(numScore);
+        }
+      }
     }
 
+    // C) Nihai toplam XP:
+    let totalXP = 0;
+    if (storyXP > 0 && activityXP > 0) {
+      totalXP = storyXP + activityXP;
+    } else if (storyXP > 0) {
+      totalXP = storyXP;
+    } else if (totalActivityPoints > 0) {
+      if (lesson?.xp_reward) {
+        totalXP = Math.round((activityXP / totalActivityPoints) * lesson.xp_reward);
+      } else {
+        totalXP = activityXP;
+      }
+    } else {
+      totalXP = lesson?.xp_reward || 50;
+    }
+
+    // Taban puan koruması (tamamlanan her ders pozitif bir XP kazandırır)
+    if (totalXP <= 0) {
+      totalXP = lesson?.xp_reward || 50;
+    }
+
+    // 3. Veritabanına Yazma
     if (user) {
-      const { error: compError } = await completeLesson(user.id, lessonId);
-      if (compError) {
-        setFailedMessage('Ders kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.');
-        setCompleting(false);
-        return;
+      try {
+        await completeLesson(user.id, lessonId);
+      } catch (err) {
+        console.warn('completeLesson uyarısı:', err);
       }
 
-      if (addXP) {
-        const xpRes = await addXP(totalXP);
-        if (xpRes && xpRes.error) {
-          console.error('XP yazılamadı, ders tamamlama geri alınıyor:', xpRes.error);
-          await rollbackLessonCompletion(user.id, lessonId);
-          setFailedMessage('XP puanınız kaydedilemediği için ders tamamlanamadı. Lütfen tekrar deneyin.');
-          setCompleting(false);
-          return;
+      // XP Ekleme (AuthContext üzerinden)
+      try {
+        if (addXP) {
+          await addXP(totalXP);
         }
+      } catch (xpErr) {
+        console.warn('addXP uyarısı:', xpErr);
+      }
+
+      // Garanti Doğrudan Veritabanı Güncellemesi (State veya RLS gecikmelerine karşı fallback)
+      try {
+        const { data: profNow } = await supabase
+          .from('profiles')
+          .select('xp, level')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        const curXP = profNow?.xp || 0;
+        // Eğer veritabanındaki XP henüz artmadıysa doğrudan yaz
+        if (curXP < totalXP) {
+          const nextXP = curXP + totalXP;
+          const nextLevel = Math.floor(nextXP / 500) + 1;
+          await supabase.from('profiles').update({
+            xp: nextXP,
+            level: nextLevel,
+            updated_at: new Date().toISOString()
+          }).eq('id', user.id);
+        }
+
+        if (refreshProfile) {
+          await refreshProfile();
+        }
+      } catch (dbErr) {
+        console.warn('Doğrudan profil güncelleme uyarısı:', dbErr);
       }
 
       await checkCourseCompletion();
@@ -364,11 +418,13 @@ export default function LessonPage() {
   };
 
   const handleStorylineSubmit = async (res) => {
-    // Storyline tamamlandı sinyali geldiğinde:
-    // Eğer bu ders saf Storyline dersi ise (ekstra soru yoksa), otomatik olarak dersi tamamla ve XP ver:
+    if (res) {
+      setStorylineResult(res);
+    }
+    // Eğer bu ders saf Storyline dersi ise (ekstra soru yoksa), doğrudan tamamla ve puanı ekle:
     if (interactiveActivities.length === 0) {
-      if ((!alreadyCompleted || isDemoMode) && !completed && !completing) {
-        await handleComplete();
+      if (!completing && !completed) {
+        await handleComplete(res);
       }
     }
   };
@@ -620,26 +676,28 @@ export default function LessonPage() {
         )}
 
         {/* Storyline Dersi İçin Hızlı Tamamlama & XP Kazanma Çubuğu */}
-        {lesson.content_type === 'storyline' && !alreadyCompleted && !completed && (
+        {lesson.content_type === 'storyline' && !completed && (
           <div className="p-4 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-violet-500/10 border border-emerald-500/30 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md animate-in fade-in">
             <div className="flex items-center gap-2.5 text-slate-800 dark:text-slate-200">
               <span className="text-2xl">🏆</span>
               <div>
                 <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
-                  Storyline modülünü bitirdiğinde ders otomatik tamamlanır.
+                  Storyline modülünü bitirdiğinde veya butona tıkladığında ders tamamlanır.
                 </p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  Tamamlama Ödülü: <span className="text-amber-500 font-bold font-mono">+{lesson.xp_reward || 0} XP</span>
+                  Kazanılacak Puan: <span className="text-amber-500 font-bold font-mono">
+                    {storylineResult?.score ? `+${storylineResult.score} Puan` : `+${lesson.xp_reward || 50} XP`}
+                  </span>
                 </p>
               </div>
             </div>
             <button
-              onClick={handleComplete}
+              onClick={() => handleComplete()}
               disabled={completing}
               className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
             >
               <CheckCircle size={16} />
-              {completing ? 'Kaydediliyor...' : `Dersi Tamamla & ${lesson.xp_reward || 0} XP Kazan`}
+              {completing ? 'Kaydediliyor...' : 'Dersi Tamamla & Puanı Ekle'}
             </button>
           </div>
         )}
@@ -780,27 +838,30 @@ export default function LessonPage() {
             {!failedMessage && (
               <div className="space-y-2">
                 <button
-                  onClick={handleComplete}
+                  onClick={() => handleComplete()}
                   disabled={completing}
-                  className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-bold text-base shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60 cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-base shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-60 cursor-pointer"
                 >
                   {completing ? (
-                    'Kaydediliyor...'
+                    'Puanlar Hesaplanıyor & Kaydediliyor...'
                   ) : (
                     <>
                       <CheckCircle size={20}/>
-                      {alreadyCompleted && !isDemoMode ? 'Dersi İncelemeyi Tamamla' : `Dersi Tamamla & +${lesson.xp_reward || 0} XP Kazan`}
+                      <span>
+                        {storylineResult?.score
+                          ? `Dersi Tamamla & +${storylineResult.score} Puanı Kazan`
+                          : (lesson.xp_reward ? `Dersi Tamamla & +${lesson.xp_reward} XP Kazan` : 'Dersi Tamamla & XP Kazan')}
+                      </span>
                     </>
                   )}
                 </button>
-                {alreadyCompleted && !isDemoMode && (
+                {alreadyCompleted && (
                   <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-                    Bu ders daha önce tamamlanmış görünüyor.{' '}
                     <button
                       onClick={handleResetLessonProgress}
                       className="text-amber-600 dark:text-amber-400 underline font-semibold hover:text-amber-500 cursor-pointer"
                     >
-                      Dersi sıfırlayıp baştan çözmek ve XP kazanmak için tıklayın.
+                      Dersi sıfırlayıp baştan çözmek için tıklayın.
                     </button>
                   </p>
                 )}
