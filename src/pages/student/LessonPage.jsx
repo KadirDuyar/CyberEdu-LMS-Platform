@@ -639,7 +639,11 @@ export default function LessonPage() {
               {activities.length > 0 && (
                 <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                   <Trophy size={12}/>
-                  <span>{activities.length} içerik / etkinlik</span>
+                  <span>
+                    {interactiveActivities.length > 0
+                      ? `${interactiveActivities.length} soru/etkinlik (${activities.length} içerik bloğu)`
+                      : `${activities.length} içerik bloğu`}
+                  </span>
                 </div>
               )}
               {lesson.content_type === 'storyline' && (
