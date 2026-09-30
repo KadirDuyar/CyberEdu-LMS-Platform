@@ -276,3 +276,23 @@ DAVRANIŞ VE YANIT KURALLARI:
 
   return await fetchGemini(message, systemInstruction, history);
 }
+
+/**
+ * Öğretmen için: Sınıf/Kohort verilerini yapay zeka ile analiz edip pedagojik rapor üretir
+ */
+export async function analyzeCohortProgressWithAI(studentsData, cohortTitle) {
+  const systemInstruction = \Sen uzman bir siber güvenlik eğitim danışmanı ve asistanısın.
+Görev: Bir öğretmene, sınıfındaki (kohort) öğrencilerin LMS üzerindeki ilerleme verilerini analiz ederek sınıfın genel durumu ve öğrencilerin performansı hakkında kısa, pedagojik tavsiyeler içeren bir özet rapor sunmak.
+Kişisel iletişim bilgileri gönderilmez. Sadece öğrenci adları ve puan/durum verileri gönderilir.
+Sadece Türkçe, okunabilir Markdown formatında yanıt ver. Asla tablo ( | ) kullanma.
+Maksimum 3-4 paragraf veya madde imi kullan. Uzatmadan sadede gel.\;
+
+  const prompt = \Sınıf Adı: Öğrenci İlerleme Verileri:
+
+Lütfen öğretmen için şu başlıklarda kısa bir analiz oluştur:
+1. Sınıfın Genel Durumu
+2. Dikkat Çeken Öğrenciler (Çok iyi gidenler veya desteğe ihtiyacı olanlar - isimlerini vererek)
+3. Öğretmen İçin Tavsiyeler (Bu verilere göre öğretmene kısa tavsiye)\;
+
+  return await fetchGemini(prompt, systemInstruction);
+}
