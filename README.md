@@ -17,6 +17,19 @@ Modern, oyunlaştırılmış ve yapay zeka destekli siber güvenlik uzaktan eği
 
 ---
 
+> ### 📌 Hızlı Proje Özeti (Executive Summary)
+> **CyberEdu LMS — Siber Güvenlik E-Öğrenme Platformu**  
+> `React 18` · `Supabase (PostgreSQL / RLS)` · `Google Gemini API` · `Articulate Storyline & SCORM` · `Tailwind CSS` · `Vercel`  
+> 🔗 **Canlı Demo:** [cyberedu-lms-platform.vercel.app](https://cyberedu-lms-platform.vercel.app)
+> 
+> * **Mimari & Rol Tabanlı Erişim:** Öğrenci, öğretmen ve admin rollerine sahip; veritabanı seviyesinde Row Level Security (RLS) politikalarıyla tam veri izolasyonu sağlanan full-stack bir LMS. Kurslar, öğrencilerin öğrenme hedeflerine göre **Farkındalık** ve **Teknik** parkurlara ayrılarak zorunlu veya seçmeli olarak dinamik şekilde kişiselleşir.
+> * **Articulate Storyline & E-Öğrenme Entegrasyonu:** Articulate Storyline ile geliştirilen interaktif SCORM/HTML5 paketleri, `postMessage` tabanlı çift yönlü bir köprüyle LMS'e entegre edildi. Modül içi test skorları ve tamamlama verileri anlık olarak veritabanına ve öğrenci XP havuzuna aktarılır; mükerrer tamamlama ile haksız XP kazanılmasını engelleyen durum denetimi (double-write prevention) ve izole testler için korumalı demo modu geliştirildi.
+> * **Gelişmiş Kurs & Kohort (Haftalık Program) Yönetimi:** Öğretmenlerin modüler kurslar ve 10'dan fazla interaktif etkinlik türüyle zenginleştirilmiş dersler oluşturabildiği; öğrencileri doğrudan davet edebildiği veya 6 haneli katılım kodu ile kayıt alabildiği; haftalık görevler, teslim kilitleri ve matris tabanlı ilerleme/puan takibi sunan kapsamlı bir sınıf yönetim altyapısı kuruldu.
+> * **Çok Katmanlı Yapay Zekâ (AI) Desteği:** Google Gemini API entegrasyonu ile öğrenciye doğrudan cevap vermeden düşünmeye sevk eden 3 kademeli Sokratik AI mentoru, öğretmen için otomatik ders ve soru taslağı üreten asistan ve öğrenci kişisel iletişim verilerini (KVKK/GDPR uyumlu şekilde) göndermeden sadece başarı metriklerini anonimleştirerek özetleyen pedagojik sınıf analiz aracı geliştirildi.
+> * **Oyunlaştırma & Sosyal Etkileşim:** Dinamik XP hesaplaması, seviye sistemi, öğrenme hedefleriyle açılabilir avatarlar/rozetler, dönemsel liderlik tabloları ve öğretmenlerin yanıtlayabildiği şeffaf ders geri bildirim (puanlama/yorum) mekanizması tasarlandı.
+
+---
+
 ## 📑 İçindekiler
 1. [Proje Hakkında](#-proje-hakkında)
 2. [Temel Teknolojiler](#-temel-teknolojiler)
