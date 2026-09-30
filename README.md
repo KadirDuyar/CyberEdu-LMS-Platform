@@ -294,7 +294,12 @@ Kayıtlı öğrencilerin eğitim çıktılarını gerçek zamanlı takip eden an
 ![Öğrenci İlerleme & Ders İstatistikleri](docs/screenshots/teacher-stats.png)
 
 ---
+#### 🤖 Yapay Zekâ Destekli Sınıf Analizi 
+Öğrenci ilerleme metriklerini ve kohort verilerini anonim olarak işleyerek eğitmenlere içgörüler ve aksiyon tavsiyeleri sunan yapay zekâ asistanı.
 
+![Yapay Zekâ Destekli Eğitmen Asistanı](docs/screenshots/Teacher-AI-PoweredClassAnalytics.png)
+
+---
 #### 👤 Eğitmen Profili ve Hesap Güvenliği (`/teacher/profile`)
 Eğitmenin platform üzerindeki kimlik ve yetki parametrelerini düzenlediği ekrandır. Profil avatar emojisi seçimi, ad-soyad güncellemesi ve parola yenileme işlemleri bu ekrandan yürütülür.
 
