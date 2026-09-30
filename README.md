@@ -88,8 +88,7 @@ Storyline paketinden gelen tamamlama ve puan sinyalleri `postMessage` dinleyicis
 - **Puan / Skor Yakalama:** `TotalScore`, `ScorePoints`, `cmi.core.score.raw` veya `cmi.score.raw` alanları okunur.
 - **Oransal XP Hesabı:** Storyline sınav puanı, dersin `xpReward` katsayısıyla oranlanarak hesaplanır (`(puan / maxPuan) * xpReward`).
 - **Veritabanı Kaydı:** Tamamlama sinyali alındığında Supabase üzerindeki `lesson_progress` tablosu güncellenir ve öğrenci profiline XP eklenir.
-- **Evrensel SCORM & Storyline İletişim Kodu (Generic Bridge):**
-- Aşağıdaki script; projeye özel değişken bağımlılıklarını ortadan kaldırarak hem standart Storyline sınav değişkenlerini (Results.ScorePoints), hem SCORM veri modelini (cmi.core), hem de özel puan değişkenlerini dinamik olarak tespit edecek şekilde genel kullanıma uygun olarak optimize edilmiştir.(özelleştirilebilir)
+- **Evrensel SCORM & Storyline İletişim Kodu (Generic Bridge):** Aşağıdaki script; projeye özel değişken bağımlılıklarını ortadan kaldırarak hem standart Storyline sınav değişkenlerini (Results.ScorePoints), hem SCORM veri modelini (cmi.core), hem de özel puan değişkenlerini dinamik olarak tespit edecek şekilde genel kullanıma uygun olarak optimize edilmiştir.(özelleştirilebilir)
 
 
 ```javascript
