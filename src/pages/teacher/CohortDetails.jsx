@@ -1522,7 +1522,7 @@ export default function CohortDetails() {
                 </div>
                 <div>
                   <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white">Yapay Zeka Sınıf Analizi</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Öğrenci isimleri ve başarı oranlarına göre hazırlanmıştır.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Öğrenci ilerleme metrikleri ve kohort tamamlama verileri anonimleştirilerek analiz edilmiştir.</p>
                 </div>
               </div>
               <button

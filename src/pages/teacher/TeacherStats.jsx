@@ -503,7 +503,7 @@ export default function TeacherStats() {
                 </div>
                 <div>
                   <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white">Genel YZ Sınıf Analizi</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Tüm öğrencilerin seviye ve tamamlama verilerine göre hazırlanmıştır.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Öğrenci ilerleme metrikleri ve tamamlama verileri anonimleştirilerek analiz edilmiştir.</p>
                 </div>
               </div>
               <button
