@@ -1,3 +1,4 @@
+import StudentProfileModal from '../../components/profile/StudentProfileModal';
 import SafeMarkdown from '../../components/ui/SafeMarkdown';
 import { analyzeCohortProgressWithAI } from '../../services/aiService';
 import { useState, useEffect } from 'react';
@@ -90,6 +91,7 @@ export default function CohortDetails() {
   // Öğrenci Ekle Modal State
   const [memberModalOpen, setMemberModalOpen] = useState(false);
   
+  const [selectedStudentModal, setSelectedStudentModal] = useState(null);
   const [aiAnalysisModalOpen, setAiAnalysisModalOpen] = useState(false);
   const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false);
   const [aiAnalysisResult, setAiAnalysisResult] = useState('');
@@ -590,6 +592,12 @@ export default function CohortDetails() {
         </div>
       )}
 
+      {selectedStudentModal && (
+        <StudentProfileModal
+          student={selectedStudentModal}
+          onClose={() => setSelectedStudentModal(null)}
+        />
+      )}
     </DashboardLayout>
     );
   }
@@ -1117,7 +1125,7 @@ export default function CohortDetails() {
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                     {filteredStudentsMatrix.map((st) => (
-                      <tr key={st.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                      <tr key={st.id} onClick={() => setSelectedStudentModal(st)} className="cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                         {/* Öğrenci Bilgisi */}
                         <td className="py-3 px-4 sticky left-0 bg-white dark:bg-slate-900/95 z-10 border-r border-slate-200 dark:border-white/5">
                           <div className="flex items-center gap-2.5">
@@ -1600,6 +1608,12 @@ export default function CohortDetails() {
         </div>
       )}
 
+      {selectedStudentModal && (
+        <StudentProfileModal
+          student={selectedStudentModal}
+          onClose={() => setSelectedStudentModal(null)}
+        />
+      )}
     </DashboardLayout>
   );
 }

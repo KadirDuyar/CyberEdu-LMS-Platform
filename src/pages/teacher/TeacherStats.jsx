@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
+import { analyzeCohortProgressWithAI } from '../../services/aiService';
+import StudentProfileModal from '../../components/profile/StudentProfileModal';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import Card from '../../components/Card';
+import SafeMarkdown from '../../components/ui/SafeMarkdown';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import {
   Users, BookOpen, Trophy, Clock, Search,
-  CheckCircle2, TrendingUp, Filter, Shield, Code2, ArrowUpDown
+  Sparkles, X, CheckCircle2, TrendingUp, Filter, Shield, Code2, ArrowUpDown
 } from 'lucide-react';
 
 export default function TeacherStats() {
@@ -17,7 +20,36 @@ export default function TeacherStats() {
   const [courses, setCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedArea, setSelectedArea] = useState('all'); // 'all' | 'awareness' | 'technical'
-  const [sortBy, setSortBy] = useState('recent'); // 'recent' | 'xp' | 'lessons'
+  const [sortBy, setSortBy] = useState('recent');
+
+  const [aiAnalysisModalOpen, setAiAnalysisModalOpen] = useState(false);
+  const [aiAnalysisLoading, setAiAnalysisLoading] = useState(false);
+  const [aiAnalysisResult, setAiAnalysisResult] = useState('');
+
+  const handleGenerateAIAnalysis = async () => {
+    if (!students || students.length === 0) return;
+    setAiAnalysisModalOpen(true);
+    if (aiAnalysisResult) return;
+
+    setAiAnalysisLoading(true);
+    try {
+      const safeData = students.map(s => ({
+        id: s.id,
+        name: s.full_name || 'Öğrenci',
+        xp: s.xp || 0,
+        completedLessons: s.completedLessonsCount || 0
+      }));
+      
+      const result = await analyzeCohortProgressWithAI(safeData, 'Genel Tüm Öğrenciler');
+      setAiAnalysisResult(result);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setAiAnalysisLoading(false);
+    }
+  };
+
+  const [selectedStudent, setSelectedStudent] = useState(null); // 'recent' | 'xp' | 'lessons'
 
   useEffect(() => {
     async function loadStats() {
@@ -179,7 +211,13 @@ export default function TeacherStats() {
     return (
       <DashboardLayout>
         <LoadingSpinner fullPage message="Öğrenci istatistikleri ve analizler yükleniyor..." />
-      </DashboardLayout>
+        {selectedStudent && (
+        <StudentProfileModal
+          student={selectedStudent}
+          onClose={() => setSelectedStudent(null)}
+        />
+      )}
+    </DashboardLayout>
     );
   }
 
@@ -451,6 +489,12 @@ export default function TeacherStats() {
         </div>
 
       </div>
+      {selectedStudent && (
+        <StudentProfileModal
+          student={selectedStudent}
+          onClose={() => setSelectedStudent(null)}
+        />
+      )}
     </DashboardLayout>
   );
 }

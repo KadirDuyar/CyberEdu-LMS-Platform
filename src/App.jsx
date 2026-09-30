@@ -161,7 +161,7 @@ export default function App() {
           <Route
             path="/student/profile/:studentId"
             element={
-              <ProtectedRoute allowedRoles={['student']}>
+              <ProtectedRoute allowedRoles={['student', 'teacher', 'admin']}>
                 <LeaderboardPage />
               </ProtectedRoute>
             }
