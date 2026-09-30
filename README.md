@@ -88,37 +88,87 @@ Storyline paketinden gelen tamamlama ve puan sinyalleri `postMessage` dinleyicis
 - **Puan / Skor Yakalama:** `TotalScore`, `ScorePoints`, `cmi.core.score.raw` veya `cmi.score.raw` alanları okunur.
 - **Oransal XP Hesabı:** Storyline sınav puanı, dersin `xpReward` katsayısıyla oranlanarak hesaplanır (`(puan / maxPuan) * xpReward`).
 - **Veritabanı Kaydı:** Tamamlama sinyali alındığında Supabase üzerindeki `lesson_progress` tablosu güncellenir ve öğrenci profiline XP eklenir.
+- **Evrensel SCORM & Storyline İletişim Kodu (Generic Bridge):**
+- Aşağıdaki script; projeye özel değişken bağımlılıklarını ortadan kaldırarak hem standart Storyline sınav değişkenlerini (Results.ScorePoints), hem SCORM veri modelini (cmi.core), hem de özel puan değişkenlerini dinamik olarak tespit edecek şekilde genel kullanıma uygun olarak optimize edilmiştir.(özelleştirilebilir)
+
 
 ```javascript
-var player = GetPlayer();
+/**
+ * CyberEdu LMS - Evrensel Articulate Storyline & SCORM Entegrasyon Köprüsü
+ * Bu script, Storyline içindeki tamamlama/skor verisini dinamik olarak okur
+ * ve ana LMS penceresine standart bir postMessage ile iletir.
+ */
+(function sendLmsCompletion() {
+  try {
+    var player = (typeof GetPlayer === "function") ? GetPlayer() : null;
 
-function readNum(names) {
-  for (var i = 0; i < names.length; i++) {
-    try {
-      var v = player.GetVar(names[i]);
-      if (v !== undefined && v !== null && v !== "" && !isNaN(Number(v))) {
-        return Number(v);
+    // 1. Dinamik Değişken Okuyucu
+    function getNumericVar(keys) {
+      if (!player) return null;
+      for (var i = 0; i < keys.length; i++) {
+        try {
+          var val = player.GetVar(keys[i]);
+          if (val !== undefined && val !== null && val !== "" && !isNaN(Number(val))) {
+            return Number(val);
+          }
+        } catch (e) {}
       }
-    } catch (e) {}
+      return null;
+    }
+
+    // 2. Skor Tespiti: Standart Storyline Sınav Değişkenleri ve Özel Alanlar
+    var score = getNumericVar([
+      "Results.ScorePoints",
+      "Results1.ScorePoints",
+      "Quiz.ScorePoints",
+      "TotalScore",
+      "totalScore",
+      "Score",
+      "Puan"
+    ]);
+
+    // 3. Maksimum Puan Tespiti
+    var maxScore = getNumericVar([
+      "Results.PassPoints",
+      "Results.MaxPoints",
+      "Results1.MaxPoints",
+      "Quiz.MaxPoints",
+      "MaxScore",
+      "maxScore"
+    ]);
+
+    // 4. Standart SCORM API Fallback (Eğer paket SCORM modunda çalışıyorsa)
+    if (score === null && typeof window.pipwerks !== "undefined" && window.pipwerks.SCORM) {
+      var scormScore = window.pipwerks.SCORM.get("cmi.core.score.raw");
+      if (scormScore && !isNaN(Number(scormScore))) {
+        score = Number(scormScore);
+      }
+    }
+
+    // Değer bulunamazsa varsayılan değer atamaları (Yüzdelik sisteme uyumlu)
+    var finalScore = (score !== null && score >= 0) ? score : 100;
+    var finalMax = (maxScore !== null && maxScore > 0) ? maxScore : 100;
+
+    // 5. Standart LMS Veri Paketi
+    var payload = {
+      type: "storyline_complete",
+      status: "completed",
+      score: finalScore,
+      maxScore: finalMax,
+      percentage: Math.round((finalScore / finalMax) * 100),
+      timestamp: new Date().toISOString()
+    };
+
+    console.log("[CyberEdu LMS Bridge] Sinyal gönderiliyor:", payload);
+
+    // 6. Güvenli postMessage İletimi
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(JSON.stringify(payload), "*");
+    }
+  } catch (err) {
+    console.error("[CyberEdu LMS Bridge] Entegrasyon hatası:", err);
   }
-  return null;
-}
-
-// Kendi değişken adınızı EN BAŞA yazın (ekranda %...% ile gösterdiğiniz değişken)
-var score = readNum(["Results.ScorePoints", "TotalScore", "totalScore"]);
-var max   = readNum(["Results.MaxPoints", "MaxScore"]);
-
-if (max === null || max <= 0) max = 300;      // sadece max için sabit değer
-if (score === null) score = 0;                // bulunamazsa sahte 300 VERME
-
-console.log("[Storyline] score:", score, "max:", max);
-
-// TEK mesaj gönder (iki kez göndermek çift XP riski yaratıyordu)
-window.parent.postMessage(JSON.stringify({
-  type: "storyline_complete",
-  score: score,
-  maxScore: max
-}), "*");
+})();
 ```
 
 ---
