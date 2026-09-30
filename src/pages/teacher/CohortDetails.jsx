@@ -1,5 +1,5 @@
 import StudentProfileModal from '../../components/profile/StudentProfileModal';
-import SafeMarkdown from '../../components/ui/SafeMarkdown';
+import FormattedAiMessage from '../../components/ui/FormattedAiMessage';
 import { analyzeCohortProgressWithAI } from '../../services/aiService';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -577,7 +577,7 @@ export default function CohortDetails() {
                   <p className="text-sm font-medium text-slate-500 dark:text-slate-400 animate-pulse">Yapay zeka verileri inceliyor ve pedagojik raporu hazırlıyor...</p>
                 </div>
               ) : (
-                <SafeMarkdown content={aiAnalysisResult} />
+                <FormattedAiMessage text={aiAnalysisResult} />
               )}
             </div>
             <div className="p-4 border-t border-slate-100 dark:border-white/5 flex justify-end">
@@ -1593,7 +1593,7 @@ export default function CohortDetails() {
                   <p className="text-sm font-medium text-slate-500 dark:text-slate-400 animate-pulse">Yapay zeka verileri inceliyor ve pedagojik raporu hazırlıyor...</p>
                 </div>
               ) : (
-                <SafeMarkdown content={aiAnalysisResult} />
+                <FormattedAiMessage text={aiAnalysisResult} />
               )}
             </div>
             <div className="p-4 border-t border-slate-100 dark:border-white/5 flex justify-end">

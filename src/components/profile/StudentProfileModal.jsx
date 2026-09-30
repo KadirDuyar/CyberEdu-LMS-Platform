@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { X, Trophy, BookOpen, Star, Sparkles, Shield, Code2 } from 'lucide-react';
 import { analyzeCohortProgressWithAI } from '../../services/aiService';
 import LoadingSpinner from '../ui/LoadingSpinner';
-import SafeMarkdown from '../ui/SafeMarkdown';
+import FormattedAiMessage from '../ui/FormattedAiMessage';
 
 export default function StudentProfileModal({ student, onClose }) {
   const [details, setDetails] = useState(null);
@@ -118,7 +118,7 @@ export default function StudentProfileModal({ student, onClose }) {
               </div>
             ) : (
               <div className="prose prose-sm dark:prose-invert prose-violet max-w-none">
-                <SafeMarkdown content={aiResult} />
+                <FormattedAiMessage text={aiResult} />
               </div>
             )}
           </div>

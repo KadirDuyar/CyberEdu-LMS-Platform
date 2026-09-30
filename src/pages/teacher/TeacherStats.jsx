@@ -5,7 +5,7 @@ import DashboardLayout from '../../layouts/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
 import Card from '../../components/Card';
-import SafeMarkdown from '../../components/ui/SafeMarkdown';
+import FormattedAiMessage from '../../components/ui/FormattedAiMessage';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import {
   Users, BookOpen, Trophy, Clock, Search,
