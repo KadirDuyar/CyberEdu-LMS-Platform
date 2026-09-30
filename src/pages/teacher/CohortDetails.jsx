@@ -25,6 +25,7 @@ import {
   notifyIncompleteStudents,
 } from '../../services/cohortService';
 import {
+  Sparkles,
   ArrowLeft,
   Calendar,
   Users,
@@ -546,59 +547,7 @@ export default function CohortDetails() {
     return (
       <DashboardLayout>
         <LoadingSpinner fullPage />
-      
-      {aiAnalysisModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg">
-                  <Sparkles className="text-white" size={20} />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-lg text-slate-900 dark:text-white">Yapay Zeka Sınıf Analizi</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Öğrenci isimleri ve başarı oranlarına göre hazırlanmıştır.</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setAiAnalysisModalOpen(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="p-6 overflow-y-auto custom-scrollbar flex-1 prose prose-sm dark:prose-invert prose-violet max-w-none">
-              {aiAnalysisLoading ? (
-                <div className="flex flex-col items-center justify-center py-12 gap-4">
-                  <div className="relative">
-                    <div className="w-12 h-12 rounded-full border-4 border-violet-500/20 animate-ping"></div>
-                    <div className="absolute inset-0 border-4 border-t-violet-500 rounded-full animate-spin"></div>
-                  </div>
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400 animate-pulse">Yapay zeka verileri inceliyor ve pedagojik raporu hazırlıyor...</p>
-                </div>
-              ) : (
-                <FormattedAiMessage text={aiAnalysisResult} />
-              )}
-            </div>
-            <div className="p-4 border-t border-slate-100 dark:border-white/5 flex justify-end">
-              <button
-                onClick={() => setAiAnalysisModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-sm font-bold bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
-              >
-                Kapat
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {selectedStudentModal && (
-        <StudentProfileModal
-          student={selectedStudentModal}
-          onClose={() => setSelectedStudentModal(null)}
-        />
-      )}
-    </DashboardLayout>
+      </DashboardLayout>
     );
   }
 
