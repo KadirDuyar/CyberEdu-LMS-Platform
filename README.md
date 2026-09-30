@@ -90,15 +90,35 @@ Storyline paketinden gelen tamamlama ve puan sinyalleri `postMessage` dinleyicis
 - **Veritabanı Kaydı:** Tamamlama sinyali alındığında Supabase üzerindeki `lesson_progress` tablosu güncellenir ve öğrenci profiline XP eklenir.
 
 ```javascript
-// Storyline'da son slayt veya tamamlama trigger'ına eklenecek JS kodu:
-window.parent.postMessage(
-  JSON.stringify({ 
-    type: 'storyline_complete', 
-    score: 100,      // veya %Results.ScorePoints% değişkeni
-    maxScore: 100    // veya %Results.PassPoints%
-  }),
-  '*'
-);
+var player = GetPlayer();
+
+function readNum(names) {
+  for (var i = 0; i < names.length; i++) {
+    try {
+      var v = player.GetVar(names[i]);
+      if (v !== undefined && v !== null && v !== "" && !isNaN(Number(v))) {
+        return Number(v);
+      }
+    } catch (e) {}
+  }
+  return null;
+}
+
+// Kendi değişken adınızı EN BAŞA yazın (ekranda %...% ile gösterdiğiniz değişken)
+var score = readNum(["Results.ScorePoints", "TotalScore", "totalScore"]);
+var max   = readNum(["Results.MaxPoints", "MaxScore"]);
+
+if (max === null || max <= 0) max = 300;      // sadece max için sabit değer
+if (score === null) score = 0;                // bulunamazsa sahte 300 VERME
+
+console.log("[Storyline] score:", score, "max:", max);
+
+// TEK mesaj gönder (iki kez göndermek çift XP riski yaratıyordu)
+window.parent.postMessage(JSON.stringify({
+  type: "storyline_complete",
+  score: score,
+  maxScore: max
+}), "*");
 ```
 
 ---
